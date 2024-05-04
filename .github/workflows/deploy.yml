@@ -3,7 +3,7 @@ name: Deploy to Amazon EC2
 on:
   push:
     branches:
-      - develop-mysql
+      - main
 
 env:
   AWS_REGION: ap-northeast-2
@@ -27,31 +27,31 @@ jobs:
 
     #  설정파일
     - name: add api key file
-      run: echo "${{ secrets.DEV_API_KEY }}" > ./src/main/resources/application-API-KEY.properties
+      run: echo "${{ secrets.API_KEY }}" > ./src/main/resources/application-API-KEY.properties
       shell: bash
 
     - name: add jwt file
-      run: echo "${{ secrets.DEV_JWT }}" > ./src/main/resources/application-JWT.properties
+      run: echo "${{ secrets.JWT }}" > ./src/main/resources/application-JWT.properties
       shell: bash
 
     - name: add oauth file
-      run: echo "${{ secrets.DEV_OAUTH }}" > ./src/main/resources/application-OAUTH.properties
+      run: echo "${{ secrets.OAUTH }}" > ./src/main/resources/application-OAUTH.properties
       shell: bash
 
     - name: add test setting file
-      run: echo "${{ secrets.DEV_TEST }}" > ./src/test/resources/application-TEST.properties
+      run: echo "${{ secrets.TEST }}" > ./src/test/resources/application-TEST.properties
       shell: bash
 
     - name: add authkey file
-      run: echo "${{ secrets.DEV_AUTHKEY }}" > ./src/main/resources/static/AuthKey_D5ZQTHUQ4K.p8
+      run: echo "${{ secrets.AUTHKEY }}" > ./src/main/resources/static/AuthKey_D5ZQTHUQ4K.p8
       shell: bash
 
     - name: add elasticsearch file
-      run: echo "${{ secrets.DEV_ES }}" > ./src/main/resources/application-ES.properties
+      run: echo "${{ secrets.ES }}" > ./src/main/resources/application-ES.properties
       shell: bash
 
     - name: add lambda key file
-      run: echo "${{ secrets.DEV_LAMBDA }}" > ./src/main/resources/application-LAMBDA.properties
+      run: echo "${{ secrets.LAMBDA }}" > ./src/main/resources/application-LAMBDA.properties
       shell: bash
 
     - name: gradlew에 실행 권한 부여
