@@ -19,17 +19,19 @@ POCHAK은 사용자들이 서로의 순간에 참여하고 상호 작용할 수 
 ### 🌟 프로필의 다양성
 당신의 POCHAK 프로필은 다른 사람들이 기록한 당신의 순간들을 보여줍니다. 여러 시각으로부터의 사진들이 모여 하나의 아름다운 이야기를 만들어냅니다.
 
-## Server Team
-> WWL, Troubleshooting, Team Rules 등은 [GitHub Wiki](https://github.com/APPS-sookmyung/2023-POCHAK-server/wiki)에서 확인할 수 있습니다.
-<table align = "center">
-  <tr align = "center">
-    <td><a href="https://github.com/Haileyyyyyyyy"><img src="https://avatars.githubusercontent.com/u/90396746?v=4" width=200></a></td>
-    <td><a href="https://github.com/5jisoo"><img src="https://avatars.githubusercontent.com/u/96935231?v=4" width=200></a></td>
-    <td><a href="https://github.com/hagoeun0119"><img src="https://avatars.githubusercontent.com/u/93965468?v=4" width=200></a></td>
+## Contributors
+
+<table>
+  <tr>
+    <td align="center" valign="top" width="14.28%"><a href="https://github.com/Haileyyyyyyyy"><img src="https://avatars.githubusercontent.com/u/90396746?v=4" ></a></td>
+    <td align="center" valign="top" width="14.28%"><a href="https://github.com/5jisoo"><img src="https://avatars.githubusercontent.com/u/96935231?v=4" ></a></td>
+    <td align="center" valign="top" width="14.28%"><a href="https://github.com/hagoeun0119"><img src="https://avatars.githubusercontent.com/u/93965468?v=4" ></a></td>
+    <td align="center" valign="top" width="14.28%"><a href="https://github.com/dudrhy12"><img src="https://avatars.githubusercontent.com/u/90203803?v=4" ></a></td>
   </tr>
-  <tr align = "center">
-    <td><a href = "https://github.com/Haileyyyyyyyy">김다연 Hailey Kim</a><br>PM, Backend Developer</td>
-    <td><a href = "https://github.com/5jisoo">오지수 Lucy Oh</a><br>Backend Developer</td>
-    <td><a href = "https://github.com/hagoeun0119">하고은 Goeun Ha</a><br>Backend Developer</td>
+  <tr>
+    <td align="center" valign="top" width="14.28%"><a href = "https://github.com/Haileyyyyyyyy">김다연 Hailey Kim</a><br>PM, Backend Developer</td>
+    <td align="center" valign="top" width="14.28%"><a href = "https://github.com/5jisoo">오지수 Lucy Oh</a><br>Backend Developer</td>
+    <td align="center" valign="top" width="14.28%"><a href = "https://github.com/hagoeun0119">하고은 Goeun Ha</a><br>Backend Developer</td>
+    <td align="center" valign="top" width="14.28%"><a href = "https://github.com/dudrhy12">조영서 Bella Cho</a><br>Backend Developer</td>
   </tr>
 </table>
