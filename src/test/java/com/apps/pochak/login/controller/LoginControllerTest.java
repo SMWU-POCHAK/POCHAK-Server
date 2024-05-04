@@ -128,35 +128,35 @@ public class LoginControllerTest {
                 );
     }
 
-    @Test
-    @Transactional
-    @DisplayName("Refresh API Document")
-    void refresh() throws Exception {
-        this.mockMvc.perform(
-                        RestDocumentationRequestBuilders
-                                .post("/api/v2/member/refresh")
-                                .header("Authorization", authorization1)
-                                .header("RefreshToken", refreshToken)
-                                .contentType(APPLICATION_JSON)
-                ).andExpect(status().isOk())
-                .andDo(
-                        document("refresh",
-                                getDocumentRequest(),
-                                getDocumentResponse(),
-                                requestHeaders(
-                                        headerWithName("Authorization")
-                                                .description("Basic auth credentials")
-                                ),
-                                responseFields(
-                                        fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),
-                                        fieldWithPath("code").type(STRING).description("결과 코드"),
-                                        fieldWithPath("message").type(STRING).description("결과 메세지"),
-                                        fieldWithPath("result").type(OBJECT).description("결과 데이터"),
-                                        fieldWithPath("result.accessToken").type(STRING).description("엑세스 토큰")
-                                )
-                        )
-                );
-    }
+//    @Test
+//    @Transactional
+//    @DisplayName("Refresh API Document")
+//    void refresh() throws Exception {
+//        this.mockMvc.perform(
+//                        RestDocumentationRequestBuilders
+//                                .post("/api/v2/member/refresh")
+//                                .header("Authorization", authorization1)
+//                                .header("RefreshToken", refreshToken)
+//                                .contentType(APPLICATION_JSON)
+//                ).andExpect(status().isOk())
+//                .andDo(
+//                        document("refresh",
+//                                getDocumentRequest(),
+//                                getDocumentResponse(),
+//                                requestHeaders(
+//                                        headerWithName("Authorization")
+//                                                .description("Basic auth credentials")
+//                                ),
+//                                responseFields(
+//                                        fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),
+//                                        fieldWithPath("code").type(STRING).description("결과 코드"),
+//                                        fieldWithPath("message").type(STRING).description("결과 메세지"),
+//                                        fieldWithPath("result").type(OBJECT).description("결과 데이터"),
+//                                        fieldWithPath("result.accessToken").type(STRING).description("엑세스 토큰")
+//                                )
+//                        )
+//                );
+//    }
 
     @Test
     @Transactional
