@@ -39,9 +39,6 @@ public class LikeService {
         final Member loginMember = jwtService.getLoginMember();
         final Post post = postRepository.findPostById(postId);
 
-        if (post.isOwner(loginMember))
-            throw new GeneralException(POST_OWNER_LIKE);
-
         final Optional<LikeEntity> optionalLike = likeRepository.findByLikeMemberAndLikedPost(loginMember, post);
         if (optionalLike.isPresent()) {
             final LikeEntity postLike = optionalLike.get();
