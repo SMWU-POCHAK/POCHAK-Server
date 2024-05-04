@@ -21,7 +21,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
     private final PostRepository postRepository;
-
     private final JwtService jwtService;
 
     public ProfileResponse getProfileDetail(final String handle,

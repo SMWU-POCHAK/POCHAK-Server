@@ -22,7 +22,6 @@ import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCE
 @RestController
 @RequiredArgsConstructor
 public class OAuthController {
-
     private final JwtService jwtService;
     private final OAuthService oAuthService;
     private final AppleOAuthService appleOAuthService;

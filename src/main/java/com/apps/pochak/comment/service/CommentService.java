@@ -30,8 +30,6 @@ import static com.apps.pochak.global.converter.PageableToPageRequestConverter.to
 @Service
 @RequiredArgsConstructor
 public class CommentService {
-    public static final int DEFAULT_PAGING_SIZE = 30;
-
     private final CommentRepository commentRepository;
     private final TagRepository tagRepository;
     private final PostRepository postRepository;

@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
+import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/alarms")
@@ -16,7 +18,7 @@ public class AlarmController {
 
     @GetMapping("")
     public ApiResponse<AlarmElements> getAllAlarms(
-            @PageableDefault(30) final Pageable pageable
+            @PageableDefault(DEFAULT_PAGING_SIZE) final Pageable pageable
     ) {
         return ApiResponse.onSuccess(alarmService.getAllAlarms(pageable));
     }

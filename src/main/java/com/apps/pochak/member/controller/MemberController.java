@@ -16,11 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/v2/members")
 public class MemberController {
     private final MemberService memberService;
+    public static final int PROFILE_PAGING_SIZE = 12;
 
     @GetMapping("/{handle}")
     public ApiResponse<?> getProfileDetail(
             @PathVariable("handle") final String handle,
-            @PageableDefault(12) final Pageable pageable
+            @PageableDefault(PROFILE_PAGING_SIZE) final Pageable pageable
     ) {
         if (pageable.getPageNumber() == 0)
             return ApiResponse.onSuccess(memberService.getProfileDetail(handle, pageable));
@@ -31,7 +32,7 @@ public class MemberController {
     @GetMapping("/{handle}/upload")
     public ApiResponse<PostElements> getUploadPosts(
             @PathVariable("handle") final String handle,
-            @PageableDefault(12) final Pageable pageable
+            @PageableDefault(PROFILE_PAGING_SIZE) final Pageable pageable
     ) {
         return ApiResponse.onSuccess(memberService.getUploadPosts(handle, pageable));
     }

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
+import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_DELETE_POST;
 import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_UPLOAD_POST;
 
@@ -21,7 +22,7 @@ public class PostController {
 
     @GetMapping("")
     public ApiResponse<PostElements> getHomeTab(
-            @PageableDefault(30) final Pageable pageable
+            @PageableDefault(DEFAULT_PAGING_SIZE) final Pageable pageable
     ) {
         return ApiResponse.onSuccess(postService.getHomeTab(pageable));
     }
@@ -51,7 +52,7 @@ public class PostController {
 
     @GetMapping("/search")
     public ApiResponse<PostElements> getSearchTab(
-            @PageableDefault(30) final Pageable pageable
+            @PageableDefault(DEFAULT_PAGING_SIZE) final Pageable pageable
     ) {
         return ApiResponse.onSuccess(postService.getSearchTab(pageable));
     }
