@@ -46,7 +46,11 @@ public class Post extends BaseEntity {
     private String caption;
 
     @Builder
-    public Post(Member owner, String postImage, String caption) {
+    public Post(
+            final Member owner,
+            final String postImage,
+            final String caption
+    ) {
         this.owner = owner;
         this.postImage = postImage;
         this.caption = caption;
@@ -56,7 +60,7 @@ public class Post extends BaseEntity {
         return getPostStatus().equals(PRIVATE);
     }
 
-    public Boolean isOwner(Member member) {
+    public Boolean isOwner(final Member member) {
         return this.owner.getId().equals(member.getId());
     }
 

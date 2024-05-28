@@ -6,8 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 @Getter
 @AllArgsConstructor
@@ -19,15 +18,15 @@ public enum SuccessStatus implements BaseCode {
     SUCCESS_CHECK_ALARM(NO_CONTENT, "ALARM2001", "성공적으로 알람을 확인하였습니다."),
 
     // Comment
-    SUCCESS_UPLOAD_COMMENT(NO_CONTENT, "COMMENT2001", "성공적으로 댓글을 등록하였습니다."),
+    SUCCESS_UPLOAD_COMMENT(CREATED, "COMMENT2001", "성공적으로 댓글을 등록하였습니다."),
 
     // Follow
-    SUCCESS_FOLLOW(NO_CONTENT, "FOLLOW2001", "성공적으로 팔로우하였습니다."),
+    SUCCESS_FOLLOW(CREATED, "FOLLOW2001", "성공적으로 팔로우하였습니다."),
     SUCCESS_UNFOLLOW(NO_CONTENT, "FOLLOW2002", "성공적으로 팔로우를 취소하였습니다."),
     SUCCESS_DELETE_FOLLOWER(NO_CONTENT, "FOLLOW2003", "성공적으로 팔로워를 삭제하였습니다."),
 
     // Like
-    SUCCESS_LIKE(NO_CONTENT, "LIKE2001", "성공적으로 좋아요를 처리하였습니다."),
+    SUCCESS_LIKE(CREATED, "LIKE2001", "성공적으로 좋아요를 처리하였습니다."),
 
     // Login
     SUCCESS_LOG_OUT(NO_CONTENT, "LOGIN2001", "성공적으로 로그아웃하였습니다"),
@@ -36,11 +35,14 @@ public enum SuccessStatus implements BaseCode {
     // Member
 
     // Post
-    SUCCESS_UPLOAD_POST(NO_CONTENT, "POST2001", "성공적으로 게시물을 등록하였습니다."),
+    SUCCESS_UPLOAD_POST(CREATED, "POST2001", "성공적으로 게시물을 등록하였습니다."),
     SUCCESS_DELETE_POST(NO_CONTENT, "POST2002", "성공적으로 게시물을 삭제하였습니다."),
 
+    // Report
+    SUCCESS_UPLOAD_REPORT(CREATED, "REPORT2001", "성공적으로 해당 게시물을 신고하였습니다."),
+
     // Tag
-    SUCCESS_ACCEPT(NO_CONTENT, "TAG2001", "성공적으로 게시물 업로드 요청을 수락하였습니다."),
+    SUCCESS_ACCEPT(CREATED, "TAG2001", "성공적으로 게시물 업로드 요청을 수락하였습니다."),
     SUCCESS_POST_ACCEPT(NO_CONTENT, "TAG2002", "성공적으로 게시물 업로드 요청을 수락하였습니다. 모든 요청이 수락되어 게시물이 업로드됩니다."),
     SUCCESS_REJECT(NO_CONTENT, "TAG2003", "성공적으로 게시물 업로드 요청을 거절하였습니다."),
     ;

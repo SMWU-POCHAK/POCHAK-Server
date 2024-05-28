@@ -45,3 +45,6 @@ pochak server team~~
 === Login
 
 * link:login.html[Login API]
+
+=== Report
+* link:report.html[Report API]

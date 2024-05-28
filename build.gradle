@@ -70,13 +70,16 @@ asciidoctor {
 
 asciidoctor.doFirst {
 	delete file('src/main/resources/static/docs')
+	project.file('src/main/resources/static/docs').mkdirs()
 }
 
-bootJar {
-	dependsOn asciidoctor
-	println "output Dir checking -- ${asciidoctor.outputDir}"
+asciidoctor.doLast {
 	copy {
 		from("${asciidoctor.outputDir}")
 		into 'src/main/resources/static/docs'
 	}
+}
+
+bootJar {
+	dependsOn asciidoctor
 }

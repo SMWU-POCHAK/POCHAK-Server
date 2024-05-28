@@ -13,6 +13,9 @@ caches
 daemon
 native
 
+# ignore html files
+src/main/resources/static/docs/
+
 # ignore key file
 AuthKey_D5ZQTHUQ4K.p8
 
