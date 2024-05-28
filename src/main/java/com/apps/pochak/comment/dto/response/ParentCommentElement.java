@@ -1,8 +1,8 @@
 package com.apps.pochak.comment.dto.response;
 
 import com.apps.pochak.comment.domain.Comment;
+import com.apps.pochak.global.Constant;
 import com.apps.pochak.global.PageInfo;
-import com.apps.pochak.global.converter.ListToPageConverter;
 import com.apps.pochak.member.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,8 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.apps.pochak.comment.service.CommentService.DEFAULT_PAGING_SIZE;
-import static com.apps.pochak.global.converter.ListToPageConverter.*;
+import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
 
 @Data
 @NoArgsConstructor
@@ -34,7 +33,7 @@ public class ParentCommentElement {
     ) {
         this(
                 parentComment,
-                PageRequest.of(0, DEFAULT_PAGING_SIZE)
+                PageRequest.of(0, Constant.DEFAULT_PAGING_SIZE)
         );
     }
 

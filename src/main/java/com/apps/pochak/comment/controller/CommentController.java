@@ -11,14 +11,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
-import static com.apps.pochak.comment.service.CommentService.DEFAULT_PAGING_SIZE;
+import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_UPLOAD_COMMENT;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v2/posts/{postId}/comments")
 public class CommentController {
-
     private final CommentService commentService;
 
     @GetMapping("")

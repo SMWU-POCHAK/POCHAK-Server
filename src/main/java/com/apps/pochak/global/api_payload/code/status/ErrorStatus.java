@@ -33,7 +33,6 @@ public enum ErrorStatus implements BaseErrorCode {
     FOLLOW_ONESELF(BAD_REQUEST, "FOLLOW4002", "자기 자신을 팔로우할 수 없습니다."),
 
     // Like
-    POST_OWNER_LIKE(BAD_REQUEST, "LIKE4001", "포스트의 owner는 좋아요를 누를 수 없습니다."),
 
     // Login
     INVALID_TOKEN(BAD_REQUEST, "LOGIN4001", "잘못된 엑세스 토큰입니다."),

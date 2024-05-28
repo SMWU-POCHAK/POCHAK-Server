@@ -16,7 +16,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PostScheduler {
-
     @Value("${lambda.savepost}")
     private String lambdaBaseUrl;
 

@@ -7,4 +7,6 @@ public class Constant {
     public static final String AUTHORITIES_KEY = "role";
     public static final String HEADER_IDENTITY_TOKEN = "IdentityToken";
     public static final String HEADER_APPLE_AUTHORIZATION_CODE = "AuthorizationCode";
+
+    public static final int DEFAULT_PAGING_SIZE = 30;
 }

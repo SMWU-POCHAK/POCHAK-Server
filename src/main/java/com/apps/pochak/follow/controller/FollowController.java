@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
+import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v2/members")
@@ -17,7 +19,7 @@ public class FollowController {
     @GetMapping("/{handle}/following")
     public ApiResponse<MemberElements> getFollowings(
             @PathVariable("handle") final String handle,
-            @PageableDefault(30) final Pageable pageable
+            @PageableDefault(DEFAULT_PAGING_SIZE) final Pageable pageable
     ) {
         return ApiResponse.onSuccess(followService.getFollowings(handle, pageable));
     }
@@ -25,7 +27,7 @@ public class FollowController {
     @GetMapping("/{handle}/follower")
     public ApiResponse<MemberElements> getFollowers(
             @PathVariable("handle") final String handle,
-            @PageableDefault(30) final Pageable pageable
+            @PageableDefault(DEFAULT_PAGING_SIZE) final Pageable pageable
     ) {
         return ApiResponse.onSuccess(followService.getFollowers(handle, pageable));
     }
