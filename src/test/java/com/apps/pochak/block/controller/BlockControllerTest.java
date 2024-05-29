@@ -1,7 +1,5 @@
-package com.apps.pochak.report.controller;
+package com.apps.pochak.block.controller;
 
-import com.apps.pochak.report.domain.ReportType;
-import com.apps.pochak.report.dto.request.ReportUploadRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,14 +29,15 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
-class ReportControllerTest {
-
+class BlockControllerTest {
     @Value("${test.authorization.dayeon}")
     String authorization;
 
@@ -60,31 +59,24 @@ class ReportControllerTest {
 
     @Test
     @Transactional
-    @DisplayName("Report Upload API Document")
-    void uploadReportTest() throws Exception {
-
-        final ReportUploadRequest uploadRequest = new ReportUploadRequest(174L, ReportType.NOT_INTERESTED);
+    @DisplayName("Block Member API Document")
+    void blockMemberTest() throws Exception {
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .post("/api/v1/reports")
+                                .post("/api/v2/members/{handle}/block", "goeun")
                                 .header("Authorization", authorization)
-                                .content(objectMapper.writeValueAsString(uploadRequest))
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
-                        document("upload-report",
+                        document("block-member",
                                 getDocumentRequest(),
                                 getDocumentResponse(),
                                 requestHeaders(
-                                        headerWithName("Authorization")
-                                                .description(
-                                                        "Basic auth credentials"
-                                                )
+                                        headerWithName("Authorization").description("Basic auth credentials")
                                 ),
-                                requestFields(
-                                        fieldWithPath("postId").type(NUMBER).description("신고된 게시물 아이디"),
-                                        fieldWithPath("reportType").type(STRING).description("신고 유형")
+                                pathParameters(
+                                        parameterWithName("handle").description("차단할 사용자의 아이디(handle) : 만약 로그인 정보와 일치할 경우 BAD_REQUEST 에러가 발생합니다.")
                                 ),
                                 responseFields(
                                         fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),

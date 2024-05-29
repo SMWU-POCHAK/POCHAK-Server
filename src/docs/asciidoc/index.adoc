@@ -48,3 +48,6 @@ pochak server team~~
 
 === Report
 * link:report.html[Report API]
+
+=== Block
+* link:block.html[Block API]
