@@ -17,7 +17,9 @@ public interface CustomMemberRepository extends JpaRepository<Member, Long> {
                 "(case when m.id <> :loginMemberId then (fo.id is not null) else nullif(m.id, :loginMemberId) end) " +
             ") " +
             "from Follow f " +
-            "join Member m on f.sender = m and f.receiver = :member " +
+            "join Member m on (f.sender = m and f.receiver = :member " +
+            "                       and m not in (select b.blockedMember from Block b where b.blocker.id = :loginMemberId) " +
+            "                       and :loginMemberId not in (select b.blockedMember.id from Block b where b.blocker = m)) " +
             "left join Follow fo on (fo.receiver = f.sender and fo.sender.id = :loginMemberId and fo.status = 'ACTIVE') " +
             "where f.status = 'ACTIVE' " +
             "order by f.lastModifiedDate desc ")
@@ -35,7 +37,9 @@ public interface CustomMemberRepository extends JpaRepository<Member, Long> {
                 "(case when m.id <> :loginMemberId then (fo.id is not null) else nullif(m.id, :loginMemberId) end) " +
             ") " +
             "from Follow f " +
-            "join Member m on f.receiver = m and f.sender = :member " +
+            "join Member m on (f.receiver = m and f.sender = :member " +
+            "                       and m not in (select b.blockedMember from Block b where b.blocker.id = :loginMemberId) " +
+            "                       and :loginMemberId not in (select b.blockedMember.id from Block b where b.blocker = m)) " +
             "left join Follow fo on (fo.receiver = f.receiver and fo.sender.id = :loginMemberId and fo.status = 'ACTIVE') " +
             "where f.status = 'ACTIVE' " +
             "order by f.lastModifiedDate desc ")

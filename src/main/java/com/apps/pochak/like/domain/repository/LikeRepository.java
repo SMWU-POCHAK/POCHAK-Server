@@ -42,10 +42,10 @@ public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
             "   (case when m.id <> :loginMemberId then (f.sender is not null) else nullif(m.id, :loginMemberId) end) " +
             ") " +
             "from LikeEntity l " +
-            "left join Member m on (l.likeMember = m and m.status = 'ACTIVE'" +
-            "                       and m.id not in (select b.blockedMember from Block b where b.blocker.id = :loginMemberId) " +
-            "                       and :loginMemberId not in (select b.blockedMember.id from Block b where b.blocker = m )) " +
-            "left join Follow f on (f.sender.id = :loginMemberId and f.receiver = l.likeMember) and f.status <> 'DELETED' " +
+            "join Member m on (l.likedPost = :post and l.likeMember = m and m.status = 'ACTIVE'" +
+            "                       and m not in (select b.blockedMember from Block b where b.blocker.id = :loginMemberId) " +
+            "                       and :loginMemberId not in (select b.blockedMember.id from Block b where b.blocker = m)) " +
+            "left join Follow f on (f.sender.id = :loginMemberId and f.receiver = l.likeMember) and f.status = 'ACTIVE' " +
             "where l.status = 'ACTIVE' and l.likedPost = :post " +
             "order by f.lastModifiedDate desc ")
     List<LikeElement> findLikesAndIsFollow(
