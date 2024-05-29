@@ -24,7 +24,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "join fetch p.owner " +
             "where p.id = :postId and p.status = 'ACTIVE' " +
             "   and p.owner not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
-            "   and (select t.member from Tag t where t.post = p) not in (select b.blockedMember from Block b where b.blocker = :loginMember) ")
+            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker = p.owner) " +
+            "   and (select t.member from Tag t where t.post = p) not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
+            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker in (select t.member from Tag t where t.post = p)) "
+    )
     Optional<Post> findById(
             @Param("postId") final Long postId,
             @Param("loginMember") final Member loginMember
@@ -97,7 +100,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "select * from post as p " +
             "where p.id in :postIdList and p.status = 'ACTIVE' " +
             "   and p.owner_id not in (select b.blocked_id from block b where b.blocker_id = :loginMemberId) " +
+            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker = p.owner) " +
             "   and (select t.member_id from Tag t where t.post_id = p.id) not in (select b.blocked_id from block b where b.blocker_id = :loginMemberId) " +
+            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker in (select t.member from Tag t where t.post = p)) " +
             "order by find_in_set(id, :postIdStrList) ",
             nativeQuery = true)
     Page<Post> findPostsIn(
