@@ -54,20 +54,29 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("select p from Post p " +
             "join Tag t on ( t.post = p and t.member = :member and p.postStatus = 'PUBLIC' ) " +
             "where p.status = 'ACTIVE'" +
+            "   and p.owner not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
+            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker = p.owner) " +
+            "   and (select t.member from Tag t where t.post = p) not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
+            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker in (select t.member from Tag t where t.post = p)) " +
             "order by t.lastModifiedDate desc ")
-    Page<Post> findTaggedPost(@Param("member") final Member member,
-                              final Pageable pageable);
-
-    @Query("select p from Post p " +
-            "where (p.owner = :owner and p.owner = :loginMember and p.status = 'ACTIVE') " +
-            "   or (p.owner = :owner and p.postStatus = 'PUBLIC' and p.status = 'ACTIVE')" +
-            "order by p.createdDate desc ")
-    Page<Post> findUploadPost(
-            final Member owner,
-            final Member loginMember,
+    Page<Post> findTaggedPost(
+            @Param("member") final Member member,
+            @Param("loginMember") final Member loginMember,
             final Pageable pageable
     );
 
+    @Query("select p from Post p " +
+            "where p.owner = :owner and p.status = 'ACTIVE' and (p.owner = :loginMember or p.postStatus = 'PUBLIC') " +
+            "   and p.owner not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
+            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker = p.owner) " +
+            "   and (select t.member from Tag t where t.post = p) not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
+            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker in (select t.member from Tag t where t.post = p)) " +
+            "order by p.createdDate desc ")
+    Page<Post> findUploadPost(
+            @Param("owner") final Member owner,
+            @Param("loginMember") final Member loginMember,
+            final Pageable pageable
+    );
 
     @Query("select distinct p from Post p " +
             "join Tag t on p = t.post and p.postStatus = 'PUBLIC' and t.status = 'ACTIVE' and " +
@@ -88,10 +97,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             @Param("loginMember") final Member loginMember,
             final Pageable pageable
     );
-
-    @Modifying
-    @Query("update Post post set post.status = 'DELETED' where post.owner.id = :memberId")
-    void deletePostByMemberId(@Param("memberId") final Long memberId);
 
     @Query("select p from Post p " +
             "where p.postStatus = 'PUBLIC' and p.status = 'ACTIVE' and p.lastModifiedDate > :nowMinusOneHour ")
@@ -136,4 +141,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             @Param("memberA") final Member memberA,
             @Param("memberB") final Member memberB
     );
+
+    @Modifying
+    @Query("update Post post set post.status = 'DELETED' where post.owner.id = :memberId")
+    void deletePostByMemberId(@Param("memberId") final Long memberId);
 }
