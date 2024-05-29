@@ -44,7 +44,7 @@ public class CommentService {
     ) {
         final Member loginMember = jwtService.getLoginMember();
         final Post post = postRepository.findPublicPostById(postId, loginMember);
-        final Page<Comment> commentList = commentRepository.findParentCommentByPost(post, pageable);
+        final Page<Comment> commentList = commentRepository.findParentCommentByPost(post, loginMember, pageable);
         return new CommentElements(loginMember, commentList);
     }
 
@@ -55,7 +55,7 @@ public class CommentService {
             final Pageable pageable
     ) {
         final Member loginMember = jwtService.getLoginMember();
-        final Comment comment = commentRepository.findParentCommentById(parentCommentId)
+        final Comment comment = commentRepository.findParentCommentById(parentCommentId, loginMember)
                 .orElseThrow(() -> new GeneralException(INVALID_POST_ID));
         return new ParentCommentElement(comment, toPageRequest(pageable));
     }
@@ -90,7 +90,7 @@ public class CommentService {
             final Post post
     ) {
         final Comment parentComment = commentRepository
-                .findParentCommentById(request.getParentCommentId())
+                .findParentCommentById(request.getParentCommentId(), member)
                 .orElseThrow(() -> new GeneralException(INVALID_COMMENT_ID));
         final Comment comment = commentRepository.save(
                 request.toEntity(

@@ -68,7 +68,7 @@ public class PostService {
                 null : followRepository.existsBySenderAndReceiver(loginMember, post.getOwner());
         final Boolean isLike = likeRepository.existsByLikeMemberAndLikedPost(loginMember, post);
         final int likeCount = likeRepository.countByLikedPost(post);
-        final Comment comment = commentRepository.findFirstByPost(post).orElse(null);
+        final Comment comment = commentRepository.findFirstByPost(post, loginMember).orElse(null);
 
         return PostDetailResponse.of()
                 .post(post)
