@@ -98,7 +98,7 @@ public class PostService {
         postRepository.save(post);
 
         final List<String> taggedMemberHandles = request.getTaggedMemberHandleList();
-        final List<Member> taggedMemberList = memberRepository.findMemberByHandleList(taggedMemberHandles);
+        final List<Member> taggedMemberList = memberRepository.findMemberByHandleList(taggedMemberHandles, loginMember);
 
         final List<Tag> tagList = saveTags(taggedMemberList, post);
         saveTagApprovalAlarms(tagList);

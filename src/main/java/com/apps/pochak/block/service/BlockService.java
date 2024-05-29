@@ -25,8 +25,8 @@ public class BlockService {
 
     @Transactional
     public void blockMember(String handle) {
-        Member blockedMember = memberRepository.findByHandle(handle);
         Member blocker = jwtService.getLoginMember();
+        Member blockedMember = memberRepository.findByHandle(handle, blocker);
         saveBlockEntity(blockedMember, blocker);
         followRepository.deleteFollowsBetweenMembers(blockedMember, blocker);
         likeRepository.deleteLikesBetweenMembers(blockedMember, blocker);

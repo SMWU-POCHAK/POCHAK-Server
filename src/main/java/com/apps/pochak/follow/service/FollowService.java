@@ -38,7 +38,7 @@ public class FollowService {
     @Transactional
     public BaseCode follow(final String handle) {
         final Member loginMember = jwtService.getLoginMember();
-        final Member member = memberRepository.findByHandle(handle);
+        final Member member = memberRepository.findByHandle(handle, loginMember);
 
         if (loginMember.getId().equals(member.getId())) {
             throw new GeneralException(FOLLOW_ONESELF);
@@ -104,7 +104,7 @@ public class FollowService {
             throw new GeneralException(_UNAUTHORIZED);
         }
 
-        final Member follower = memberRepository.findByHandle(followerHandle);
+        final Member follower = memberRepository.findByHandle(followerHandle, loginMember);
         final Follow follow = followRepository.findBySenderAndReceiver(follower, loginMember);
         if (!follow.isFollow()) {
             throw new GeneralException(NOT_FOLLOW);
@@ -116,8 +116,8 @@ public class FollowService {
     public MemberElements getFollowings(final String handle,
                                         final Pageable pageable
     ) {
-        final Member member = memberRepository.findByHandle(handle);
         final Member loginMember = jwtService.getLoginMember();
+        final Member member = memberRepository.findByHandle(handle, loginMember);
         final Page<MemberElement> followingPage = customMemberRepository.findFollowingsAndIsFollow(
                 member,
                 loginMember.getId(),
@@ -132,8 +132,8 @@ public class FollowService {
     public MemberElements getFollowers(final String handle,
                                        final Pageable pageable
     ) {
-        final Member member = memberRepository.findByHandle(handle);
         final Member loginMember = jwtService.getLoginMember();
+        final Member member = memberRepository.findByHandle(handle, loginMember);
         final Page<MemberElement> followerPage = customMemberRepository.findFollowersAndIsFollow(
                 member,
                 loginMember.getId(),

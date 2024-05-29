@@ -74,14 +74,14 @@ public class OAuthService {
 
     @Transactional
     public void logout(final String handle) {
-        final Member member = memberRepository.findByHandle(handle);
+        final Member member = memberRepository.findByHandleWithoutLogin(handle);
         member.updateRefreshToken(null);
         memberRepository.save(member);
     }
 
     @Transactional
     public void signout(final String handle) {
-        final Member member = memberRepository.findByHandle(handle);
+        final Member member = memberRepository.findByHandleWithoutLogin(handle);
         if (member.getSocialType().equals(SocialType.APPLE)) {
             appleOAuthService.revoke(member.getRefreshToken());
         }

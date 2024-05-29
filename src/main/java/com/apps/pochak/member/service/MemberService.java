@@ -28,7 +28,7 @@ public class MemberService {
     ) {
         final String loginMemberHandle = jwtService.getLoginMemberHandle();
         final Member loginMember = jwtService.getLoginMember();
-        final Member member = findMemberByHandle(handle);
+        final Member member = memberRepository.findByHandle(handle, loginMember);
         final long followerCount = followRepository.countActiveFollowByReceiver(member);
         final long followingCount = followRepository.countActiveFollowBySender(member);
         final Page<Post> taggedPost = postRepository.findTaggedPost(member, pageable);
@@ -48,7 +48,8 @@ public class MemberService {
             final String handle,
             final Pageable pageable
     ) {
-        final Member member = findMemberByHandle(handle);
+        final Member loginMember = jwtService.getLoginMember();
+        final Member member = memberRepository.findByHandle(handle, loginMember);
         final Page<Post> taggedPost = postRepository.findTaggedPost(member, pageable);
         return PostElements.from(taggedPost);
     }
@@ -57,13 +58,9 @@ public class MemberService {
             final String handle,
             final Pageable pageable
     ) {
-        final Member owner = findMemberByHandle(handle);
         final Member loginMember = jwtService.getLoginMember();
+        final Member owner = memberRepository.findByHandle(handle, loginMember);
         final Page<Post> taggedPost = postRepository.findUploadPost(owner, loginMember, pageable);
         return PostElements.from(taggedPost);
-    }
-
-    private Member findMemberByHandle(final String handle) {
-        return memberRepository.findByHandle(handle);
     }
 }
