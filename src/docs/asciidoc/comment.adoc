@@ -24,7 +24,7 @@ include::{snippets}/upload-comment/path-parameters.adoc[]
 ==== request headers
 include::{snippets}/upload-comment/request-headers.adoc[]
 
-=== request body
+==== request body
 include::{snippets}/upload-comment/request-body.adoc[]
 include::{snippets}/upload-comment/request-fields.adoc[]
 

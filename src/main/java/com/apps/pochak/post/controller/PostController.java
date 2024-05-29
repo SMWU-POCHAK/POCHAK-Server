@@ -27,7 +27,7 @@ public class PostController {
         return ApiResponse.onSuccess(postService.getHomeTab(pageable));
     }
 
-    @PostMapping(value = "")
+    @PostMapping("")
     public ApiResponse<Void> uploadPost(
             @ModelAttribute final PostUploadRequest request
     ) {
