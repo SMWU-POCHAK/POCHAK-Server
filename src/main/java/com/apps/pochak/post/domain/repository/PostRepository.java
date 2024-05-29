@@ -105,9 +105,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "select * from post as p " +
             "where p.id in :postIdList and p.status = 'ACTIVE' " +
             "   and p.owner_id not in (select b.blocked_id from block b where b.blocker_id = :loginMemberId) " +
-            "   and :loginMember not in (select b.blocked_id from block b where b.blocker_id = p.owner_id) " +
+            "   and :loginMemberId not in (select b.blocked_id from block b where b.blocker_id = p.owner_id) " +
             "   and not exists (select t.member_id from tag t where t.post_id = p.id intersect select b.blocked_id from block b where b.blocker_id = :loginMemberId) " +
-            "   and :loginMember not in (select b.blocked_id from block b where b.blocker_id in (select t.member_id from Tag t where t.post_id = p.id)) " +
+            "   and :loginMemberId not in (select b.blocked_id from block b where b.blocker_id in (select t.member_id from tag t where t.post_id = p.id)) " +
             "order by find_in_set(id, :postIdStrList) ",
             nativeQuery = true)
     Page<Post> findPostsIn(
