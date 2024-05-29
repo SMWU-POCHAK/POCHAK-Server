@@ -20,19 +20,28 @@ import static com.apps.pochak.global.converter.LongListToStringConverter.convert
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-
-    @Override
     @Query("select p from Post p " +
             "join fetch p.owner " +
-            "where p.id = :postId and p.status = 'ACTIVE'")
-    Optional<Post> findById(@Param("postId") final Long postId);
+            "where p.id = :postId and p.status = 'ACTIVE' " +
+            "   and p.owner not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
+            "   and (select t.member from Tag t where t.post = p) not in (select b.blockedMember from Block b where b.blocker = :loginMember) ")
+    Optional<Post> findById(
+            @Param("postId") final Long postId,
+            @Param("loginMember") final Member loginMember
+    );
 
-    default Post findPostById(final Long postId) {
-        return findById(postId).orElseThrow(() -> new GeneralException(INVALID_POST_ID));
+    default Post findPostById(
+            final Long postId,
+            final Member loginMember
+    ) {
+        return findById(postId, loginMember).orElseThrow(() -> new GeneralException(INVALID_POST_ID));
     }
 
-    default Post findPublicPostById(final Long postId) {
-        final Post post = findById(postId).orElseThrow(() -> new GeneralException(INVALID_POST_ID));
+    default Post findPublicPostById(
+            final Long postId,
+            final Member loginMember
+    ) {
+        final Post post = findById(postId, loginMember).orElseThrow(() -> new GeneralException(INVALID_POST_ID));
         if (post.isPrivate()) {
             throw new GeneralException(PRIVATE_POST);
         }
@@ -85,10 +94,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "where p.postStatus = 'PUBLIC' and p.status = 'ACTIVE' and p.lastModifiedDate > :nowMinusOneHour ")
     List<Post> findModifiedPostWithinOneHour(@Param("nowMinusOneHour") final LocalDateTime nowMinusOneHour);
 
-    @Query(value =
-            "select * from post " +
-                    "where id in :postIdList and status = 'ACTIVE' " +
-                    "order by find_in_set(id, :postIdStrList) ",
+    @Query(value = "select * from post as p " +
+            "where p.id in :postIdList and p.status = 'ACTIVE' " +
+            "order by find_in_set(id, :postIdStrList) ",
             nativeQuery = true)
     Page<Post> findPostsIn(
             @Param("postIdList") final List<Long> postIdList,

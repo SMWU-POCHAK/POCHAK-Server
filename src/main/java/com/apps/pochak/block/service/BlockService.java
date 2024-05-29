@@ -2,7 +2,6 @@ package com.apps.pochak.block.service;
 
 import com.apps.pochak.block.domain.Block;
 import com.apps.pochak.block.domain.repository.BlockRepository;
-import com.apps.pochak.comment.domain.repository.CommentRepository;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.like.domain.repository.LikeRepository;
 import com.apps.pochak.login.jwt.JwtService;

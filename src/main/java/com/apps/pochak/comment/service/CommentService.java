@@ -43,7 +43,7 @@ public class CommentService {
             final Pageable pageable
     ) {
         final Member loginMember = jwtService.getLoginMember();
-        final Post post = postRepository.findPublicPostById(postId);
+        final Post post = postRepository.findPublicPostById(postId, loginMember);
         final Page<Comment> commentList = commentRepository.findParentCommentByPost(post, pageable);
         return new CommentElements(loginMember, commentList);
     }
@@ -54,27 +54,27 @@ public class CommentService {
             final Long parentCommentId,
             final Pageable pageable
     ) {
+        final Member loginMember = jwtService.getLoginMember();
         final Comment comment = commentRepository.findParentCommentById(parentCommentId)
                 .orElseThrow(() -> new GeneralException(INVALID_POST_ID));
-        final Post post = postRepository.findPublicPostById(postId);
         return new ParentCommentElement(comment, toPageRequest(pageable));
     }
 
     @Transactional
     public void saveComment(Long postId, CommentUploadRequest request) {
-        final Member member = jwtService.getLoginMember();
-        final Post post = postRepository.findPublicPostById(postId);
+        final Member loginMember = jwtService.getLoginMember();
+        final Post post = postRepository.findPublicPostById(postId, loginMember);
 
         if (isChildComment(request)) {
             saveChildComment(
                     request,
-                    member,
+                    loginMember,
                     post
             );
         } else {
             saveParentComment(
                     request,
-                    member,
+                    loginMember,
                     post
             );
         }
@@ -84,7 +84,7 @@ public class CommentService {
         return request.getParentCommentId() != null;
     }
 
-    private Comment saveChildComment(
+    private void saveChildComment(
             final CommentUploadRequest request,
             final Member member,
             final Post post
@@ -107,8 +107,6 @@ public class CommentService {
             sendPostOwnerCommentAlarm(comment, owner);
         }
         sendTaggedPostCommentAlarm(comment, parentCommentWriter.getId());
-
-        return comment;
     }
 
     private void saveParentComment(

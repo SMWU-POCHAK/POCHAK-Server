@@ -35,7 +35,7 @@ public class LikeService {
     @Transactional
     public void likePost(final Long postId) {
         final Member loginMember = jwtService.getLoginMember();
-        final Post post = postRepository.findPostById(postId);
+        final Post post = postRepository.findPostById(postId, loginMember);
 
         final Optional<LikeEntity> optionalLike = likeRepository.findByLikeMemberAndLikedPost(loginMember, post);
         if (optionalLike.isPresent()) {
@@ -90,7 +90,7 @@ public class LikeService {
     @Transactional
     public LikeElements getMemberLikedPost(final Long postId) {
         final Member loginMember = jwtService.getLoginMember();
-        final Post likedPost = postRepository.findPostById(postId);
+        final Post likedPost = postRepository.findPostById(postId, loginMember);
 
         final List<LikeElement> likeElements = likeRepository.findFollowersAndIsFollow(
                 loginMember.getId(),

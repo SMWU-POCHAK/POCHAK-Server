@@ -21,7 +21,7 @@ public class ReportService {
     @Transactional
     public void saveReport(final ReportUploadRequest request) {
         final Member reporter = jwtService.getLoginMember();
-        final Post reportedPost = postRepository.findPostById(request.getPostId());
+        final Post reportedPost = postRepository.findPostById(request.getPostId(), reporter);
 
         Report report = request.toEntity(reporter, reportedPost);
         reportRepository.save(report);
