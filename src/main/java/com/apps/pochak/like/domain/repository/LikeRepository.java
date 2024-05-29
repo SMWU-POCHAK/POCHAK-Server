@@ -32,8 +32,7 @@ public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
     );
 
     @Modifying
-    @Query(value = "update LikeEntity like " +
-            "set like.status = 'DELETED' " +
+    @Query("update LikeEntity like set like.status = 'DELETED' " +
             "where like.likeMember.id = :memberId or like.likedPost.owner.id = :memberId")
     void deleteLikeByMemberId(@Param("memberId") final Long memberId);
 

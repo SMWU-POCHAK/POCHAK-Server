@@ -57,19 +57,10 @@ public class MemberService {
             final String handle,
             final Pageable pageable
     ) {
-        final Member member = findMemberByHandle(handle);
-        final Page<Post> taggedPost;
-        if (isMyProfile(member)) {
-            taggedPost = postRepository.findPostByOwnerOrderByCreatedDateDesc(member, pageable);
-        } else {
-            taggedPost = postRepository.findPostByOwnerAndPostStatusOrderByCreatedDateDesc(member, PUBLIC, pageable);
-        }
+        final Member owner = findMemberByHandle(handle);
+        final Member loginMember = jwtService.getLoginMember();
+        final Page<Post> taggedPost = postRepository.findUploadPost(owner, loginMember, pageable);
         return PostElements.from(taggedPost);
-    }
-
-    private Boolean isMyProfile(final Member member) {
-        final String loginMemberHandle = jwtService.getLoginMemberHandle();
-        return member.getHandle().equals(loginMemberHandle);
     }
 
     private Member findMemberByHandle(final String handle) {

@@ -2,11 +2,13 @@ package com.apps.pochak.block.service;
 
 import com.apps.pochak.block.domain.Block;
 import com.apps.pochak.block.domain.repository.BlockRepository;
+import com.apps.pochak.comment.domain.repository.CommentRepository;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.like.domain.repository.LikeRepository;
 import com.apps.pochak.login.jwt.JwtService;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
+import com.apps.pochak.post.domain.repository.PostRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ public class BlockService {
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
     private final LikeRepository likeRepository;
+    private final PostRepository postRepository;
 
     private final JwtService jwtService;
 
@@ -28,6 +31,7 @@ public class BlockService {
         saveBlockEntity(blockedMember, blocker);
         followRepository.deleteFollowsBetweenMembers(blockedMember, blocker);
         likeRepository.deleteLikesBetweenMembers(blockedMember, blocker);
+        postRepository.setPostInactiveBetweenMembers(blockedMember, blocker);
     }
 
     private void saveBlockEntity(
