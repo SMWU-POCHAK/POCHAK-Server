@@ -39,6 +39,7 @@ public class FollowService {
     public BaseCode follow(final String handle) {
         final Member loginMember = jwtService.getLoginMember();
         final Member member = memberRepository.findByHandle(handle);
+
         if (loginMember.getId().equals(member.getId())) {
             throw new GeneralException(FOLLOW_ONESELF);
         }

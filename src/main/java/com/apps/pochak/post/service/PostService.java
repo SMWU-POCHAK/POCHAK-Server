@@ -36,8 +36,8 @@ import static com.apps.pochak.global.s3.DirName.POST;
 @Service
 @RequiredArgsConstructor
 public class PostService {
-    private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
     private final TagRepository tagRepository;
     private final CommentRepository commentRepository;
