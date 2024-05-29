@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_UPLOAD_REPORT;
+import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_BLOCK_MEMBER;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +21,6 @@ public class BlockController {
             @PathVariable("handle") final String handle
     ) {
         blockService.blockMember(handle);
-        return ApiResponse.of(SUCCESS_UPLOAD_REPORT);
+        return ApiResponse.of(SUCCESS_BLOCK_MEMBER);
     }
 }
