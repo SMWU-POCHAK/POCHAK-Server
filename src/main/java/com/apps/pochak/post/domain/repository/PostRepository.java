@@ -96,26 +96,32 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query(value = "select * from post as p " +
             "where p.id in :postIdList and p.status = 'ACTIVE' " +
+            "   and p.owner_id not in (select b.blocked_id from block b where b.blocker_id = :loginMemberId) " +
+            "   and (select t.member_id from Tag t where t.post_id = p.id) not in (select b.blocked_id from block b where b.blocker_id = :loginMemberId) " +
             "order by find_in_set(id, :postIdStrList) ",
             nativeQuery = true)
     Page<Post> findPostsIn(
             @Param("postIdList") final List<Long> postIdList,
             @Param("postIdStrList") final String postIdStrList,
+            @Param("loginMemberId") final Long loginMemberId,
             final Pageable pageable
     );
 
     default Page<Post> findPostsInIdList(
             @Param("postIdList") final List<Long> postIdList,
+            final Long loginMemberId,
             final Pageable pageable
     ) {
         final String postIdStrList = convertLongListToString(postIdList);
         return findPostsIn(
                 postIdList,
                 postIdStrList,
+                loginMemberId,
                 pageable
         );
     }
 
+    @Modifying
     @Query("update Post p SET p.status = 'INACTIVE' " +
             "where (p.owner = :memberA and p.id in (select t.post.id from Tag t where t.post = p and t.member = :memberB)) " +
             "   or (p.owner = :memberB and p.id in (select t.post.id from Tag t where t.post = p and t.member = :memberA)) " +

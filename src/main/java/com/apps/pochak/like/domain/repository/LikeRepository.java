@@ -56,7 +56,9 @@ public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
             @Param("post") final Post post
     );
 
-    @Query("delete from LikeEntity l " +
+    @Modifying
+    @Query("update LikeEntity l " +
+            "set l.status = 'DELETED' " +
             "where (l.likeMember = :memberA and l.likedPost.id in (select p.id from Post p where p.owner = :memberB))" +
             "   or (l.likeMember = :memberB and l.likedPost.id in (select p.id from Post p where p.owner = :memberA))" +
             "   or (l.likeMember = :memberA and l.likedPost.id in (select t.post.id from Tag t where t.member = :memberB))" +

@@ -144,7 +144,11 @@ public class PostService {
                         PostSearchResponse.class
                 );
 
-        final Page<Post> postPage = postRepository.findPostsInIdList(response.getPostIdList(), pageable);
+        final Page<Post> postPage = postRepository.findPostsInIdList(
+                response.getPostIdList(),
+                loginMember.getId(),
+                pageable
+        );
         return PostElements.from(postPage);
     }
 }

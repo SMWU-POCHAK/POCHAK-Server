@@ -33,7 +33,9 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
         return findFollowBySenderAndReceiver(sender, receiver).orElseThrow(() -> new GeneralException(NOT_FOLLOW));
     }
 
-    @Query("delete from Follow f " +
+    @Modifying
+    @Query("update Follow f " +
+            "set f.status = 'DELETED' " +
             "where (f.sender = :memberA and f.receiver = :memberB) or (f.sender = :memberB and f.receiver = :memberA)")
     void deleteFollowsBetweenMembers(
             @Param("memberA") final Member memberA,
@@ -41,8 +43,8 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     );
 
     @Modifying
-    @Query("update Follow follow " +
-            "set follow.status = 'DELETED' " +
-            "where follow.receiver.id = :memberId or follow.sender.id = :memberId")
+    @Query("update Follow f " +
+            "set f.status = 'DELETED' " +
+            "where f.receiver.id = :memberId or f.sender.id = :memberId")
     void deleteFollowByMemberId(@Param("memberId") final Long memberId);
 }
