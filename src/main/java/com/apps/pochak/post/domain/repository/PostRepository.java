@@ -25,7 +25,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "where p.id = :postId and p.status = 'ACTIVE' " +
             "   and p.owner not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
             "   and :loginMember not in (select b.blockedMember from Block b where b.blocker = p.owner) " +
-            "   and (select t.member from Tag t where t.post = p) not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
+            "   and not exists (select t.member from Tag t where t.post = p intersect select b.blockedMember from Block b where b.blocker = :loginMember) " +
             "   and :loginMember not in (select b.blockedMember from Block b where b.blocker in (select t.member from Tag t where t.post = p)) "
     )
     Optional<Post> findById(
@@ -56,7 +56,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "where p.status = 'ACTIVE'" +
             "   and p.owner not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
             "   and :loginMember not in (select b.blockedMember from Block b where b.blocker = p.owner) " +
-            "   and (select t.member from Tag t where t.post = p) not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
+            "   and not exists (select t.member from Tag t where t.post = p intersect select b.blockedMember from Block b where b.blocker = :loginMember) " +
             "   and :loginMember not in (select b.blockedMember from Block b where b.blocker in (select t.member from Tag t where t.post = p)) " +
             "order by t.lastModifiedDate desc ")
     Page<Post> findTaggedPost(
@@ -69,7 +69,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "where p.owner = :owner and p.status = 'ACTIVE' and (p.owner = :loginMember or p.postStatus = 'PUBLIC') " +
             "   and p.owner not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
             "   and :loginMember not in (select b.blockedMember from Block b where b.blocker = p.owner) " +
-            "   and (select t.member from Tag t where t.post = p) not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
+            "   and not exists (select t.member from Tag t where t.post = p intersect select b.blockedMember from Block b where b.blocker = :loginMember) " +
             "   and :loginMember not in (select b.blockedMember from Block b where b.blocker in (select t.member from Tag t where t.post = p)) " +
             "order by p.createdDate desc ")
     Page<Post> findUploadPost(
@@ -105,9 +105,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "select * from post as p " +
             "where p.id in :postIdList and p.status = 'ACTIVE' " +
             "   and p.owner_id not in (select b.blocked_id from block b where b.blocker_id = :loginMemberId) " +
-            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker = p.owner) " +
-            "   and (select t.member_id from Tag t where t.post_id = p.id) not in (select b.blocked_id from block b where b.blocker_id = :loginMemberId) " +
-            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker in (select t.member from Tag t where t.post = p)) " +
+            "   and :loginMember not in (select b.blocked_id from block b where b.blocker_id = p.owner_id) " +
+            "   and not exists (select t.member_id from tag t where t.post_id = p.id intersect select b.blocked_id from block b where b.blocker_id = :loginMemberId) " +
+            "   and :loginMember not in (select b.blocked_id from block b where b.blocker_id in (select t.member_id from Tag t where t.post_id = p.id)) " +
             "order by find_in_set(id, :postIdStrList) ",
             nativeQuery = true)
     Page<Post> findPostsIn(
