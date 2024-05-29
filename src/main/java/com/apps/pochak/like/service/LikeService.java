@@ -92,7 +92,7 @@ public class LikeService {
         final Member loginMember = jwtService.getLoginMember();
         final Post likedPost = postRepository.findPostById(postId, loginMember);
 
-        final List<LikeElement> likeElements = likeRepository.findFollowersAndIsFollow(
+        final List<LikeElement> likeElements = likeRepository.findLikesAndIsFollow(
                 loginMember.getId(),
                 likedPost
         );

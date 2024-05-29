@@ -17,8 +17,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("select c from Comment c " +
             "join fetch c.member " +
             "where c.post = :post " +
-            "   and c.member not in (select b from Block b where b.blocker = :loginMember) " +
-            "   and :loginMember not in (select b from Block b where b.blocker = c.member) " +
+            "   and c.member not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
+            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker = c.member) " +
             "order by c.createdDate desc limit 1")
     Optional<Comment> findFirstByPost(
             @Param("post") final Post post,
@@ -29,8 +29,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "join fetch c.member " +
             "where c.post = :post " +
             "   and c.parentComment is null " +
-            "   and c.member not in (select b from Block b where b.blocker = :loginMember)" +
-            "   and :loginMember not in (select b from Block b where b.blocker = c.member) ")
+            "   and c.member not in (select b.blockedMember from Block b where b.blocker = :loginMember)" +
+            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker = c.member) ")
     Page<Comment> findParentCommentByPost(
             @Param("post") final Post post,
             @Param("loginMember") final Member loginMember,
@@ -41,8 +41,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "join fetch c.member " +
             "where c.id = :commentId " +
             "   and c.parentComment is null " +
-            "   and c.member not in (select b from Block b where b.blocker = :loginMember)" +
-            "   and :loginMember not in (select b from Block b where b.blocker = c.member) ")
+            "   and c.member not in (select b.blockedMember from Block b where b.blocker = :loginMember)" +
+            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker = c.member) ")
     Optional<Comment> findParentCommentById(
             @Param("commentId") final Long commentId,
             @Param("loginMember") final Member loginMember
