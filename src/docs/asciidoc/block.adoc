@@ -28,3 +28,24 @@ include::{snippets}/block-member/path-parameters.adoc[]
 ==== response body
 include::{snippets}/block-member/response-body.adoc[]
 include::{snippets}/block-member/response-fields.adoc[]
+
+== `GET` Blocked Member API
+
+차단한 유저들 조회 API
+
+=== Request
+include::{snippets}/get-blocked-member/http-request.adoc[]
+
+==== request headers
+include::{snippets}/get-blocked-member/request-headers.adoc[]
+
+==== query parameters
+include::{snippets}/get-blocked-member/query-parameters.adoc[]
+
+==== path variables
+include::{snippets}/get-blocked-member/path-parameters.adoc[]
+
+=== Response
+==== response body
+include::{snippets}/get-blocked-member/response-body.adoc[]
+include::{snippets}/get-blocked-member/response-fields.adoc[]
