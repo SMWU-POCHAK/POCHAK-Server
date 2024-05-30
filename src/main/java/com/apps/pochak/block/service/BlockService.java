@@ -2,6 +2,7 @@ package com.apps.pochak.block.service;
 
 import com.apps.pochak.block.domain.Block;
 import com.apps.pochak.block.domain.repository.BlockRepository;
+import com.apps.pochak.block.dto.response.BlockElements;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.like.domain.repository.LikeRepository;
@@ -11,9 +12,12 @@ import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.BLOCK_ONESELF;
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus._UNAUTHORIZED;
 
 @Service
 @RequiredArgsConstructor
@@ -51,5 +55,23 @@ public class BlockService {
                 .build();
 
         blockRepository.save(block);
+    }
+
+    public BlockElements getBlockedMember(
+            final String handle,
+            final Pageable pageable
+    ) {
+        Member loginMember = jwtService.getLoginMember();
+        Member member = memberRepository.findByHandleWithoutLogin(handle);
+
+        if (!member.equals(loginMember)) {
+            throw new GeneralException(_UNAUTHORIZED);
+        }
+
+        Page<Block> blockedMemberPage = blockRepository.findBlockByBlocker(member, pageable);
+
+        return BlockElements.from()
+                .blockPage(blockedMemberPage)
+                .build();
     }
 }

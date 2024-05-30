@@ -13,7 +13,12 @@ public class MemberElement {
     private String name;
     private Boolean isFollow;
 
-    public MemberElement(String profileImage, String handle, String name, Long isFollow) {
+    public MemberElement(
+            final String profileImage,
+            final String handle,
+            final String name,
+            final Long isFollow
+    ) {
         this.profileImage = profileImage;
         this.handle = handle;
         this.name = name;
