@@ -14,4 +14,6 @@ public interface BlockRepository extends JpaRepository<Block, Long> {
             final Member blocker,
             final Pageable pageable
     );
+
+    void deleteByBlockerAndBlockedMember(Member blocker, Member blockedMember);
 }

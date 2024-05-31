@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_BLOCK_MEMBER;
+import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_CANCEL_BLOCK;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,5 +32,14 @@ public class BlockController {
             @PageableDefault(DEFAULT_PAGING_SIZE) final Pageable pageable
     ) {
         return ApiResponse.onSuccess(blockService.getBlockedMember(handle, pageable));
+    }
+
+    @DeleteMapping("/block")
+    public ApiResponse<Void> cancelBlock(
+            @PathVariable("handle") final String handle,
+            @RequestParam("blockedMemberHandle") final String blockedMemberHandle
+    ) {
+        blockService.cancelBlock(handle, blockedMemberHandle);
+        return ApiResponse.of(SUCCESS_CANCEL_BLOCK);
     }
 }

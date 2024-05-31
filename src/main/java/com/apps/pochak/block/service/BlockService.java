@@ -74,4 +74,21 @@ public class BlockService {
                 .blockPage(blockedMemberPage)
                 .build();
     }
+
+    @Transactional
+    public void cancelBlock(
+            final String handle,
+            final String blockedMemberHandle
+    ) {
+        Member loginMember = jwtService.getLoginMember();
+        Member blocker = memberRepository.findByHandleWithoutLogin(handle);
+
+        if (!loginMember.equals(blocker)) {
+            throw new GeneralException(_UNAUTHORIZED);
+        }
+
+        Member blockedMember = memberRepository.findByHandleWithoutLogin(blockedMemberHandle);
+
+        blockRepository.deleteByBlockerAndBlockedMember(blocker, blockedMember);
+    }
 }

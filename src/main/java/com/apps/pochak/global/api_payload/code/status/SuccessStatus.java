@@ -19,6 +19,7 @@ public enum SuccessStatus implements BaseCode {
 
     // Block
     SUCCESS_BLOCK_MEMBER(CREATED, "BLOCK2001", "성공적으로 사용자를 차단하였습니다."),
+    SUCCESS_CANCEL_BLOCK(NO_CONTENT, "BLOCK2002", "성공적으로 사용자 차단을 취소하였습니다."),
 
     // Comment
     SUCCESS_UPLOAD_COMMENT(CREATED, "COMMENT2001", "성공적으로 댓글을 등록하였습니다."),
