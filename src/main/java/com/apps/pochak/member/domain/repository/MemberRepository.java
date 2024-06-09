@@ -32,4 +32,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query(value = "select m from Member m where m.lastModifiedDate > :nowMinusOneHour ")
     List<Member> findModifiedMemberWithinOneHour(@Param("nowMinusOneHour") final LocalDateTime nowMinusOneHour);
+
+    boolean existsByHandle(String handle);
+
 }

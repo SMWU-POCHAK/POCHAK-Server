@@ -1,6 +1,7 @@
 package com.apps.pochak.member.domain;
 
 import com.apps.pochak.global.BaseEntity;
+import com.apps.pochak.member.dto.request.ProfileUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -59,5 +60,18 @@ public class Member extends BaseEntity {
         this.socialId = socialId;
         this.socialType = socialType;
         this.socialRefreshToken = socialRefreshToken;
+    }
+
+    public void updateMember(ProfileUpdateRequest profileUpdateRequest, String profileImageUrl){
+        this.name = getOrDefault(profileUpdateRequest.getName(), this.name);
+        this.handle = getOrDefault(profileUpdateRequest.getHandle(), this.handle);
+        this.message = getOrDefault(profileUpdateRequest.getMessage(), this.message);
+        this.profileImage = getOrDefault(profileImageUrl, this.profileImage);
+    }
+
+    private <T> T getOrDefault(T property, T alternative){
+        if (property != null)
+            return property;
+        return alternative;
     }
 }

@@ -33,6 +33,8 @@ public class S3Service {
     private String bucket;
 
     public String upload(MultipartFile multipartFile, DirName dirName) {
+        if (multipartFile == null)
+            throw new GeneralException(NULL_FILE);
         try {
             File uploadFile = convert(multipartFile)
                     .orElseThrow(() -> new ImageException(CONVERT_FILE_ERROR));

@@ -1,10 +1,15 @@
 package com.apps.pochak.member.service;
 
+import com.amazonaws.services.ec2.util.S3UploadPolicy;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
+import com.apps.pochak.global.api_payload.exception.GeneralException;
+import com.apps.pochak.global.s3.S3Service;
 import com.apps.pochak.login.jwt.JwtService;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
+import com.apps.pochak.member.dto.request.ProfileUpdateRequest;
 import com.apps.pochak.member.dto.response.ProfileResponse;
+import com.apps.pochak.member.dto.response.ProfileUpdateResponse;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.post.dto.PostElements;
@@ -12,7 +17,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.DUPLICATE_HANDLE;
+import static com.apps.pochak.global.s3.DirName.MEMBER;
 import static com.apps.pochak.post.domain.PostStatus.PUBLIC;
 
 @Service
@@ -22,6 +30,7 @@ public class MemberService {
     private final FollowRepository followRepository;
     private final PostRepository postRepository;
     private final JwtService jwtService;
+    private final S3Service awsS3Service;
 
     public ProfileResponse getProfileDetail(final String handle,
                                             final Pageable pageable
@@ -41,6 +50,21 @@ public class MemberService {
                 .followerCount(followerCount)
                 .followingCount(followingCount)
                 .isFollow(isFollow)
+                .build();
+    }
+
+    public ProfileUpdateResponse updateProfileDetail(final String handle,
+                                    final ProfileUpdateRequest profileUpdateRequest){
+        final Member member = findMemberByHandle(handle);
+        checkHandleDuplication(handle);
+        String profileImageUrl = awsS3Service.upload(profileUpdateRequest.getProfieImage(), MEMBER);
+        member.updateMember(profileUpdateRequest, profileImageUrl);
+
+        return ProfileUpdateResponse.builder()
+                .name(member.getName())
+                .handle(member.getHandle())
+                .message(member.getMessage())
+                .profileImage(member.getProfileImage())
                 .build();
     }
 
@@ -75,4 +99,12 @@ public class MemberService {
     private Member findMemberByHandle(final String handle) {
         return memberRepository.findByHandle(handle);
     }
+
+    private void checkHandleDuplication(String handle) {
+        if (memberRepository.existsByHandle(handle)) {
+            throw new GeneralException(DUPLICATE_HANDLE);
+        }
+    }
 }
+
+
