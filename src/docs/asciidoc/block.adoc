@@ -49,3 +49,24 @@ include::{snippets}/get-blocked-member/path-parameters.adoc[]
 ==== response body
 include::{snippets}/get-blocked-member/response-body.adoc[]
 include::{snippets}/get-blocked-member/response-fields.adoc[]
+
+== `DELETE` Block Member API
+
+차단 취소 API
+
+=== Request
+include::{snippets}/cancel-block/http-request.adoc[]
+
+==== request headers
+include::{snippets}/cancel-block/request-headers.adoc[]
+
+==== query params
+include::{snippets}/cancel-block/query-parameters.adoc[]
+
+==== path variables
+include::{snippets}/cancel-block/path-parameters.adoc[]
+
+=== Response
+==== response body
+include::{snippets}/cancel-block/response-body.adoc[]
+include::{snippets}/cancel-block/response-fields.adoc[]

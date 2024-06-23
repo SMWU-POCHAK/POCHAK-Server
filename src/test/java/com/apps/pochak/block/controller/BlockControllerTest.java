@@ -75,7 +75,7 @@ class BlockControllerTest {
                                         headerWithName("Authorization").description("Basic auth credentials")
                                 ),
                                 pathParameters(
-                                        parameterWithName("handle").description("차단할 사용자의 아이디(handle) : 만약 로그인 정보와 일치할 경우 BAD_REQUEST 에러가 발생합니다.")
+                                        parameterWithName("handle").description("차단할 사용자의 아이디(handle) : 만약 로그인 정보와 일치할 경우 (= 자기 자신 차단 시도) BAD_REQUEST 에러가 발생합니다.")
                                 ),
                                 responseFields(
                                         fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),
@@ -106,7 +106,7 @@ class BlockControllerTest {
                                         headerWithName("Authorization").description("Basic auth credentials")
                                 ),
                                 pathParameters(
-                                        parameterWithName("handle").description("차단할 사용자의 아이디(handle) : " +
+                                        parameterWithName("handle").description("차단한 사용자의 아이디(handle) : " +
                                                 "만약 로그인 정보와 일치하지 않을 경우 UNAUTHORIZED 에러가 발생합니다. (자신만 차단한 사용자 열람 가능)")
                                 ),
                                 queryParameters(
@@ -141,6 +141,44 @@ class BlockControllerTest {
                                                 .description("차단한 사용자 리스트: 아이디 (handle)").optional(),
                                         fieldWithPath("result.blockList[].name").type(STRING)
                                                 .description("차단한 사용자 리스트: 이름").optional()
+                                )
+
+                        )
+                );
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("Cancel Block API Document")
+    void cancelBlockTest() throws Exception {
+
+        String blockedMemberHandle = "ssok";
+
+        this.mockMvc.perform(
+                        RestDocumentationRequestBuilders
+                                .delete("/api/v2/members/{handle}/block", "dxxynni")
+                                .queryParam("blockedMemberHandle", blockedMemberHandle)
+                                .header("Authorization", authorization)
+                                .contentType(APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andDo(
+                        document("cancel-block",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(
+                                        headerWithName("Authorization").description("Basic auth credentials")
+                                ),
+                                pathParameters(
+                                        parameterWithName("handle").description("차단한 사용자의 아이디(handle) " +
+                                                ": 만약 로그인 정보와 일치하지 않을 경우 UNAUTHORIZED 에러가 발생합니다. (자신만 차단한 사용자 열람 가능)")
+                                ),
+                                queryParameters(
+                                        parameterWithName("blockedMemberHandle").description("차단을 취소하고자하는 차단한 사용자 아이디").optional()
+                                ),
+                                responseFields(
+                                        fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),
+                                        fieldWithPath("code").type(STRING).description("결과 코드"),
+                                        fieldWithPath("message").type(STRING).description("결과 메세지")
                                 )
 
                         )
