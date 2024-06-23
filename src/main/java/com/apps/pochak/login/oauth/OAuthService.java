@@ -43,7 +43,7 @@ public class OAuthService {
         Optional<Member> findMember = memberRepository.findMemberBySocialId(memberInfoRequest.getSocialId());
 
         if (findMember.isPresent()) {
-            throw new GeneralException(EXIST_USER);
+            throw new GeneralException(EXIST_USER); // TODO: Exception이 아니라 Login으로 넘어가야할 듯
         }
 
         String profileImageUrl = awsS3Service.upload(memberInfoRequest.getProfileImage(), MEMBER);
