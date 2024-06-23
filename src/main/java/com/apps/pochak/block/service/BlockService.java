@@ -10,17 +10,18 @@ import com.apps.pochak.login.jwt.JwtService;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.repository.PostRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.BLOCK_ONESELF;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus._UNAUTHORIZED;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BlockService {
     private final BlockRepository blockRepository;
     private final MemberRepository memberRepository;
@@ -30,7 +31,6 @@ public class BlockService {
 
     private final JwtService jwtService;
 
-    @Transactional
     public void blockMember(String handle) {
         Member blocker = jwtService.getLoginMember();
         Member blockedMember = memberRepository.findByHandle(handle, blocker);
@@ -57,6 +57,7 @@ public class BlockService {
         blockRepository.save(block);
     }
 
+    @Transactional(readOnly = true)
     public BlockElements getBlockedMember(
             final String handle,
             final Pageable pageable
@@ -75,7 +76,6 @@ public class BlockService {
                 .build();
     }
 
-    @Transactional
     public void cancelBlock(
             final String handle,
             final String blockedMemberHandle
@@ -90,5 +90,6 @@ public class BlockService {
         Member blockedMember = memberRepository.findByHandleWithoutLogin(blockedMemberHandle);
 
         blockRepository.deleteByBlockerAndBlockedMember(blocker, blockedMember);
+        postRepository.reactivatePostBetweenMembers(blocker, blockedMember);
     }
 }

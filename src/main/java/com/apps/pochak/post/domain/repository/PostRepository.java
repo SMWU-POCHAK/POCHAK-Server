@@ -81,11 +81,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("select distinct p from Post p " +
             "join Tag t on p = t.post and p.postStatus = 'PUBLIC' and t.status = 'ACTIVE' and " +
             "   ( " +
-            "       t.member.id in ( " +    // follow members tagged in post
-            "           select f.receiver.id from Follow f where f.sender = :loginMember and f.status = 'ACTIVE' " +
+            "       t.member in ( " +    // follow members tagged in post
+            "           select f.receiver from Follow f where f.sender = :loginMember and f.status = 'ACTIVE' " +
             "       ) " +
-            "       or p.owner.id in (" +   // follow owner of post
-            "           select f.receiver.id from Follow f where f.sender = :loginMember and f.status = 'ACTIVE' " +
+            "       or p.owner in (" +   // follow owner of post
+            "           select f.receiver from Follow f where f.sender = :loginMember and f.status = 'ACTIVE' " +
             "       ) " +
             "       or t.member = :loginMember " +  // tagged in
             "       or p.owner = :loginMember " +  // owner
@@ -133,11 +133,23 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Modifying
     @Query("update Post p SET p.status = 'INACTIVE' " +
-            "where (p.owner = :memberA and p.id in (select t.post.id from Tag t where t.post = p and t.member = :memberB)) " +
-            "   or (p.owner = :memberB and p.id in (select t.post.id from Tag t where t.post = p and t.member = :memberA)) " +
+            "where (p.owner = :memberA and p in (select t.post from Tag t where t.post = p and t.member = :memberB)) " +
+            "   or (p.owner = :memberB and p in (select t.post from Tag t where t.post = p and t.member = :memberA)) " +
             "   or (:memberA in (select t.member from Tag t where t.post = p) " +
             "       and :memberB in (select t.member from Tag t where t.post = p))")
     void setPostInactiveBetweenMembers(
+            @Param("memberA") final Member memberA,
+            @Param("memberB") final Member memberB
+    );
+
+    @Modifying
+    @Query("update Post p SET p.status = 'ACTIVE' " +
+            "where p.status = 'INACTIVE' " +
+            "   and p.owner not in (select b.blockedMember from Block b where b.blocker in (select t.member from Tag t where t.post = p)) " +
+            "   and not exists (select t.member from Tag t where t.post = p " +
+            "                   intersect " +
+            "                   select b.blockedMember from Block b where b.blocker = p.owner or b.blocker in (select t.member from Tag t where t.post = p))")
+    void reactivatePostBetweenMembers(
             @Param("memberA") final Member memberA,
             @Param("memberB") final Member memberB
     );

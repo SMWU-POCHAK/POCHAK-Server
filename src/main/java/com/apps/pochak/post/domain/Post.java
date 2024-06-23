@@ -24,8 +24,8 @@ import static lombok.AccessLevel.PROTECTED;
 @DynamicInsert
 @NoArgsConstructor(access = PROTECTED)
 @SQLDelete(sql = "UPDATE post SET status = 'DELETED' WHERE id = ?")
-@SQLRestriction("status = 'ACTIVE'")
 public class Post extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
