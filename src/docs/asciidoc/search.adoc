@@ -1,0 +1,32 @@
+= Search API
+pochak server team~~
+:doctype: book
+:icons: font
+:source-highlighter: highlishtjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== `GET` Search Member API
+
+멤버 검색 API
+
+- 검색 성능은 매우 떨어지지만... 어쩔 수 없다!
+
+=== Request
+include::{snippets}/search-member/http-request.adoc[]
+
+==== request headers
+include::{snippets}/search-member/request-headers.adoc[]
+
+==== query parameters
+include::{snippets}/search-member/query-parameters.adoc[]
+
+=== Response
+==== response body
+include::{snippets}/search-member/response-body.adoc[]
+include::{snippets}/search-member/response-fields.adoc[]

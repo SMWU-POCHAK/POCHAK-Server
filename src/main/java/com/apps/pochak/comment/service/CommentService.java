@@ -14,21 +14,21 @@ import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.tag.domain.Tag;
 import com.apps.pochak.tag.domain.repository.TagRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.INVALID_COMMENT_ID;
-import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.INVALID_POST_ID;
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 import static com.apps.pochak.global.converter.PageableToPageRequestConverter.toPageRequest;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CommentService {
     private final CommentRepository commentRepository;
     private final TagRepository tagRepository;
@@ -37,60 +37,58 @@ public class CommentService {
 
     private final JwtService jwtService;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public CommentElements getComments(
             final Long postId,
             final Pageable pageable
     ) {
         final Member loginMember = jwtService.getLoginMember();
-        final Post post = postRepository.findPublicPostById(postId);
-        final Page<Comment> commentList = commentRepository.findParentCommentByPost(post, pageable);
+        final Post post = postRepository.findPublicPostById(postId, loginMember);
+        final Page<Comment> commentList = commentRepository.findParentCommentByPost(post, loginMember, pageable);
         return new CommentElements(loginMember, commentList);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ParentCommentElement getChildCommentsByParentCommentId(
             final Long postId,
             final Long parentCommentId,
             final Pageable pageable
     ) {
-        final Comment comment = commentRepository.findParentCommentById(parentCommentId)
+        final Member loginMember = jwtService.getLoginMember();
+        final Comment comment = commentRepository.findParentCommentById(parentCommentId, loginMember)
                 .orElseThrow(() -> new GeneralException(INVALID_POST_ID));
-        final Post post = postRepository.findPublicPostById(postId);
         return new ParentCommentElement(comment, toPageRequest(pageable));
     }
 
-    @Transactional
-    public void saveComment(Long postId, CommentUploadRequest request) {
-        final Member member = jwtService.getLoginMember();
-        final Post post = postRepository.findPublicPostById(postId);
+    public void saveComment(
+            final Long postId,
+            final CommentUploadRequest request
+    ) {
+        final Member loginMember = jwtService.getLoginMember();
+        final Post post = postRepository.findPublicPostById(postId, loginMember);
 
-        if (isChildComment(request)) {
+        if (request.checkChildComment()) {
             saveChildComment(
                     request,
-                    member,
+                    loginMember,
                     post
             );
         } else {
             saveParentComment(
                     request,
-                    member,
+                    loginMember,
                     post
             );
         }
     }
 
-    private Boolean isChildComment(CommentUploadRequest request) {
-        return request.getParentCommentId() != null;
-    }
-
-    private Comment saveChildComment(
+    private void saveChildComment(
             final CommentUploadRequest request,
             final Member member,
             final Post post
     ) {
         final Comment parentComment = commentRepository
-                .findParentCommentById(request.getParentCommentId())
+                .findParentCommentById(request.getParentCommentId(), member)
                 .orElseThrow(() -> new GeneralException(INVALID_COMMENT_ID));
         final Comment comment = commentRepository.save(
                 request.toEntity(
@@ -107,8 +105,6 @@ public class CommentService {
             sendPostOwnerCommentAlarm(comment, owner);
         }
         sendTaggedPostCommentAlarm(comment, parentCommentWriter.getId());
-
-        return comment;
     }
 
     private void saveParentComment(
@@ -161,5 +157,27 @@ public class CommentService {
         );
 
         alarmRepository.save(commentReplyAlarm);
+    }
+
+    public void deleteComment(
+            final Long postId,
+            final Long commentId
+    ) {
+        Comment comment = commentRepository.findCommentById(commentId);
+        checkAuthorized(comment);
+        commentRepository.deleteCommentById(commentId);
+    }
+
+    private void checkAuthorized(final Comment comment) {
+        Member member = jwtService.getLoginMember();
+        Post post = comment.getPost();
+        if (post.isOwner(member)) return;
+
+        List<Tag> tagList = tagRepository.findTagsByPost(post);
+        for (Tag tag : tagList) {
+            if (tag.isMember(member)) return;
+        }
+
+        throw new GeneralException(_UNAUTHORIZED);
     }
 }

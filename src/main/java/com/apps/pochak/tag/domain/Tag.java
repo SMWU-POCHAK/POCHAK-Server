@@ -40,8 +40,15 @@ public class Tag extends BaseEntity {
     private Boolean isAccepted;
 
     @Builder
-    public Tag(Post post, Member member) {
+    public Tag(
+            final Post post,
+            final Member member
+    ) {
         this.post = post;
         this.member = member;
+    }
+
+    public boolean isMember(final Member member) {
+        return this.member.getId().equals(member.getId());
     }
 }

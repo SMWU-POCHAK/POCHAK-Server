@@ -114,22 +114,22 @@ public class Alarm extends BaseEntity {
                 .build();
     }
 
-    public Boolean isCommentAlarm() {
+    public boolean isCommentAlarm() {
         final AlarmType type = this.alarmType;
         return type.equals(AlarmType.COMMENT_REPLY) ||
                 type.equals(AlarmType.TAGGED_COMMENT) ||
                 type.equals(AlarmType.OWNER_COMMENT);
     }
 
-    public Boolean isFollowAlarm() {
+    public boolean isFollowAlarm() {
         return this.alarmType.equals(AlarmType.FOLLOW);
     }
 
-    public Boolean isLikeAlarm() {
+    public boolean isLikeAlarm() {
         return this.alarmType.equals(AlarmType.LIKE);
     }
 
-    public Boolean isTagApprovalAlarm() {
+    public boolean isTagApprovalAlarm() {
         return this.alarmType.equals(AlarmType.TAG_APPROVAL);
     }
 }

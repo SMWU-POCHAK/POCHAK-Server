@@ -12,9 +12,9 @@ import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.tag.domain.Tag;
 import com.apps.pochak.tag.domain.repository.TagRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +24,7 @@ import static com.apps.pochak.global.BaseEntityStatus.ACTIVE;
 import static com.apps.pochak.global.BaseEntityStatus.DELETED;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class LikeService {
     private final LikeRepository likeRepository;
@@ -32,10 +33,9 @@ public class LikeService {
     private final AlarmRepository alarmRepository;
     private final JwtService jwtService;
 
-    @Transactional
     public void likePost(final Long postId) {
         final Member loginMember = jwtService.getLoginMember();
-        final Post post = postRepository.findPostById(postId);
+        final Post post = postRepository.findPostById(postId, loginMember);
 
         final Optional<LikeEntity> optionalLike = likeRepository.findByLikeMemberAndLikedPost(loginMember, post);
         if (optionalLike.isPresent()) {
@@ -87,12 +87,12 @@ public class LikeService {
         alarmRepository.deleteAll(alarmList);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public LikeElements getMemberLikedPost(final Long postId) {
         final Member loginMember = jwtService.getLoginMember();
-        final Post likedPost = postRepository.findPostById(postId);
+        final Post likedPost = postRepository.findPostById(postId, loginMember);
 
-        final List<LikeElement> likeElements = likeRepository.findFollowersAndIsFollow(
+        final List<LikeElement> likeElements = likeRepository.findLikesAndIsFollow(
                 loginMember.getId(),
                 likedPost
         );

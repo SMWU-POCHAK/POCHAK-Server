@@ -1,0 +1,72 @@
+= Block API
+pochak server team~~
+:doctype: book
+:icons: font
+:source-highlighter: highlishtjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== `POST` Block Member API
+
+유저 차단 API
+
+=== Request
+include::{snippets}/block-member/http-request.adoc[]
+
+==== request headers
+include::{snippets}/block-member/request-headers.adoc[]
+
+==== path variables
+include::{snippets}/block-member/path-parameters.adoc[]
+
+=== Response
+==== response body
+include::{snippets}/block-member/response-body.adoc[]
+include::{snippets}/block-member/response-fields.adoc[]
+
+== `GET` Blocked Member API
+
+차단한 유저들 조회 API
+
+=== Request
+include::{snippets}/get-blocked-member/http-request.adoc[]
+
+==== request headers
+include::{snippets}/get-blocked-member/request-headers.adoc[]
+
+==== query parameters
+include::{snippets}/get-blocked-member/query-parameters.adoc[]
+
+==== path variables
+include::{snippets}/get-blocked-member/path-parameters.adoc[]
+
+=== Response
+==== response body
+include::{snippets}/get-blocked-member/response-body.adoc[]
+include::{snippets}/get-blocked-member/response-fields.adoc[]
+
+== `DELETE` Block Member API
+
+차단 취소 API
+
+=== Request
+include::{snippets}/cancel-block/http-request.adoc[]
+
+==== request headers
+include::{snippets}/cancel-block/request-headers.adoc[]
+
+==== query params
+include::{snippets}/cancel-block/query-parameters.adoc[]
+
+==== path variables
+include::{snippets}/cancel-block/path-parameters.adoc[]
+
+=== Response
+==== response body
+include::{snippets}/cancel-block/response-body.adoc[]
+include::{snippets}/cancel-block/response-fields.adoc[]

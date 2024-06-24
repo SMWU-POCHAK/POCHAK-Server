@@ -14,13 +14,13 @@ import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.NOT_FOL
 
 public interface FollowRepository extends JpaRepository<Follow, Long> {
 
-    @Query(value = "select count(f) from Follow f where f.receiver = :member and f.status = 'ACTIVE'")
+    @Query("select count(f) from Follow f where f.receiver = :member and f.status = 'ACTIVE'")
     long countActiveFollowByReceiver(@Param("member") final Member member);
 
-    @Query(value = "select count(f) from Follow f where f.sender = :member and f.status = 'ACTIVE'")
+    @Query("select count(f) from Follow f where f.sender = :member and f.status = 'ACTIVE'")
     long countActiveFollowBySender(@Param("member") final Member member);
 
-    @Query(value = "select count(f.id) > 0 from Follow f " +
+    @Query("select count(f.id) > 0 from Follow f " +
             "where f.sender = :sender and f.receiver = :receiver and f.status = 'ACTIVE'")
     boolean existsBySenderAndReceiver(
             @Param("sender") final Member sender,
@@ -34,8 +34,17 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     }
 
     @Modifying
-    @Query(value = "update Follow follow " +
-            "set follow.status = 'DELETED' " +
-            "where follow.receiver.id = :memberId or follow.sender.id = :memberId")
+    @Query("update Follow f " +
+            "set f.status = 'DELETED' " +
+            "where (f.sender = :memberA and f.receiver = :memberB) or (f.sender = :memberB and f.receiver = :memberA)")
+    void deleteFollowsBetweenMembers(
+            @Param("memberA") final Member memberA,
+            @Param("memberB") final Member memberB
+    );
+
+    @Modifying
+    @Query("update Follow f " +
+            "set f.status = 'DELETED' " +
+            "where f.receiver.id = :memberId or f.sender.id = :memberId")
     void deleteFollowByMemberId(@Param("memberId") final Long memberId);
 }
