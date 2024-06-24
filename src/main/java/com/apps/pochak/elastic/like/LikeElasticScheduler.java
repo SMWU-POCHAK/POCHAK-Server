@@ -1,8 +1,6 @@
-package com.apps.pochak.like.service;
+package com.apps.pochak.elastic.like;
 
-import com.apps.pochak.like.domain.LikeDocument;
 import com.apps.pochak.like.domain.LikeEntity;
-import com.apps.pochak.like.domain.repository.LikeElasticRepository;
 import com.apps.pochak.like.domain.repository.LikeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;

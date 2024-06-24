@@ -1,4 +1,4 @@
-package com.apps.pochak.global.elasticsearch.repository;
+package com.apps.pochak.elastic.repository;
 
 import jakarta.annotation.Nullable;
 import org.springframework.data.domain.Page;

@@ -1,4 +1,4 @@
-package com.apps.pochak.post.service;
+package com.apps.pochak.elastic.post;
 
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PostScheduler {
+public class PostElasticScheduler {
     @Value("${lambda.savepost}")
     private String lambdaBaseUrl;
 
@@ -24,7 +24,7 @@ public class PostScheduler {
 
     private final PostRepository postRepository;
 
-    @Scheduled(cron = "0 0 * * * *")
+//    @Scheduled(cron = "0 0 * * * *")
     public void savePostData() {
         final List<Post> postList
                 = postRepository.findModifiedPostWithinOneHour(LocalDateTime.now().minusHours(1));

@@ -1,11 +1,8 @@
-package com.apps.pochak.member.service;
+package com.apps.pochak.elastic.member;
 
 import com.apps.pochak.member.domain.Member;
-import com.apps.pochak.member.domain.MemberDocument;
-import com.apps.pochak.member.domain.repository.MemberElasticRepository;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,7 +15,7 @@ public class MemberElasticScheduler {
     private final MemberRepository memberRepository;
     private final MemberElasticRepository memberElasticRepository;
 
-    @Scheduled(cron = "0 0 * * * *")
+//    @Scheduled(cron = "0 0 * * * *")
     public void saveMemberData() {
         final List<Member> memberList
                 = memberRepository.findModifiedMemberWithinOneHour(LocalDateTime.now().minusHours(1));

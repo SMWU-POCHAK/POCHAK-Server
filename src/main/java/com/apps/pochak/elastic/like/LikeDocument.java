@@ -1,6 +1,7 @@
-package com.apps.pochak.member.domain;
+package com.apps.pochak.elastic.like;
 
 import com.apps.pochak.global.BaseDocument;
+import com.apps.pochak.like.domain.LikeEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,19 +13,19 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import static lombok.AccessLevel.PROTECTED;
 
-@Document(indexName = "#{@memberIndex}")
+@Document(indexName = "#{@likeIndex}")
 @Getter
 @DynamicInsert
 @NoArgsConstructor(access = PROTECTED)
-public class MemberDocument extends BaseDocument {
+public class LikeDocument extends BaseDocument {
     @Id
     private String id;
 
     @Field(type = FieldType.Keyword)
-    private String handle;
+    private String memberId;
 
-    @Field(type = FieldType.Text)
-    private String profileImage;
+    @Field(type = FieldType.Keyword)
+    private String postId;
 
     @Override
     public boolean isNew() {
@@ -32,9 +33,9 @@ public class MemberDocument extends BaseDocument {
     }
 
     @Builder(builderMethodName = "from")
-    public MemberDocument(Member member) {
-        this.id = member.getId().toString();
-        this.handle = member.getHandle();
-        this.profileImage = member.getProfileImage();
+    public LikeDocument(LikeEntity likeEntity) {
+        this.id = likeEntity.getId().toString();
+        this.memberId = likeEntity.getLikeMember().getId().toString();
+        this.postId = likeEntity.getLikedPost().getId().toString();
     }
 }

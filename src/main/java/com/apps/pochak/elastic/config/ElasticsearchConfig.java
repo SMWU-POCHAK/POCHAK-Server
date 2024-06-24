@@ -1,4 +1,4 @@
-package com.apps.pochak.global.elasticsearch.config;
+package com.apps.pochak.elastic.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
