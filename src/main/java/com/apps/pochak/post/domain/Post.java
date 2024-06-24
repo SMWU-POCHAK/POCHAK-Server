@@ -56,11 +56,11 @@ public class Post extends BaseEntity {
         this.caption = caption;
     }
 
-    public Boolean isPrivate() {
+    public boolean isPrivate() {
         return getPostStatus().equals(PRIVATE);
     }
 
-    public Boolean isOwner(final Member member) {
+    public boolean isOwner(final Member member) {
         return this.owner.getId().equals(member.getId());
     }
 

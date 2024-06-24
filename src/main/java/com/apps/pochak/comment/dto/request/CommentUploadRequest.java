@@ -32,7 +32,7 @@ public class CommentUploadRequest {
         return new Comment(this.content, member, post, parentComment);
     }
 
-    public Boolean isChildComment() {
+    public boolean checkChildComment() {
         return getParentCommentId() != null;
     }
 }

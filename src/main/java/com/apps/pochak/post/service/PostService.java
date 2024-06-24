@@ -76,7 +76,7 @@ public class PostService {
                 .build();
     }
 
-    private Boolean isAccessAuthorized(final Post post,
+    private boolean isAccessAuthorized(final Post post,
                                        final List<Tag> tagList,
                                        final Member loginMember) {
         final List<String> taggedMemberHandleList = tagList.stream()

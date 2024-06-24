@@ -67,7 +67,7 @@ public class CommentService {
         final Member loginMember = jwtService.getLoginMember();
         final Post post = postRepository.findPublicPostById(postId, loginMember);
 
-        if (request.isChildComment()) {
+        if (request.checkChildComment()) {
             saveChildComment(
                     request,
                     loginMember,

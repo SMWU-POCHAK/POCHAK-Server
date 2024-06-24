@@ -48,7 +48,7 @@ public class Tag extends BaseEntity {
         this.member = member;
     }
 
-    public Boolean isMember(final Member member) {
+    public boolean isMember(final Member member) {
         return this.member.getId().equals(member.getId());
     }
 }

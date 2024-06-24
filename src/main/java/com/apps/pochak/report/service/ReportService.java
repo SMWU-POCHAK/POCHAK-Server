@@ -7,18 +7,18 @@ import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.report.domain.Report;
 import com.apps.pochak.report.domain.repository.ReportRepository;
 import com.apps.pochak.report.dto.request.ReportUploadRequest;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ReportService {
     private final ReportRepository reportRepository;
     private final PostRepository postRepository;
     private final JwtService jwtService;
 
-    @Transactional
     public void saveReport(final ReportUploadRequest request) {
         final Member reporter = jwtService.getLoginMember();
         final Post reportedPost = postRepository.findPostById(request.getPostId(), reporter);
