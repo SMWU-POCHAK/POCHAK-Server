@@ -46,14 +46,6 @@ jobs:
       run: echo "${{ secrets.AUTHKEY }}" > ./src/main/resources/static/AuthKey_D5ZQTHUQ4K.p8
       shell: bash
 
-    - name: add elasticsearch file
-      run: echo "${{ secrets.ES }}" > ./src/main/resources/application-ES.properties
-      shell: bash
-
-    - name: add lambda key file
-      run: echo "${{ secrets.LAMBDA }}" > ./src/main/resources/application-LAMBDA.properties
-      shell: bash
-
     - name: gradlew에 실행 권한 부여
       run: chmod +x ./gradlew
       shell : bash
