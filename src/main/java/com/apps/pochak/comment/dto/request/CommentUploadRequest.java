@@ -31,4 +31,8 @@ public class CommentUploadRequest {
     ) {
         return new Comment(this.content, member, post, parentComment);
     }
+
+    public Boolean isChildComment() {
+        return getParentCommentId() != null;
+    }
 }

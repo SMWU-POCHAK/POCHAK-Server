@@ -23,6 +23,7 @@ public enum SuccessStatus implements BaseCode {
 
     // Comment
     SUCCESS_UPLOAD_COMMENT(CREATED, "COMMENT2001", "성공적으로 댓글을 등록하였습니다."),
+    SUCCESS_DELETE_COMMENT(NO_CONTENT, "COMMENT2002", "성공적으로 댓글을 삭제하였습니다."),
 
     // Follow
     SUCCESS_FOLLOW(CREATED, "FOLLOW2001", "성공적으로 팔로우하였습니다."),
