@@ -16,16 +16,13 @@ import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.post.dto.PostElements;
 import com.apps.pochak.post.dto.request.PostUploadRequest;
 import com.apps.pochak.post.dto.response.PostDetailResponse;
-import com.apps.pochak.post.dto.response.PostSearchResponse;
 import com.apps.pochak.tag.domain.Tag;
 import com.apps.pochak.tag.domain.repository.TagRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +31,7 @@ import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 import static com.apps.pochak.global.s3.DirName.POST;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
@@ -46,17 +44,15 @@ public class PostService {
 
     private final S3Service s3Service;
     private final JwtService jwtService;
-    private final RestTemplate restTemplate;
 
-    @Value("${lambda.search}")
-    private String lambdaBaseUrl;
-
+    @Transactional(readOnly = true)
     public PostElements getHomeTab(Pageable pageable) {
         final Member loginMember = jwtService.getLoginMember();
         final Page<Post> taggedPost = postRepository.findTaggedPostsOfFollowing(loginMember, pageable);
         return PostElements.from(taggedPost);
     }
 
+    @Transactional(readOnly = true)
     public PostDetailResponse getPostDetail(final Long postId) {
         final Member loginMember = jwtService.getLoginMember();
         final Post post = postRepository.findPostById(postId, loginMember);
@@ -90,7 +86,6 @@ public class PostService {
         return post.isOwner(loginMember) || taggedMemberHandleList.contains(loginMember.getHandle());
     }
 
-    @Transactional
     public void savePost(final PostUploadRequest request) {
         final Member loginMember = jwtService.getLoginMember();
         final String image = s3Service.upload(request.getPostImage(), POST);
@@ -124,7 +119,6 @@ public class PostService {
         alarmRepository.saveAll(tagApprovalAlarmList);
     }
 
-    @Transactional
     public void deletePost(final Long postId) {
         final Member loginMember = jwtService.getLoginMember();
         final Post post = postRepository.findById(postId).orElseThrow(() -> new GeneralException(INVALID_POST_ID));
@@ -135,20 +129,9 @@ public class PostService {
         commentRepository.bulkDeleteByPost(post);
     }
 
+    @Transactional(readOnly = true)
     public PostElements getSearchTab(Pageable pageable) {
-        final Member loginMember = jwtService.getLoginMember();
-
-        final PostSearchResponse response = restTemplate
-                .getForObject(
-                        lambdaBaseUrl + "/post_recommend_tab?userId=" + loginMember.getId(),
-                        PostSearchResponse.class
-                );
-
-        final Page<Post> postPage = postRepository.findPostsInIdList(
-                response.getPostIdList(),
-                loginMember.getId(),
-                pageable
-        );
+        final Page<Post> postPage = postRepository.findPopularPost(pageable);
         return PostElements.from(postPage);
     }
 }

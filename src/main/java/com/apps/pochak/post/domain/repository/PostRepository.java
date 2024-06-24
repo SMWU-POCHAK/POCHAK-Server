@@ -131,6 +131,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         );
     }
 
+    @Query("select p from Post p " +
+            "left join LikeEntity l on l.likedPost = p " +
+            "group by p.id " +
+            "order by count(l) desc ")
+    Page<Post> findPopularPost(final Pageable pageable);
+
     @Modifying
     @Query("update Post p SET p.status = 'INACTIVE' " +
             "where (p.owner = :memberA and p in (select t.post from Tag t where t.post = p and t.member = :memberB)) " +
