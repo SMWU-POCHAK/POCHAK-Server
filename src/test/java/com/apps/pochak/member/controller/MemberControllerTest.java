@@ -180,4 +180,65 @@ class MemberControllerTest {
                         )
                 );
     }
+
+    @Test
+    @DisplayName("search Member API Document")
+    void searchMemberTest() throws Exception {
+
+        String keyword = "habo";
+
+        this.mockMvc.perform(
+                        RestDocumentationRequestBuilders
+                                .get("/api/v2/members/search")
+                                .queryParam("keyword", keyword)
+                                .header("Authorization", authorization1)
+                                .contentType(APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andDo(
+                        document("search_member",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(
+                                        headerWithName("Authorization").description("Basic auth credentials")
+                                ),
+                                queryParameters(
+                                        parameterWithName("keyword").description("검색하고자 하는 멤버의 아이디"),
+                                        parameterWithName("page").description("조회할 페이지 [default: 0]").optional()
+                                ),
+                                responseFields(
+                                        fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),
+                                        fieldWithPath("code").type(STRING).description("결과 코드"),
+                                        fieldWithPath("message").type(STRING).description("결과 메세지"),
+                                        fieldWithPath("result").type(OBJECT).description("결과 데이터"),
+                                        fieldWithPath("result.pageInfo").type(OBJECT).description("검색된 멤버들 페이징 정보"),
+                                        fieldWithPath("result.pageInfo.lastPage").type(BOOLEAN)
+                                                .description(
+                                                        "검색된 멤버들 페이징 정보: 현재 페이지가 마지막 페이지인지의 여부"
+                                                ),
+                                        fieldWithPath("result.pageInfo.totalPages").type(NUMBER)
+                                                .description(
+                                                        "검색된 멤버들 페이징 정보: 총 페이지 수"
+                                                ),
+                                        fieldWithPath("result.pageInfo.totalElements").type(NUMBER)
+                                                .description(
+                                                        "검색된 멤버들 페이징 정보: 총 검색된 멤버들의 수"
+                                                ),
+                                        fieldWithPath("result.pageInfo.size").type(NUMBER)
+                                                .description(
+                                                        "검색된 멤버들 페이징 정보: 페이징 사이즈"
+                                                ),
+                                        fieldWithPath("result.memberList").type(ARRAY).description("검색된 멤버 리스트"),
+                                        fieldWithPath("result.memberList[].memberId").type(NUMBER)
+                                                .description("검색된 멤버 리스트: 멤버 아이디").optional(),
+                                        fieldWithPath("result.memberList[].profileImage").type(STRING)
+                                                .description("검색된 멤버 리스트: 프로필 이미지").optional(),
+                                        fieldWithPath("result.memberList[].handle").type(STRING)
+                                                .description("검색된 멤버 리스트: 멤버 핸들").optional(),
+                                        fieldWithPath("result.memberList[].name").type(STRING)
+                                                .description("검색된 멤버 리스트: 멤버 이름").optional(),
+                                        fieldWithPath("result.memberList[].isFollow").description("(이 데이터는 무시해주세요~ 어차피 전부 null로 전달됨!)").type(BOOLEAN).optional()
+                                )
+                        )
+                );
+    }
 }

@@ -58,6 +58,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     void deleteMemberByMemberId(@Param("memberId") final Long memberId);
 
     @Query("select m from Member m " +
-            "where m.handle ilike :keyword")
-    Page<Member> searchByHandle(@Param("keyword") final String keyword, final Pageable pageable);
+            "where m.handle ilike concat('%', :keyword, '%')" +
+            "   and m not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
+            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker = m) ")
+    Page<Member> searchByHandle(
+            @Param("keyword") final String keyword,
+            @Param("loginMember") final Member loginMember,
+            final Pageable pageable
+    );
 }

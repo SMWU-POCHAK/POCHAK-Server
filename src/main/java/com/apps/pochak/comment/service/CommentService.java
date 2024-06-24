@@ -60,7 +60,10 @@ public class CommentService {
         return new ParentCommentElement(comment, toPageRequest(pageable));
     }
 
-    public void saveComment(Long postId, CommentUploadRequest request) {
+    public void saveComment(
+            final Long postId,
+            final CommentUploadRequest request
+    ) {
         final Member loginMember = jwtService.getLoginMember();
         final Post post = postRepository.findPublicPostById(postId, loginMember);
 

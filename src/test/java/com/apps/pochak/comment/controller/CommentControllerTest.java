@@ -327,7 +327,6 @@ class CommentControllerTest {
 
         final CommentUploadRequest uploadRequest = new CommentUploadRequest("댓글 내용 테스트", 13L);
 
-
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .post("/api/v2/posts/{postId}/comments", 2)

@@ -73,7 +73,8 @@ public class MemberService {
             final String keyword,
             final Pageable pageable
     ) {
-        Page<Member> memberPage = memberRepository.searchByHandle(keyword, pageable);
+        Member loginMember = jwtService.getLoginMember();
+        Page<Member> memberPage = memberRepository.searchByHandle(keyword, loginMember, pageable);
         return MemberElements.from(memberPage);
     }
 }

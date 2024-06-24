@@ -113,7 +113,7 @@ class FollowControllerTest {
                                         fieldWithPath("result.memberList[].profileImage").type(STRING)
                                                 .description("팔로잉 리스트: 프로필 이미지").optional(),
                                         fieldWithPath("result.memberList[].handle").type(STRING)
-                                                .description("팔로잉 리스트: 멤버 아이디").optional(),
+                                                .description("팔로잉 리스트: 멤버 핸들").optional(),
                                         fieldWithPath("result.memberList[].name").type(STRING)
                                                 .description("팔로잉 리스트: 멤버 이름").optional(),
                                         fieldWithPath("result.memberList[].isFollow").type(BOOLEAN)
