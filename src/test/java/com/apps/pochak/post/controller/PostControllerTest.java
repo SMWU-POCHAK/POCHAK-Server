@@ -117,6 +117,57 @@ class PostControllerTest {
     }
 
     @Test
+    @DisplayName("Search Tab API Document")
+    void getSearchTab() throws Exception {
+        this.mockMvc.perform(
+                        RestDocumentationRequestBuilders
+                                .get("/api/v2/posts/search")
+                                .header("Authorization", authorization1)
+                                .contentType(APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andDo(
+                        document("get-search-tab",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(
+                                        headerWithName("Authorization").description("Basic auth credentials")
+                                ),
+                                queryParameters(
+                                        parameterWithName("page").description("조회할 페이지 [default: 0]").optional()
+                                ),
+                                responseFields(
+                                        fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),
+                                        fieldWithPath("code").type(STRING).description("결과 코드"),
+                                        fieldWithPath("message").type(STRING).description("결과 메세지"),
+                                        fieldWithPath("result").type(OBJECT).description("결과 데이터"),
+                                        fieldWithPath("result.pageInfo").type(OBJECT).description("게시물 페이징 정보"),
+                                        fieldWithPath("result.pageInfo.lastPage").type(BOOLEAN)
+                                                .description(
+                                                        "게시물 페이징 정보: 현재 페이지가 마지막 페이지인지의 여부"
+                                                ),
+                                        fieldWithPath("result.pageInfo.totalPages").type(NUMBER)
+                                                .description(
+                                                        "게시물 페이징 정보: 총 페이지 수"
+                                                ),
+                                        fieldWithPath("result.pageInfo.totalElements").type(NUMBER)
+                                                .description(
+                                                        "게시물 페이징 정보: 태그된 총 포스트 수"
+                                                ),
+                                        fieldWithPath("result.pageInfo.size").type(NUMBER)
+                                                .description(
+                                                        "게시물 페이징 정보: 페이징 사이즈"
+                                                ),
+                                        fieldWithPath("result.postList").type(ARRAY).description("게시물 리스트"),
+                                        fieldWithPath("result.postList[].postId").type(NUMBER)
+                                                .description("게시물 리스트: 게시물 아이디"),
+                                        fieldWithPath("result.postList[].postImage").type(STRING)
+                                                .description("게시물 리스트: 게시물 이미지")
+                                )
+                        )
+                );
+    }
+
+    @Test
     @Transactional
     @DisplayName("Post Upload API Document")
     void uploadPostTest() throws Exception {

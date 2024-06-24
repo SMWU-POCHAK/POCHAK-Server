@@ -41,6 +41,7 @@ pochak server team~~
 === Member 멤버
 * link:profile.html[Profile API]
 * link:follow.html[Follow API]
+* link:search.html[Search API]
 
 === Login 로그인
 

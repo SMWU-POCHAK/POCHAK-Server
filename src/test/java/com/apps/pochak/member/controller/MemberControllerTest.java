@@ -195,7 +195,7 @@ class MemberControllerTest {
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
-                        document("search_member",
+                        document("search-member",
                                 getDocumentRequest(),
                                 getDocumentResponse(),
                                 requestHeaders(
