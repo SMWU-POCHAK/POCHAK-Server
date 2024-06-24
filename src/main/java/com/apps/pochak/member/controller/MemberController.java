@@ -1,15 +1,15 @@
 package com.apps.pochak.member.controller;
 
 import com.apps.pochak.global.api_payload.ApiResponse;
+import com.apps.pochak.member.dto.response.MemberElements;
 import com.apps.pochak.member.service.MemberService;
 import com.apps.pochak.post.dto.PostElements;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,5 +35,13 @@ public class MemberController {
             @PageableDefault(PROFILE_PAGING_SIZE) final Pageable pageable
     ) {
         return ApiResponse.onSuccess(memberService.getUploadPosts(handle, pageable));
+    }
+
+    @GetMapping("/search")
+    public ApiResponse<MemberElements> searchMember(
+            @RequestParam("keyword") final String keyword,
+            @PageableDefault(DEFAULT_PAGING_SIZE) final Pageable pageable
+    ) {
+        return ApiResponse.onSuccess(memberService.search(keyword, pageable));
     }
 }

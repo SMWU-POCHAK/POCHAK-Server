@@ -4,6 +4,7 @@ import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.login.jwt.JwtService;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
+import com.apps.pochak.member.dto.response.MemberElements;
 import com.apps.pochak.member.dto.response.ProfileResponse;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
@@ -12,15 +13,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MemberService {
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
     private final PostRepository postRepository;
     private final JwtService jwtService;
 
+    @Transactional(readOnly = true)
     public ProfileResponse getProfileDetail(final String handle,
                                             final Pageable pageable
     ) {
@@ -42,6 +46,7 @@ public class MemberService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public PostElements getTaggedPosts(
             final String handle,
             final Pageable pageable
@@ -52,6 +57,7 @@ public class MemberService {
         return PostElements.from(taggedPost);
     }
 
+    @Transactional(readOnly = true)
     public PostElements getUploadPosts(
             final String handle,
             final Pageable pageable
@@ -60,5 +66,14 @@ public class MemberService {
         final Member owner = memberRepository.findByHandle(handle, loginMember);
         final Page<Post> taggedPost = postRepository.findUploadPost(owner, loginMember, pageable);
         return PostElements.from(taggedPost);
+    }
+
+    @Transactional(readOnly = true)
+    public MemberElements search(
+            final String keyword,
+            final Pageable pageable
+    ) {
+        Page<Member> memberPage = memberRepository.searchByHandle(keyword, pageable);
+        return MemberElements.from(memberPage);
     }
 }

@@ -11,10 +11,11 @@ import org.springframework.data.repository.query.Param;
 public interface CustomMemberRepository extends JpaRepository<Member, Long> {
     @Query("select  " +
             "new com.apps.pochak.member.dto.response.MemberElement(" +
-                "m.profileImage, " +
-                "m.handle, " +
-                "m.name, " +
-                "(case when m.id <> :loginMemberId then (fo.id is not null) else nullif(m.id, :loginMemberId) end) " +
+            "   m.id, " +
+            "   m.profileImage, " +
+            "   m.handle, " +
+            "   m.name, " +
+            "   (case when m.id <> :loginMemberId then (fo.id is not null) else nullif(m.id, :loginMemberId) end) " +
             ") " +
             "from Follow f " +
             "join Member m on (f.sender = m and f.receiver = :member " +
@@ -31,10 +32,11 @@ public interface CustomMemberRepository extends JpaRepository<Member, Long> {
 
     @Query("select  " +
             "new com.apps.pochak.member.dto.response.MemberElement(" +
-                "m.profileImage, " +
-                "m.handle, " +
-                "m.name, " +
-                "(case when m.id <> :loginMemberId then (fo.id is not null) else nullif(m.id, :loginMemberId) end) " +
+            "   m.id, " +
+            "   m.profileImage, " +
+            "   m.handle, " +
+            "   m.name, " +
+            "   (case when m.id <> :loginMemberId then (fo.id is not null) else nullif(m.id, :loginMemberId) end) " +
             ") " +
             "from Follow f " +
             "join Member m on (f.receiver = m and f.sender = :member " +

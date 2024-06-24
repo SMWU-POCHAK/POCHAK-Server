@@ -12,11 +12,11 @@ import com.apps.pochak.member.domain.repository.CustomMemberRepository;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.member.dto.response.MemberElement;
 import com.apps.pochak.member.dto.response.MemberElements;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +27,7 @@ import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.*;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class FollowService {
     private final FollowRepository followRepository;
@@ -35,7 +36,6 @@ public class FollowService {
     private final CustomMemberRepository customMemberRepository;
     private final JwtService jwtService;
 
-    @Transactional
     public BaseCode follow(final String handle) {
         final Member loginMember = jwtService.getLoginMember();
         final Member member = memberRepository.findByHandle(handle, loginMember);
@@ -94,7 +94,6 @@ public class FollowService {
         alarmRepository.deleteAll(alarmList);
     }
 
-    @Transactional
     public BaseCode deleteFollower(final String handle,
                                    final String followerHandle
     ) {
@@ -113,6 +112,7 @@ public class FollowService {
         return SUCCESS_DELETE_FOLLOWER;
     }
 
+    @Transactional(readOnly = true)
     public MemberElements getFollowings(final String handle,
                                         final Pageable pageable
     ) {
@@ -124,11 +124,10 @@ public class FollowService {
                 pageable
         );
 
-        return MemberElements.from()
-                .memberElementPage(followingPage)
-                .build();
+        return new MemberElements(followingPage);
     }
 
+    @Transactional(readOnly = true)
     public MemberElements getFollowers(final String handle,
                                        final Pageable pageable
     ) {
@@ -140,8 +139,6 @@ public class FollowService {
                 pageable
         );
 
-        return MemberElements.from()
-                .memberElementPage(followerPage)
-                .build();
+        return new MemberElements(followerPage);
     }
 }

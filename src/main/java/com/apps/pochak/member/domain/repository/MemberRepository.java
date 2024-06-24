@@ -2,6 +2,8 @@ package com.apps.pochak.member.domain.repository;
 
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.member.domain.Member;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -54,4 +56,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Modifying
     @Query("update Member member set member.status = 'DELETED' where member.id = :memberId")
     void deleteMemberByMemberId(@Param("memberId") final Long memberId);
+
+    @Query("select m from Member m " +
+            "where m.handle ilike :keyword")
+    Page<Member> searchByHandle(@Param("keyword") final String keyword, final Pageable pageable);
 }
