@@ -1,10 +1,7 @@
 package com.apps.pochak.member.domain;
 
 import com.apps.pochak.global.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +11,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.util.Objects;
 
+import static jakarta.persistence.EnumType.*;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -43,6 +41,7 @@ public class Member extends BaseEntity {
 
     private String socialId;
 
+    @Enumerated(STRING)
     private SocialType socialType;
 
     private String socialRefreshToken;
