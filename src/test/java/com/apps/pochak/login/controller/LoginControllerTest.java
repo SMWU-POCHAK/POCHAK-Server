@@ -93,7 +93,6 @@ public class LoginControllerTest {
                                 .queryParam("socialId", "1111111")
                                 .queryParam("socialType", "apple")
                                 .queryParam("socialRefreshToken", "1111111")
-                                .header("Authorization", authorization2)
                 ).andExpect(status().isOk())
                 .andDo(
                         document("signup",
