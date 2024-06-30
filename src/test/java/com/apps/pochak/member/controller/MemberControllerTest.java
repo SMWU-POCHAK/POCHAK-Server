@@ -241,4 +241,32 @@ class MemberControllerTest {
                         )
                 );
     }
+
+    @Test
+    @DisplayName("check duplicate handle API Document")
+    void checkDuplicateHandleTest() throws Exception {
+
+        String handle = "5ji";
+
+        this.mockMvc.perform(
+                        RestDocumentationRequestBuilders
+                                .get("/api/v2/members/duplicate")
+                                .queryParam("handle", handle)
+                                .contentType(APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andDo(
+                        document("check-duplicate-handle",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                queryParameters(
+                                        parameterWithName("handle").description("검색하고자 하는 handle")
+                                ),
+                                responseFields(
+                                        fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부 (중복시 실패 처리됨)"),
+                                        fieldWithPath("code").type(STRING).description("결과 코드"),
+                                        fieldWithPath("message").type(STRING).description("결과 메세지")
+                                )
+                        )
+                );
+    }
 }
