@@ -25,6 +25,9 @@ public enum ErrorStatus implements BaseErrorCode {
     INVALID_ALARM_ID(BAD_REQUEST, "ALARM4001", "유효하지 않은 알람 아이디입니다."),
     NOT_YOUR_ALARM(UNAUTHORIZED, "ALARM4002", "해당 알람의 확인 권한이 없습니다."),
 
+    // Block
+    BLOCK_ONESELF(BAD_REQUEST, "BLOCK4001", "자기 자신을 차단할 수 없습니다."),
+
     // Comment
     INVALID_COMMENT_ID(BAD_REQUEST, "COMMENT4001", "유효하지 않은 댓글 아이디입니다."),
 

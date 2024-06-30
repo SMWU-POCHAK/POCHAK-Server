@@ -13,6 +13,8 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.util.Objects;
+
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -51,7 +53,16 @@ public class Member extends BaseEntity {
     }
 
     @Builder(builderMethodName = "signupMember", builderClassName = "signupMember")
-    public Member(String name, String email, String handle, String message, String socialId, SocialType socialType, String profileImage, String socialRefreshToken) {
+    public Member(
+            final String name,
+            final String email,
+            final String handle,
+            final String message,
+            final String socialId,
+            final SocialType socialType,
+            final String profileImage,
+            final String socialRefreshToken
+    ) {
         this.handle = handle;
         this.name = name;
         this.message = message;
@@ -62,16 +73,19 @@ public class Member extends BaseEntity {
         this.socialRefreshToken = socialRefreshToken;
     }
 
-    public void updateMember(ProfileUpdateRequest profileUpdateRequest, String profileImageUrl){
-        this.name = getOrDefault(profileUpdateRequest.getName(), this.name);
-        this.handle = getOrDefault(profileUpdateRequest.getHandle(), this.handle);
-        this.message = getOrDefault(profileUpdateRequest.getMessage(), this.message);
-        this.profileImage = getOrDefault(profileImageUrl, this.profileImage);
-    }
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null) {
+            return false;
+        }
+        if (this.getClass() != o.getClass()) {
+            return false;
+        }
 
-    private <T> T getOrDefault(T property, T alternative){
-        if (property != null)
-            return property;
-        return alternative;
+        Member member = (Member)o;
+        return Objects.equals(id, member.id);
     }
 }

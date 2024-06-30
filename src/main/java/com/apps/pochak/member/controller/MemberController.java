@@ -3,6 +3,7 @@ package com.apps.pochak.member.controller;
 import com.apps.pochak.global.api_payload.ApiResponse;
 import com.apps.pochak.global.api_payload.exception.handler.AppleOAuthException;
 import com.apps.pochak.member.dto.request.ProfileUpdateRequest;
+import com.apps.pochak.member.dto.response.MemberElements;
 import com.apps.pochak.member.service.MemberService;
 import com.apps.pochak.post.dto.PostElements;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,10 +40,12 @@ public class MemberController {
         return ApiResponse.onSuccess(memberService.getUploadPosts(handle, pageable));
     }
 
-    @PutMapping("/{handle}")
-    public ApiResponse<?> updateProfileDetail(
-            @PathVariable("handle") final String handle,
-            @ModelAttribute final ProfileUpdateRequest profileUpdateRequest){
-        return ApiResponse.onSuccess(memberService.updateProfileDetail(handle, profileUpdateRequest));
+
+    @GetMapping("/search")
+    public ApiResponse<MemberElements> searchMember(
+            @RequestParam("keyword") final String keyword,
+            @PageableDefault(DEFAULT_PAGING_SIZE) final Pageable pageable
+    ) {
+        return ApiResponse.onSuccess(memberService.search(keyword, pageable));
     }
 }

@@ -9,8 +9,10 @@ import com.apps.pochak.report.domain.repository.ReportRepository;
 import com.apps.pochak.report.dto.request.ReportUploadRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ReportService {
     private final ReportRepository reportRepository;
@@ -19,7 +21,7 @@ public class ReportService {
 
     public void saveReport(final ReportUploadRequest request) {
         final Member reporter = jwtService.getLoginMember();
-        final Post reportedPost = postRepository.findPostById(request.getPostId());
+        final Post reportedPost = postRepository.findPostById(request.getPostId(), reporter);
 
         Report report = request.toEntity(reporter, reportedPost);
         reportRepository.save(report);

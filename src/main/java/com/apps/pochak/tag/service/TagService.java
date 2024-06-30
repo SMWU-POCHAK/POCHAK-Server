@@ -18,6 +18,7 @@ import java.util.List;
 import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.*;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class TagService {
     private final TagRepository tagRepository;
@@ -26,7 +27,6 @@ public class TagService {
 
     private final JwtService jwtService;
 
-    @Transactional
     public BaseCode approveOrRejectTagRequest(Long tagId, Boolean isAccept) {
         final Member loginMember = jwtService.getLoginMember();
         final Tag tag = tagRepository.findTagByIdAndMember(tagId, loginMember);

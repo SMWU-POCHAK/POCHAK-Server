@@ -27,11 +27,6 @@ public class OAuthController {
     private final AppleOAuthService appleOAuthService;
     private final GoogleOAuthService googleOAuthService;
 
-    @GetMapping("/google/login/{accessToken}")
-    public ApiResponse<?> googleOAuthRequest(@PathVariable String accessToken) {
-        return ApiResponse.onSuccess(googleOAuthService.login(accessToken));
-    }
-
     @PostMapping(value = "/api/v2/member/signup")
     public ApiResponse<?> signup(@ModelAttribute final MemberInfoRequest memberInfoRequest) {
         return ApiResponse.onSuccess(oAuthService.signup(memberInfoRequest));
@@ -48,12 +43,17 @@ public class OAuthController {
         return ApiResponse.onSuccess(appleOAuthService.login(idToken, authorizationCode));
     }
 
+    @GetMapping("/google/login/{accessToken}")
+    public ApiResponse<?> googleOAuthRequest(@PathVariable String accessToken) {
+        return ApiResponse.onSuccess(googleOAuthService.login(accessToken));
+    }
+
     @GetMapping("/api/v2/member/logout")
     public ApiResponse<?> logout() {
         String accessToken = JwtHeaderUtil.getAccessToken();
         String handle = jwtService.getHandle(accessToken);
         oAuthService.logout(handle);
-        return ApiResponse.of(SUCCESS_LOG_OUT, null);
+        return ApiResponse.of(SUCCESS_LOG_OUT);
     }
 
     @DeleteMapping("/api/v2/member/signout")
@@ -61,6 +61,6 @@ public class OAuthController {
         String accessToken = JwtHeaderUtil.getAccessToken();
         String handle = jwtService.getHandle(accessToken);
         oAuthService.signout(handle);
-        return ApiResponse.of(SUCCESS_SIGN_OUT, null);
+        return ApiResponse.of(SUCCESS_SIGN_OUT);
     }
 }

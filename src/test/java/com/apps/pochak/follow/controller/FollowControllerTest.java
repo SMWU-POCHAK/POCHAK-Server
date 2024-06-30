@@ -108,10 +108,12 @@ class FollowControllerTest {
                                                         "팔로잉 페이징 정보: 페이징 사이즈"
                                                 ),
                                         fieldWithPath("result.memberList").type(ARRAY).description("팔로잉 리스트"),
+                                        fieldWithPath("result.memberList[].memberId").type(NUMBER)
+                                                .description("팔로워 리스트: 멤버 아이디").optional(),
                                         fieldWithPath("result.memberList[].profileImage").type(STRING)
                                                 .description("팔로잉 리스트: 프로필 이미지").optional(),
                                         fieldWithPath("result.memberList[].handle").type(STRING)
-                                                .description("팔로잉 리스트: 멤버 아이디").optional(),
+                                                .description("팔로잉 리스트: 멤버 핸들").optional(),
                                         fieldWithPath("result.memberList[].name").type(STRING)
                                                 .description("팔로잉 리스트: 멤버 이름").optional(),
                                         fieldWithPath("result.memberList[].isFollow").type(BOOLEAN)
@@ -171,10 +173,12 @@ class FollowControllerTest {
                                                         "팔로워 페이징 정보: 페이징 사이즈"
                                                 ),
                                         fieldWithPath("result.memberList").type(ARRAY).description("팔로워 리스트"),
+                                        fieldWithPath("result.memberList[].memberId").type(NUMBER)
+                                                .description("팔로워 리스트: 멤버 아이디").optional(),
                                         fieldWithPath("result.memberList[].profileImage").type(STRING)
                                                 .description("팔로워 리스트: 프로필 이미지").optional(),
                                         fieldWithPath("result.memberList[].handle").type(STRING)
-                                                .description("팔로워 리스트: 멤버 아이디").optional(),
+                                                .description("팔로워 리스트: 멤버 핸들").optional(),
                                         fieldWithPath("result.memberList[].name").type(STRING)
                                                 .description("팔로워 리스트: 멤버 이름").optional(),
                                         fieldWithPath("result.memberList[].isFollow").type(BOOLEAN)

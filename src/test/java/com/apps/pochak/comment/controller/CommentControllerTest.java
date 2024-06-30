@@ -327,7 +327,6 @@ class CommentControllerTest {
 
         final CommentUploadRequest uploadRequest = new CommentUploadRequest("댓글 내용 테스트", 13L);
 
-
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .post("/api/v2/posts/{postId}/comments", 2)
@@ -357,6 +356,44 @@ class CommentControllerTest {
                                                                 "만약 자식 댓글을 작성하고 싶은 경우 부모 댓글 아이디를 전달하고, " +
                                                                 "부모 댓글을 작성하고 싶은 경우 null값으로 전달합니다."
                                                 ).optional()
+                                ),
+                                responseFields(
+                                        fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),
+                                        fieldWithPath("code").type(STRING).description("결과 코드"),
+                                        fieldWithPath("message").type(STRING).description("결과 메세지")
+                                )
+
+                        )
+                );
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("Delete Comment API Document")
+    void deleteCommentTest() throws Exception {
+
+        Long postId = 2L;
+        String commentId = "3";
+
+        this.mockMvc.perform(
+                        RestDocumentationRequestBuilders
+                                .delete("/api/v2/posts/{postId}/comments", postId)
+                                .queryParam("commentId", commentId)
+                                .header("Authorization", authorization)
+                                .contentType(APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andDo(
+                        document("delete-comment",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(
+                                        headerWithName("Authorization").description("Basic auth credentials : 댓글은 게시글의 주인(찍은 사람 + 찍힌 사람들)과 댓글을 작성한 사람들만 삭제할 수 있습니다.")
+                                ),
+                                pathParameters(
+                                        parameterWithName("postId").description("게시물 아이디")
+                                ),
+                                queryParameters(
+                                        parameterWithName("commentId").description("삭제하려는 댓글 아이디").optional()
                                 ),
                                 responseFields(
                                         fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),

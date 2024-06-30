@@ -32,19 +32,23 @@ pochak server team~~
 
 == API List
 
-=== Post
+=== Post 게시물
 
 * link:post.html[Post API]
 * link:comment.html[Comment API]
 * link:like.html[LIKE API]
 
-=== Member
+=== Member 멤버
 * link:profile.html[Profile API]
 * link:follow.html[Follow API]
+* link:search.html[Search API]
 
-=== Login
+=== Login 로그인
 
 * link:login.html[Login API]
 
-=== Report
+=== Report 신고
 * link:report.html[Report API]
+
+=== Block 차단
+* link:block.html[Block API]

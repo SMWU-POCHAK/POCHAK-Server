@@ -58,7 +58,7 @@ public class JwtService {
     public String validateRefreshToken(String accessToken, String refreshToken) {
         String handle = getHandle(accessToken);
 
-        Member member = memberRepository.findByHandle(handle);
+        Member member = memberRepository.findByHandleWithoutLogin(handle);
 
         if (member.getRefreshToken() == null || member.getRefreshToken().isEmpty())
             throw new RefreshTokenException(NULL_REFRESH_TOKEN);
@@ -126,7 +126,7 @@ public class JwtService {
     // custom
     public Member getLoginMember() {
         final String loginMemberHandle = getLoginMemberHandle();
-        return memberRepository.findByHandle(loginMemberHandle);
+        return memberRepository.findByHandleWithoutLogin(loginMemberHandle);
     }
 
     public String getLoginMemberHandle() {

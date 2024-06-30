@@ -60,8 +60,8 @@ class ReportControllerTest {
 
     @Test
     @Transactional
-    @DisplayName("Comment Upload API Document")
-    void uploadCommentTest() throws Exception {
+    @DisplayName("Report Upload API Document")
+    void uploadReportTest() throws Exception {
 
         final ReportUploadRequest uploadRequest = new ReportUploadRequest(174L, ReportType.NOT_INTERESTED);
 

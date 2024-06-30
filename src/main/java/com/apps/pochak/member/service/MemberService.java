@@ -7,7 +7,7 @@ import com.apps.pochak.global.s3.S3Service;
 import com.apps.pochak.login.jwt.JwtService;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
-import com.apps.pochak.member.dto.request.ProfileUpdateRequest;
+import com.apps.pochak.member.dto.response.MemberElements;
 import com.apps.pochak.member.dto.response.ProfileResponse;
 import com.apps.pochak.member.dto.response.ProfileUpdateResponse;
 import com.apps.pochak.post.domain.Post;
@@ -17,14 +17,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.DUPLICATE_HANDLE;
-import static com.apps.pochak.global.s3.DirName.MEMBER;
-import static com.apps.pochak.post.domain.PostStatus.PUBLIC;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MemberService {
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
@@ -32,15 +29,16 @@ public class MemberService {
     private final JwtService jwtService;
     private final S3Service awsS3Service;
 
+    @Transactional(readOnly = true)
     public ProfileResponse getProfileDetail(final String handle,
                                             final Pageable pageable
     ) {
         final String loginMemberHandle = jwtService.getLoginMemberHandle();
         final Member loginMember = jwtService.getLoginMember();
-        final Member member = findMemberByHandle(handle);
+        final Member member = memberRepository.findByHandle(handle, loginMember);
         final long followerCount = followRepository.countActiveFollowByReceiver(member);
         final long followingCount = followRepository.countActiveFollowBySender(member);
-        final Page<Post> taggedPost = postRepository.findTaggedPost(member, pageable);
+        final Page<Post> taggedPost = postRepository.findTaggedPost(member, loginMember, pageable);
         final Boolean isFollow = (handle.equals(loginMemberHandle)) ?
                 null : followRepository.existsBySenderAndReceiver(loginMember, member);
 
@@ -53,51 +51,36 @@ public class MemberService {
                 .build();
     }
 
-    public ProfileUpdateResponse updateProfileDetail(final String handle,
-                                    final ProfileUpdateRequest profileUpdateRequest){
-        final Member member = findMemberByHandle(handle);
-        checkHandleDuplication(handle);
-        String profileImageUrl = awsS3Service.upload(profileUpdateRequest.getProfieImage(), MEMBER);
-        member.updateMember(profileUpdateRequest, profileImageUrl);
-
-        return ProfileUpdateResponse.builder()
-                .name(member.getName())
-                .handle(member.getHandle())
-                .message(member.getMessage())
-                .profileImage(member.getProfileImage())
-                .build();
-    }
-
+    @Transactional(readOnly = true)
     public PostElements getTaggedPosts(
             final String handle,
             final Pageable pageable
     ) {
-        final Member member = findMemberByHandle(handle);
-        final Page<Post> taggedPost = postRepository.findTaggedPost(member, pageable);
+        final Member loginMember = jwtService.getLoginMember();
+        final Member member = memberRepository.findByHandle(handle, loginMember);
+        final Page<Post> taggedPost = postRepository.findTaggedPost(member, loginMember, pageable);
         return PostElements.from(taggedPost);
     }
 
+    @Transactional(readOnly = true)
     public PostElements getUploadPosts(
             final String handle,
             final Pageable pageable
     ) {
-        final Member member = findMemberByHandle(handle);
-        final Page<Post> taggedPost;
-        if (isMyProfile(member)) {
-            taggedPost = postRepository.findPostByOwnerOrderByCreatedDateDesc(member, pageable);
-        } else {
-            taggedPost = postRepository.findPostByOwnerAndPostStatusOrderByCreatedDateDesc(member, PUBLIC, pageable);
-        }
+        final Member loginMember = jwtService.getLoginMember();
+        final Member owner = memberRepository.findByHandle(handle, loginMember);
+        final Page<Post> taggedPost = postRepository.findUploadPost(owner, loginMember, pageable);
         return PostElements.from(taggedPost);
     }
 
-    private Boolean isMyProfile(final Member member) {
-        final String loginMemberHandle = jwtService.getLoginMemberHandle();
-        return member.getHandle().equals(loginMemberHandle);
-    }
-
-    private Member findMemberByHandle(final String handle) {
-        return memberRepository.findByHandle(handle);
+    @Transactional(readOnly = true)
+    public MemberElements search(
+            final String keyword,
+            final Pageable pageable
+    ) {
+        Member loginMember = jwtService.getLoginMember();
+        Page<Member> memberPage = memberRepository.searchByHandle(keyword, loginMember, pageable);
+        return MemberElements.from(memberPage);
     }
 
     private void checkHandleDuplication(String handle) {

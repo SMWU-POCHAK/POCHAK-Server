@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_CHECK_ALARM;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AlarmService {
     private final AlarmRepository alarmRepository;
@@ -26,7 +27,6 @@ public class AlarmService {
         return new AlarmElements(alarmPage);
     }
 
-    @Transactional
     public BaseCode checkAlarm(Long alarmId) {
         final Member loginMember = jwtService.getLoginMember();
         final Alarm alarm = alarmRepository.findAlarmById(alarmId, loginMember);

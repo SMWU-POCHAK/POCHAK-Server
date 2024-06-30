@@ -24,8 +24,8 @@ import static lombok.AccessLevel.PROTECTED;
 @DynamicInsert
 @NoArgsConstructor(access = PROTECTED)
 @SQLDelete(sql = "UPDATE post SET status = 'DELETED' WHERE id = ?")
-@SQLRestriction("status = 'ACTIVE'")
 public class Post extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
@@ -56,11 +56,11 @@ public class Post extends BaseEntity {
         this.caption = caption;
     }
 
-    public Boolean isPrivate() {
+    public boolean isPrivate() {
         return getPostStatus().equals(PRIVATE);
     }
 
-    public Boolean isOwner(final Member member) {
+    public boolean isOwner(final Member member) {
         return this.owner.getId().equals(member.getId());
     }
 
