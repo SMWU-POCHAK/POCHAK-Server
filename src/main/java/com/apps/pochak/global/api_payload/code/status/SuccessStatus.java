@@ -38,6 +38,7 @@ public enum SuccessStatus implements BaseCode {
     SUCCESS_SIGN_OUT(NO_CONTENT, "LOGIN2002", "성공적으로 탈퇴하였습니다."),
 
     // Member
+    VALID_HANDLE(NO_CONTENT, "MEMBER2001", "사용가능한 handle(아이디)입니다."),
 
     // Post
     SUCCESS_UPLOAD_POST(CREATED, "POST2001", "성공적으로 게시물을 등록하였습니다."),
