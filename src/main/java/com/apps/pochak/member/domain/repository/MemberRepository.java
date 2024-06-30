@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.INVALID_MEMBER_HANDLE;
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
@@ -27,6 +27,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             @Param("handle") final String handle,
             @Param("loginMember") final Member loginMember
     );
+
+    default void checkDuplicateHandle(final String handle) {
+        if (findMemberByHandle(handle).isPresent())
+            throw new GeneralException(DUPLICATE_HANDLE);
+    }
 
     default Member findByHandleWithoutLogin(final String handle) {
         return findMemberByHandle(handle).orElseThrow(() -> new GeneralException(INVALID_MEMBER_HANDLE));

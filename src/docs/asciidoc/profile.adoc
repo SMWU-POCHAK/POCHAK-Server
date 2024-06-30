@@ -54,3 +54,18 @@ include::{snippets}/get-uploaded-post/query-parameters.adoc[]
 ==== response body
 include::{snippets}/get-uploaded-post/response-body.adoc[]
 include::{snippets}/get-uploaded-post/response-fields.adoc[]
+
+== `GET` Check Duplicate Handle API
+
+중복되는 아이디 (handle) 검사용 API
+
+=== Request
+include::{snippets}/check-duplicate-handle/http-request.adoc[]
+
+==== query parameters
+include::{snippets}/check-duplicate-handle/query-parameters.adoc[]
+
+=== Response
+==== response body
+include::{snippets}/check-duplicate-handle/response-body.adoc[]
+include::{snippets}/check-duplicate-handle/response-fields.adoc[]

@@ -77,4 +77,9 @@ public class MemberService {
         Page<Member> memberPage = memberRepository.searchByKeyword(keyword, loginMember, pageable);
         return MemberElements.from(memberPage);
     }
+
+    @Transactional(readOnly = true)
+    public void checkDuplicate(String handle) {
+        memberRepository.checkDuplicateHandle(handle);
+    }
 }
