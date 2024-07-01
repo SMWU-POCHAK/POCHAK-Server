@@ -60,9 +60,9 @@ public class MemberService {
             throw new GeneralException(UNAUTHORIZED_MEMBER_REQUEST);
         }
         String profileImageUrl = updateMember.getProfileImage();
-        if (profileUpdateRequest.getProfieImage() != null) {
+        if (profileUpdateRequest.getProfileImage() != null) {
             awsS3Service.deleteFileFromS3(updateMember.getProfileImage());
-            profileImageUrl = awsS3Service.upload(profileUpdateRequest.getProfieImage(), MEMBER);
+            profileImageUrl = awsS3Service.upload(profileUpdateRequest.getProfileImage(), MEMBER);
         }
         updateMember.updateMember(profileUpdateRequest, profileImageUrl);
 

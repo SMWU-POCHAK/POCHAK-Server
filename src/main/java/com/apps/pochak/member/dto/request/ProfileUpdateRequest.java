@@ -13,6 +13,6 @@ public class ProfileUpdateRequest {
 
     private String message;
 
-    private MultipartFile profieImage;
+    private MultipartFile profileImage;
 
 }
