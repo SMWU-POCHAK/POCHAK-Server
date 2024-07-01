@@ -170,6 +170,8 @@ public class CommentService {
 
     private void checkAuthorized(final Comment comment) {
         Member member = jwtService.getLoginMember();
+        if (comment.isOwner(member)) return;
+
         Post post = comment.getPost();
         if (post.isOwner(member)) return;
 

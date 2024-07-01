@@ -3,9 +3,9 @@ package com.apps.pochak.global.api_payload.exception.handler;
 import com.apps.pochak.global.api_payload.code.BaseErrorCode;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 
-public class RefreshTokenException extends GeneralException {
+public class InvalidJwtException extends GeneralException {
 
-    public RefreshTokenException(BaseErrorCode code) {
+    public InvalidJwtException(BaseErrorCode code) {
         super(code);
     }
 }

@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 class ReportControllerTest {
 
-    @Value("${test.authorization.dayeon}")
+    @Value("${test.authorization.master1}")
     String authorization;
 
     @Autowired

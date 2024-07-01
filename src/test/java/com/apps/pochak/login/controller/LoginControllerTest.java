@@ -1,7 +1,5 @@
 package com.apps.pochak.login.controller;
 
-import com.apps.pochak.login.dto.request.MemberInfoRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,7 +30,8 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.requestHe
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,13 +42,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 public class LoginControllerTest {
 
-    @Value("${test.authorization.goeun}")
+    @Value("${test.authorization.master1}")
     String authorization1;
 
-    @Value("${test.authorization.user1}")
+    @Value("${test.authorization.master2}")
     String authorization2;
 
-    @Value("${test.refreshtoken.goeun}")
+    @Value("${test.authorization.master1.refresh}")
     String refreshToken;
 
     @Autowired
@@ -84,7 +83,7 @@ public class LoginControllerTest {
         );
 
         this.mockMvc.perform(
-                        multipart("/api/v2/member/signup")
+                        multipart("/api/v2/members/signup")
                                 .file(profileImage)
                                 .queryParam("name", "user1")
                                 .queryParam("email", "user1@email.com")
@@ -115,10 +114,11 @@ public class LoginControllerTest {
                                         fieldWithPath("code").type(STRING).description("결과 코드"),
                                         fieldWithPath("message").type(STRING).description("결과 메세지"),
                                         fieldWithPath("result").type(OBJECT).description("결과 데이터"),
-                                        fieldWithPath("result.id").type(NULL).description("소셜 아이디"),
-                                        fieldWithPath("result.name").type(NULL).description("회원 이름"),
-                                        fieldWithPath("result.email").type(NULL).description("회원 이메일"),
-                                        fieldWithPath("result.socialType").type(NULL).description("소셜 타입 (google, apple)"),
+                                        fieldWithPath("result.id").type(NUMBER).description("멤버 아이디"),
+                                        fieldWithPath("result.socialId").type(STRING).description("소셜 아이디"),
+                                        fieldWithPath("result.name").type(STRING).description("회원 이름"),
+                                        fieldWithPath("result.email").type(STRING).description("회원 이메일"),
+                                        fieldWithPath("result.socialType").type(STRING).description("소셜 타입 (google, apple)"),
                                         fieldWithPath("result.accessToken").type(STRING).description("엑세스 토큰"),
                                         fieldWithPath("result.refreshToken").type(STRING).description("리프레쉬 토큰"),
                                         fieldWithPath("result.isNewMember").type(BOOLEAN).description("회원가입 여부")
@@ -127,35 +127,35 @@ public class LoginControllerTest {
                 );
     }
 
-//    @Test
-//    @Transactional
-//    @DisplayName("Refresh API Document")
-//    void refresh() throws Exception {
-//        this.mockMvc.perform(
-//                        RestDocumentationRequestBuilders
-//                                .post("/api/v2/member/refresh")
-//                                .header("Authorization", authorization1)
-//                                .header("RefreshToken", refreshToken)
-//                                .contentType(APPLICATION_JSON)
-//                ).andExpect(status().isOk())
-//                .andDo(
-//                        document("refresh",
-//                                getDocumentRequest(),
-//                                getDocumentResponse(),
-//                                requestHeaders(
-//                                        headerWithName("Authorization")
-//                                                .description("Basic auth credentials")
-//                                ),
-//                                responseFields(
-//                                        fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),
-//                                        fieldWithPath("code").type(STRING).description("결과 코드"),
-//                                        fieldWithPath("message").type(STRING).description("결과 메세지"),
-//                                        fieldWithPath("result").type(OBJECT).description("결과 데이터"),
-//                                        fieldWithPath("result.accessToken").type(STRING).description("엑세스 토큰")
-//                                )
-//                        )
-//                );
-//    }
+    @Test
+    @Transactional
+    @DisplayName("Refresh API Document")
+    void refresh() throws Exception {
+        this.mockMvc.perform(
+                        RestDocumentationRequestBuilders
+                                .post("/api/v2/members/refresh")
+                                .header("Authorization", authorization1)
+                                .header("RefreshToken", refreshToken)
+                                .contentType(APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andDo(
+                        document("refresh",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(
+                                        headerWithName("Authorization")
+                                                .description("Basic auth credentials")
+                                ),
+                                responseFields(
+                                        fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),
+                                        fieldWithPath("code").type(STRING).description("결과 코드"),
+                                        fieldWithPath("message").type(STRING).description("결과 메세지"),
+                                        fieldWithPath("result").type(OBJECT).description("결과 데이터"),
+                                        fieldWithPath("result.accessToken").type(STRING).description("엑세스 토큰")
+                                )
+                        )
+                );
+    }
 
     @Test
     @Transactional
@@ -163,7 +163,7 @@ public class LoginControllerTest {
     void logout() throws Exception {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .get("/api/v2/member/logout")
+                                .get("/api/v2/members/logout")
                                 .header("Authorization", authorization1)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
@@ -190,7 +190,7 @@ public class LoginControllerTest {
     void signout() throws Exception {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .delete("/api/v2/member/signout")
+                                .delete("/api/v2/members/signout")
                                 .header("Authorization", authorization1)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())

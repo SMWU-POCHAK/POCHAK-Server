@@ -2,6 +2,8 @@ package com.apps.pochak.login.controller;
 
 import com.apps.pochak.global.api_payload.ApiResponse;
 import com.apps.pochak.login.dto.request.MemberInfoRequest;
+import com.apps.pochak.login.dto.response.OAuthMemberResponse;
+import com.apps.pochak.login.dto.response.PostTokenResponse;
 import com.apps.pochak.login.jwt.JwtHeaderUtil;
 import com.apps.pochak.login.jwt.JwtService;
 import com.apps.pochak.login.oauth.AppleOAuthService;
@@ -27,19 +29,20 @@ public class OAuthController {
     private final AppleOAuthService appleOAuthService;
     private final GoogleOAuthService googleOAuthService;
 
-    @PostMapping(value = "/api/v2/member/signup")
-    public ApiResponse<?> signup(@ModelAttribute final MemberInfoRequest memberInfoRequest) {
+    @PostMapping(value = "/api/v2/members/signup")
+    public ApiResponse<OAuthMemberResponse> signup(@ModelAttribute final MemberInfoRequest memberInfoRequest) {
         return ApiResponse.onSuccess(oAuthService.signup(memberInfoRequest));
     }
 
-    @PostMapping("/api/v2/member/refresh")
-    public ApiResponse<?> refresh() {
-        return ApiResponse.onSuccess(jwtService.reissueAccessToken());
+    @PostMapping("/api/v2/members/refresh")
+    public ApiResponse<PostTokenResponse> refresh() {
+        return ApiResponse.onSuccess(oAuthService.reissueAccessToken());
     }
 
     @PostMapping("/apple/login")
     public ApiResponse<?> appleOAuthRequest(@RequestHeader(HEADER_IDENTITY_TOKEN) String idToken,
-                                            @RequestHeader(HEADER_APPLE_AUTHORIZATION_CODE) String authorizationCode) throws NoSuchAlgorithmException, InvalidKeySpecException, JsonProcessingException {
+                                            @RequestHeader(HEADER_APPLE_AUTHORIZATION_CODE) String authorizationCode)
+            throws NoSuchAlgorithmException, InvalidKeySpecException, JsonProcessingException {
         return ApiResponse.onSuccess(appleOAuthService.login(idToken, authorizationCode));
     }
 
@@ -48,19 +51,19 @@ public class OAuthController {
         return ApiResponse.onSuccess(googleOAuthService.login(accessToken));
     }
 
-    @GetMapping("/api/v2/member/logout")
+    @GetMapping("/api/v2/members/logout")
     public ApiResponse<?> logout() {
         String accessToken = JwtHeaderUtil.getAccessToken();
-        String handle = jwtService.getHandle(accessToken);
-        oAuthService.logout(handle);
+        String id = jwtService.getSubject(accessToken);
+        oAuthService.logout(id);
         return ApiResponse.of(SUCCESS_LOG_OUT);
     }
 
-    @DeleteMapping("/api/v2/member/signout")
+    @DeleteMapping("/api/v2/members/signout")
     public ApiResponse<?> signout() {
         String accessToken = JwtHeaderUtil.getAccessToken();
-        String handle = jwtService.getHandle(accessToken);
-        oAuthService.signout(handle);
+        String id = jwtService.getSubject(accessToken);
+        oAuthService.signout(id);
         return ApiResponse.of(SUCCESS_SIGN_OUT);
     }
 }

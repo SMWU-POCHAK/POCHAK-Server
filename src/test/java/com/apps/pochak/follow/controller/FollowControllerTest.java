@@ -38,11 +38,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureRestDocs
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 class FollowControllerTest {
-    @Value("${test.authorization.dayeon}")
+    @Value("${test.authorization.master1}")
     String authorization1;
 
-    @Value("${test.authorization.goeun}")
-    String authorization3;
+    @Value("${test.authorization.master2}")
+    String authorization2;
 
     @Autowired
     MockMvc mockMvc;
@@ -69,7 +69,7 @@ class FollowControllerTest {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .get("/api/v2/members/{handle}/following", handle)
-                                .header("Authorization", authorization3)
+                                .header("Authorization", authorization2)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
@@ -134,7 +134,7 @@ class FollowControllerTest {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .get("/api/v2/members/{handle}/follower", handle)
-                                .header("Authorization", authorization3)
+                                .header("Authorization", authorization2)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
@@ -195,12 +195,12 @@ class FollowControllerTest {
     @DisplayName("follow member API Document")
     void followTest() throws Exception {
 
-        String handle = "dxxynni";
+        String handle = "master1";
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .post("/api/v2/members/{handle}/follow", handle)
-                                .header("Authorization", authorization3)
+                                .header("Authorization", authorization2)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
@@ -231,8 +231,8 @@ class FollowControllerTest {
     @DisplayName("delete follower API Document")
     void deleteFollowerTest() throws Exception {
 
-        String handle = "dxxynni";
-        String followerHandle = "habongee";
+        String handle = "master1";
+        String followerHandle = "master2";
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders

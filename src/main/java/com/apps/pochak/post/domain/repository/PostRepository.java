@@ -131,6 +131,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         );
     }
 
+    @Query("""
+            select p.id from Post p
+            join Tag t on t.post = p
+            where (p.owner = :member or t.member = :member) and p.status != 'DELETED'
+            """)
+    List<Long> findPostIdListByOwnerOrTaggedMember(@Param("member") final Member member);
+
     @Query("select p from Post p " +
             "left join LikeEntity l on l.likedPost = p " +
             "where p.postStatus = 'PUBLIC' " +
@@ -162,6 +169,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     );
 
     @Modifying
-    @Query("update Post post set post.status = 'DELETED' where post.owner.id = :memberId")
-    void deletePostByMemberId(@Param("memberId") final Long memberId);
+    @Query("update Post p set p.status = 'DELETED' where p.id in :postIdList")
+    void deleteAllPost(@Param("postIdList") final List<Long> postIdList);
 }

@@ -2,6 +2,7 @@ package com.apps.pochak.member.domain.repository;
 
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.member.domain.Member;
+import com.apps.pochak.member.domain.SocialType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +18,12 @@ import java.util.Optional;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
+
+    default Member findMemberById(
+            final Long id
+    ) {
+        return findById(id).orElseThrow(() -> new GeneralException(INVALID_MEMBER_HANDLE));
+    }
 
     Optional<Member> findMemberByHandle(final String handle);
 
@@ -27,11 +35,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             @Param("handle") final String handle,
             @Param("loginMember") final Member loginMember
     );
-
-    default void checkDuplicateHandle(final String handle) {
-        if (findMemberByHandle(handle).isPresent())
-            throw new GeneralException(DUPLICATE_HANDLE);
-    }
 
     default Member findByHandleWithoutLogin(final String handle) {
         return findMemberByHandle(handle).orElseThrow(() -> new GeneralException(INVALID_MEMBER_HANDLE));
@@ -53,14 +56,16 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             @Param("loginMember") final Member loginMember
     );
 
-    Optional<Member> findMemberBySocialId(String socialId);
+    default void checkDuplicateHandle(final String handle) {
+        if (findMemberByHandle(handle).isPresent())
+            throw new GeneralException(DUPLICATE_HANDLE);
+    }
 
-    @Query(value = "select m from Member m where m.lastModifiedDate > :nowMinusOneHour ")
-    List<Member> findModifiedMemberWithinOneHour(@Param("nowMinusOneHour") final LocalDateTime nowMinusOneHour);
+    Optional<Member> findMemberByIdAndRefreshToken(final Long id, final String refreshToken);
 
-    @Modifying
-    @Query("update Member member set member.status = 'DELETED' where member.id = :memberId")
-    void deleteMemberByMemberId(@Param("memberId") final Long memberId);
+    Optional<Member> findMemberBySocialId(final String socialId);
+
+    Optional<Member> findMemberBySocialIdAndSocialType(final String socialId, final SocialType socialType);
 
 
     @Query("select m from Member m " +
@@ -72,4 +77,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             @Param("loginMember") final Member loginMember,
             final Pageable pageable
     );
+
+    @Modifying
+    @Query("update Member member set member.status = 'DELETED' where member.id = :memberId")
+    void deleteMemberByMemberId(@Param("memberId") final Long memberId);
 }

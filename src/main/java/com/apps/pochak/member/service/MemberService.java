@@ -35,13 +35,12 @@ public class MemberService {
     public ProfileResponse getProfileDetail(final String handle,
                                             final Pageable pageable
     ) {
-        final String loginMemberHandle = jwtService.getLoginMemberHandle();
         final Member loginMember = jwtService.getLoginMember();
         final Member member = memberRepository.findByHandle(handle, loginMember);
         final long followerCount = followRepository.countActiveFollowByReceiver(member);
         final long followingCount = followRepository.countActiveFollowBySender(member);
         final Page<Post> taggedPost = postRepository.findTaggedPost(member, loginMember, pageable);
-        final Boolean isFollow = (handle.equals(loginMemberHandle)) ?
+        final Boolean isFollow = (handle.equals(loginMember.getHandle())) ?
                 null : followRepository.existsBySenderAndReceiver(loginMember, member);
 
         return ProfileResponse.of()

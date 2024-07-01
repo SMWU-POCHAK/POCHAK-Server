@@ -6,6 +6,7 @@ import com.apps.pochak.login.dto.response.AppleTokenResponse;
 import com.apps.pochak.login.dto.response.OAuthMemberResponse;
 import com.apps.pochak.login.jwt.JwtService;
 import com.apps.pochak.member.domain.Member;
+import com.apps.pochak.member.domain.SocialType;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,17 +81,18 @@ public class AppleOAuthService {
             return OAuthMemberResponse.builder()
                     .socialId(sub)
                     .email(email)
-                    .socialType("apple")
+                    .socialType(SocialType.APPLE.name())
                     .refreshToken(appleRefreshToken)
                     .isNewMember(false)
                     .build();
         }
 
         String appRefreshToken = jwtService.createRefreshToken();
-        String appAccessToken = jwtService.createAccessToken(member.getHandle());
+        String appAccessToken = jwtService.createAccessToken(member.getId().toString());
 
         member.updateRefreshToken(appRefreshToken);
         memberRepository.save(member);
+
         return OAuthMemberResponse.builder()
                 .socialId(sub)
                 .email(email)
@@ -104,7 +106,7 @@ public class AppleOAuthService {
     /**
      * Get alg, kid From JWT Header
      */
-    public Map<String, String> getHeaderFromIdToken(String idToken) throws JsonProcessingException {
+    private Map<String, String> getHeaderFromIdToken(String idToken) throws JsonProcessingException {
         String idTokenHeader = idToken.substring(0, idToken.indexOf("."));
         String decodeIdTokenHeader = new String(Base64.getDecoder().decode((idTokenHeader)));
         return objectMapper.readValue(decodeIdTokenHeader, Map.class);
@@ -113,7 +115,7 @@ public class AppleOAuthService {
     /**
      * Get Public Key
      */
-    public Claims verifyIdToken(String kid, String alg, String idToken) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    private Claims verifyIdToken(String kid, String alg, String idToken) throws NoSuchAlgorithmException, InvalidKeySpecException {
         try {
             WebClient webClient = WebClient
                     .builder()
@@ -152,11 +154,11 @@ public class AppleOAuthService {
         } catch (MalformedJwtException e) {
             throw new AppleOAuthException(MALFORMED_TOKEN);
         } catch (ExpiredJwtException e) {
-            throw new AppleOAuthException(EXPIRED_TOKEN);
+            throw new AppleOAuthException(EXPIRED_ACCESS_TOKEN);
         } catch (UnsupportedJwtException e) {
             throw new AppleOAuthException(UNSUPPORTED_TOKEN);
         } catch (IllegalArgumentException e) {
-            throw new AppleOAuthException(INVALID_TOKEN);
+            throw new AppleOAuthException(INVALID_ACCESS_TOKEN);
         }
     }
 
@@ -170,7 +172,7 @@ public class AppleOAuthService {
         return converter.getPrivateKey(object);
     }
 
-    public String makeClientSecret() throws IOException {
+    private String makeClientSecret() throws IOException {
         Date expirationDate = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
         return Jwts.builder()
                 .setHeaderParam("kid", KEY_ID)
@@ -188,7 +190,7 @@ public class AppleOAuthService {
      * Get Apple Refresh Token
      * For Delete Account
      */
-    public String getAppleRefreshToken(String authorizationCode) {
+    private String getAppleRefreshToken(String authorizationCode) {
         WebClient webClient = WebClient
                 .builder()
                 .baseUrl(PUBLIC_KEY_URL)
