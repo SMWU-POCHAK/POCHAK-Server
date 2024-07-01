@@ -29,12 +29,12 @@ public class OAuthController {
     private final AppleOAuthService appleOAuthService;
     private final GoogleOAuthService googleOAuthService;
 
-    @PostMapping(value = "/api/v2/member/signup")
+    @PostMapping(value = "/api/v2/members/signup")
     public ApiResponse<OAuthMemberResponse> signup(@ModelAttribute final MemberInfoRequest memberInfoRequest) {
         return ApiResponse.onSuccess(oAuthService.signup(memberInfoRequest));
     }
 
-    @PostMapping("/api/v2/member/refresh")
+    @PostMapping("/api/v2/members/refresh")
     public ApiResponse<PostTokenResponse> refresh() {
         return ApiResponse.onSuccess(oAuthService.reissueAccessToken());
     }
@@ -51,7 +51,7 @@ public class OAuthController {
         return ApiResponse.onSuccess(googleOAuthService.login(accessToken));
     }
 
-    @GetMapping("/api/v2/member/logout")
+    @GetMapping("/api/v2/members/logout")
     public ApiResponse<?> logout() {
         String accessToken = JwtHeaderUtil.getAccessToken();
         String id = jwtService.getSubject(accessToken);
@@ -59,7 +59,7 @@ public class OAuthController {
         return ApiResponse.of(SUCCESS_LOG_OUT);
     }
 
-    @DeleteMapping("/api/v2/member/signout")
+    @DeleteMapping("/api/v2/members/signout")
     public ApiResponse<?> signout() {
         String accessToken = JwtHeaderUtil.getAccessToken();
         String id = jwtService.getSubject(accessToken);

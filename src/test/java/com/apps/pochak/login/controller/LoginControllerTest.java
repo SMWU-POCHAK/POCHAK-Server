@@ -83,7 +83,7 @@ public class LoginControllerTest {
         );
 
         this.mockMvc.perform(
-                        multipart("/api/v2/member/signup")
+                        multipart("/api/v2/members/signup")
                                 .file(profileImage)
                                 .queryParam("name", "user1")
                                 .queryParam("email", "user1@email.com")
@@ -133,7 +133,7 @@ public class LoginControllerTest {
     void refresh() throws Exception {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .post("/api/v2/member/refresh")
+                                .post("/api/v2/members/refresh")
                                 .header("Authorization", authorization1)
                                 .header("RefreshToken", refreshToken)
                                 .contentType(APPLICATION_JSON)
@@ -163,7 +163,7 @@ public class LoginControllerTest {
     void logout() throws Exception {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .get("/api/v2/member/logout")
+                                .get("/api/v2/members/logout")
                                 .header("Authorization", authorization1)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
@@ -190,7 +190,7 @@ public class LoginControllerTest {
     void signout() throws Exception {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .delete("/api/v2/member/signout")
+                                .delete("/api/v2/members/signout")
                                 .header("Authorization", authorization1)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
