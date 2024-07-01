@@ -22,7 +22,7 @@ public class JwtHeaderUtil {
     private static String getToken(String tokenHeader) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String headerValue = request.getHeader(tokenHeader);
-        if (headerValue == null) throw new GeneralException(_UNAUTHORIZED); // TODO: Exception 고치기
+        if (headerValue == null) throw new GeneralException(_UNAUTHORIZED);
         if (StringUtils.hasText(headerValue) && headerValue.startsWith(TOKEN_PREFIX)) {
             return headerValue.substring(TOKEN_PREFIX.length());
         }

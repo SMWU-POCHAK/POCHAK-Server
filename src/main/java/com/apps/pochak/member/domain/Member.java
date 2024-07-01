@@ -46,10 +46,6 @@ public class Member extends BaseEntity {
 
     private String socialRefreshToken;
 
-    public void updateRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
-
     @Builder(builderMethodName = "signupMember", builderClassName = "signupMember")
     public Member(
             final String name,
@@ -59,6 +55,7 @@ public class Member extends BaseEntity {
             final String socialId,
             final SocialType socialType,
             final String profileImage,
+            final String refreshToken,
             final String socialRefreshToken
     ) {
         this.handle = handle;
@@ -68,6 +65,7 @@ public class Member extends BaseEntity {
         this.profileImage = profileImage;
         this.socialId = socialId;
         this.socialType = socialType;
+        this.refreshToken = refreshToken;
         this.socialRefreshToken = socialRefreshToken;
     }
 
@@ -85,5 +83,9 @@ public class Member extends BaseEntity {
 
         Member member = (Member)o;
         return Objects.equals(id, member.id);
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }

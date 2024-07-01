@@ -14,9 +14,9 @@ import com.apps.pochak.member.domain.SocialType;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.tag.domain.repository.TagRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -25,6 +25,7 @@ import static com.apps.pochak.global.s3.DirName.MEMBER;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OAuthService {
 
     private final JwtService jwtService;
@@ -38,18 +39,13 @@ public class OAuthService {
     private final AppleOAuthService appleOAuthService;
     private final S3Service awsS3Service;
 
-    @Transactional
     public OAuthMemberResponse signup(MemberInfoRequest memberInfoRequest) {
         Optional<Member> findMember = memberRepository.findMemberBySocialId(memberInfoRequest.getSocialId());
+        if (findMember.isPresent()) throw new GeneralException(EXIST_USER);
 
-        if (findMember.isPresent()) {
-            throw new GeneralException(EXIST_USER); // TODO: Exception이 아니라 Login으로 넘어가야할 듯
-        }
 
         String profileImageUrl = awsS3Service.upload(memberInfoRequest.getProfileImage(), MEMBER);
-
         String refreshToken = jwtService.createRefreshToken();
-        String accessToken = jwtService.createAccessToken(memberInfoRequest.getHandle());
 
         Member member = Member.signupMember()
                 .name(memberInfoRequest.getName())
@@ -58,28 +54,23 @@ public class OAuthService {
                 .message(memberInfoRequest.getMessage())
                 .socialId(memberInfoRequest.getSocialId())
                 .profileImage(profileImageUrl)
+                .refreshToken(refreshToken)
                 .socialType(SocialType.of(memberInfoRequest.getSocialType()))
                 .socialRefreshToken(memberInfoRequest.getSocialRefreshToken())
                 .build();
-
-        member.updateRefreshToken(refreshToken);
         memberRepository.save(member);
 
-        return OAuthMemberResponse.builder()
-                .isNewMember(false)
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+        String accessToken = jwtService.createAccessToken(member.getId().toString());
+
+        return new OAuthMemberResponse(member, false, accessToken);
     }
 
-    @Transactional
     public void logout(final String handle) {
         final Member member = memberRepository.findByHandleWithoutLogin(handle);
         member.updateRefreshToken(null);
         memberRepository.save(member);
     }
 
-    @Transactional
     public void signout(final String handle) {
         final Member member = memberRepository.findByHandleWithoutLogin(handle);
         if (member.getSocialType().equals(SocialType.APPLE)) {

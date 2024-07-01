@@ -53,7 +53,8 @@ public enum ErrorStatus implements BaseErrorCode {
     INVALID_OAUTH_TOKEN(BAD_REQUEST, "LOGIN4013", "토큰을 가져올 수 없습니다."),
 
     // Member
-    INVALID_MEMBER_HANDLE(BAD_REQUEST, "MEMBER4001", "유효하지 않은 멤버의 handle입니다."),
+    INVALID_MEMBER_ID(BAD_REQUEST, "MEMBER4001", "유효하지 않은 멤버의 아이디입니다."),
+    INVALID_MEMBER_HANDLE(BAD_REQUEST, "MEMBER4002", "유효하지 않은 멤버의 handle입니다."),
     DUPLICATE_HANDLE(BAD_REQUEST, "MEMBER4002", "중복되는 handle(아이디) 입니다."),
 
     // Post

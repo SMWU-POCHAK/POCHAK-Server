@@ -17,6 +17,12 @@ import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
+    default Member findMemberById(
+            final Long id
+    ) {
+        return findById(id).orElseThrow(() -> new GeneralException(INVALID_MEMBER_HANDLE));
+    }
+
     Optional<Member> findMemberByHandle(final String handle);
 
     @Query("select m from Member m " +
@@ -53,7 +59,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             @Param("loginMember") final Member loginMember
     );
 
-    Optional<Member> findMemberBySocialId(String socialId);
+    Optional<Member> findMemberBySocialId(final String socialId);
 
     @Query(value = "select m from Member m where m.lastModifiedDate > :nowMinusOneHour ")
     List<Member> findModifiedMemberWithinOneHour(@Param("nowMinusOneHour") final LocalDateTime nowMinusOneHour);

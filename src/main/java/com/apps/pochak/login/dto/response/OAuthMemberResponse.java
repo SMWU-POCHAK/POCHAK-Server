@@ -1,24 +1,25 @@
 package com.apps.pochak.login.dto.response;
 
+import com.apps.pochak.member.domain.Member;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-import static lombok.AccessLevel.PRIVATE;
 
 @Getter
-@RequiredArgsConstructor(access = PRIVATE)
+@AllArgsConstructor
 public class OAuthMemberResponse {
-    private final String id;
-    private final String name;
-    private final String email;
-    private final String socialType;
-    private final String accessToken;
-    private final String refreshToken;
-    private final Boolean isNewMember;
+    private Long id;
+    private String socialId;
+    private String name;
+    private String email;
+    private String socialType;
+    private String accessToken;
+    private String refreshToken;
+    private Boolean isNewMember;
+
 
     @Builder
-    public static OAuthMemberResponse of(
+    public OAuthMemberResponse(
             final String socialId,
             final String name,
             final String email,
@@ -27,14 +28,26 @@ public class OAuthMemberResponse {
             final String refreshToken,
             final Boolean isNewMember
     ) {
-        return new OAuthMemberResponse(
-                socialId,
-                name,
-                email,
-                socialType,
-                accessToken,
-                refreshToken,
-                isNewMember
-        );
+        this.socialId = socialId;
+        this.name = name;
+        this.email = email;
+        this.socialType = socialType;
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+        this.isNewMember = isNewMember;
+    }
+
+    public OAuthMemberResponse(
+            final Member member,
+            final Boolean isNewMember,
+            final String accessToken
+    ) {
+        this.id = member.getId();
+        this.socialId = member.getSocialId();
+        this.email = member.getEmail();
+        this.socialType = member.getSocialType().name();
+        this.accessToken = accessToken;
+        this.refreshToken = member.getRefreshToken();
+        this.isNewMember = isNewMember;
     }
 }

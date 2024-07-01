@@ -39,7 +39,8 @@ public class OAuthController {
 
     @PostMapping("/apple/login")
     public ApiResponse<?> appleOAuthRequest(@RequestHeader(HEADER_IDENTITY_TOKEN) String idToken,
-                                            @RequestHeader(HEADER_APPLE_AUTHORIZATION_CODE) String authorizationCode) throws NoSuchAlgorithmException, InvalidKeySpecException, JsonProcessingException {
+                                            @RequestHeader(HEADER_APPLE_AUTHORIZATION_CODE) String authorizationCode)
+            throws NoSuchAlgorithmException, InvalidKeySpecException, JsonProcessingException {
         return ApiResponse.onSuccess(appleOAuthService.login(idToken, authorizationCode));
     }
 
@@ -51,7 +52,7 @@ public class OAuthController {
     @GetMapping("/api/v2/member/logout")
     public ApiResponse<?> logout() {
         String accessToken = JwtHeaderUtil.getAccessToken();
-        String handle = jwtService.getHandle(accessToken);
+        String handle = jwtService.getSubject(accessToken);
         oAuthService.logout(handle);
         return ApiResponse.of(SUCCESS_LOG_OUT);
     }
@@ -59,7 +60,7 @@ public class OAuthController {
     @DeleteMapping("/api/v2/member/signout")
     public ApiResponse<?> signout() {
         String accessToken = JwtHeaderUtil.getAccessToken();
-        String handle = jwtService.getHandle(accessToken);
+        String handle = jwtService.getSubject(accessToken);
         oAuthService.signout(handle);
         return ApiResponse.of(SUCCESS_SIGN_OUT);
     }
