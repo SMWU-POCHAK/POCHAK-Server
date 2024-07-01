@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -34,11 +35,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             @Param("loginMember") final Member loginMember
     );
 
-    default void checkDuplicateHandle(final String handle) {
-        if (findMemberByHandle(handle).isPresent())
-            throw new GeneralException(DUPLICATE_HANDLE);
-    }
-
     default Member findByHandleWithoutLogin(final String handle) {
         return findMemberByHandle(handle).orElseThrow(() -> new GeneralException(INVALID_MEMBER_HANDLE));
     }
@@ -59,14 +55,14 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             @Param("loginMember") final Member loginMember
     );
 
+    default void checkDuplicateHandle(final String handle) {
+        if (findMemberByHandle(handle).isPresent())
+            throw new GeneralException(DUPLICATE_HANDLE);
+    }
+
+    Optional<Member> findMemberByIdAndRefreshToken(final Long id, final String refreshToken);
+
     Optional<Member> findMemberBySocialId(final String socialId);
-
-    @Query(value = "select m from Member m where m.lastModifiedDate > :nowMinusOneHour ")
-    List<Member> findModifiedMemberWithinOneHour(@Param("nowMinusOneHour") final LocalDateTime nowMinusOneHour);
-
-    @Modifying
-    @Query("update Member member set member.status = 'DELETED' where member.id = :memberId")
-    void deleteMemberByMemberId(@Param("memberId") final Long memberId);
 
     @Query("select m from Member m " +
             "where (m.handle ilike concat('%', :keyword, '%') or m.name ilike concat('%', :keyword, '%')) " +
@@ -77,4 +73,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             @Param("loginMember") final Member loginMember,
             final Pageable pageable
     );
+
+    @Modifying
+    @Query("update Member member set member.status = 'DELETED' where member.id = :memberId")
+    void deleteMemberByMemberId(@Param("memberId") final Long memberId);
 }

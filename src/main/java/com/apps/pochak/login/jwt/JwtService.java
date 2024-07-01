@@ -1,6 +1,6 @@
 package com.apps.pochak.login.jwt;
 
-import com.apps.pochak.global.api_payload.exception.GeneralException;
+import com.apps.pochak.global.api_payload.exception.handler.ExpiredPeriodJwtException;
 import com.apps.pochak.global.api_payload.exception.handler.InvalidJwtException;
 import com.apps.pochak.global.api_payload.exception.handler.RefreshTokenException;
 import com.apps.pochak.login.dto.response.PostTokenResponse;
@@ -62,32 +62,35 @@ public class JwtService {
                 .compact();
     }
 
-    public String validateRefreshToken(String accessToken, String refreshToken) {
-        String handle = getSubject(accessToken);
-        Member member = memberRepository.findByHandleWithoutLogin(handle);
-
-        if (member.getRefreshToken() == null || member.getRefreshToken().isEmpty())
-            throw new RefreshTokenException(NULL_REFRESH_TOKEN);
-
-        if (!member.getRefreshToken().equals(refreshToken))
-            throw new RefreshTokenException(INVALID_REFRESH_TOKEN);
-
-        return member.getHandle();
-    }
-
-    public void validate(String token) {
+    public void validateAccessToken(final String accessToken) {
         try {
-            parseToken(token);
+            parseToken(accessToken);
         } catch (SecurityException e) {
             throw new InvalidJwtException(INVALID_TOKEN_SIGNATURE);
         } catch (MalformedJwtException e) {
             throw new InvalidJwtException(MALFORMED_TOKEN);
         } catch (ExpiredJwtException e) {
-            throw new InvalidJwtException(EXPIRED_TOKEN);
+            throw new InvalidJwtException(EXPIRED_ACCESS_TOKEN);
         } catch (UnsupportedJwtException e) {
             throw new InvalidJwtException(UNSUPPORTED_TOKEN);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidJwtException(INVALID_TOKEN);
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new InvalidJwtException(INVALID_ACCESS_TOKEN);
+        }
+    }
+
+    private void validateRefreshToken(final String refreshToken) {
+        try {
+            parseToken(refreshToken);
+        } catch (SecurityException e) {
+            throw new InvalidJwtException(INVALID_TOKEN_SIGNATURE);
+        } catch (MalformedJwtException e) {
+            throw new InvalidJwtException(MALFORMED_TOKEN);
+        } catch (ExpiredJwtException e) {
+            throw new InvalidJwtException(EXPIRED_REFRESH_TOKEN);
+        } catch (UnsupportedJwtException e) {
+            throw new InvalidJwtException(UNSUPPORTED_TOKEN);
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new InvalidJwtException(INVALID_REFRESH_TOKEN);
         }
     }
 
@@ -116,31 +119,32 @@ public class JwtService {
                 .parseClaimsJws(token);
     }
 
-    public PostTokenResponse reissueAccessToken() {
-        String accessToken = JwtHeaderUtil.getAccessToken();
-        String refreshToken = JwtHeaderUtil.getRefreshToken();
-
-        if (refreshToken == null)
-            throw new RefreshTokenException(NULL_REFRESH_TOKEN);
-
-        validate(refreshToken);
-
-        String handle = validateRefreshToken(accessToken, refreshToken);
-        String newAccessToken = createAccessToken(handle);
-
-        return PostTokenResponse.builder()
-                .accessToken(newAccessToken)
-                .build();
+    public boolean isValidRefreshAndInvalidAccess(final String refreshToken, final String accessToken) {
+        validateRefreshToken(refreshToken);
+        try {
+            validateAccessToken(accessToken);
+        } catch (final ExpiredPeriodJwtException e) {
+            return true;
+        }
+        return false;
     }
 
-    // custom
+    public boolean isValidRefreshAndValidAccess(final String refreshToken, final String accessToken) {
+        try {
+            validateRefreshToken(refreshToken);
+            validateAccessToken(accessToken);
+            return true;
+        } catch (final JwtException e) {
+            return false;
+        }
+    }
+
+    // custom method
+    // TODO: 다른 방식 찾아오기
     public Member getLoginMember() {
         final String id = getLoginMemberId();
-        try {
-            return memberRepository.findMemberById(Long.parseLong(id));
-        } catch (GeneralException e) {
-            throw new InvalidJwtException(INVALID_TOKEN);
-        }
+        return memberRepository.findById(Long.parseLong(id))
+                .orElseThrow(() -> new InvalidJwtException(INVALID_ACCESS_TOKEN));
     }
 
     public String getLoginMemberId() {

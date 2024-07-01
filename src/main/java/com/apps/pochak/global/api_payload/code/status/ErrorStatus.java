@@ -38,19 +38,20 @@ public enum ErrorStatus implements BaseErrorCode {
     // Like
 
     // Login
-    INVALID_TOKEN(BAD_REQUEST, "LOGIN4001", "잘못된 엑세스 토큰입니다."),
-    INVALID_TOKEN_SIGNATURE(BAD_REQUEST, "LOGIN4002", "잘못된 토큰 서명입니다."),
-    UNSUPPORTED_TOKEN(BAD_REQUEST, "LOGIN4003", "지원하지 않는 형식의 토큰입니다."),
-    MALFORMED_TOKEN(BAD_REQUEST, "LOGIN4004", "유효하지 않은 구성의 토큰입니다."),
-    NULL_TOKEN(BAD_REQUEST, "LOGIN4005", "토큰이 존재하지 않습니다."),
-    EXIST_USER(BAD_REQUEST, "LOGIN4006", "존재하는 유저입니다."),
-    INVALID_REFRESH_TOKEN(BAD_REQUEST, "LOGIN4007", "잘못된 리프레시 토큰입니다."),
+    INVALID_ACCESS_TOKEN(BAD_REQUEST, "LOGIN4001", "잘못된 엑세스 토큰입니다."),
+    INVALID_REFRESH_TOKEN(BAD_REQUEST, "LOGIN4002", "잘못된 리프레시 토큰입니다."),
+    INVALID_TOKEN_SIGNATURE(BAD_REQUEST, "LOGIN4003", "잘못된 토큰 서명입니다."),
+    UNSUPPORTED_TOKEN(BAD_REQUEST, "LOGIN4004", "지원하지 않는 형식의 토큰입니다."),
+    MALFORMED_TOKEN(BAD_REQUEST, "LOGIN4005", "유효하지 않은 구성의 토큰입니다."),
+    NULL_TOKEN(BAD_REQUEST, "LOGIN4006", "토큰이 존재하지 않습니다."),
+    EXIST_USER(BAD_REQUEST, "LOGIN4007", "존재하는 유저입니다."),
     NULL_REFRESH_TOKEN(BAD_REQUEST, "LOGIN4008", "리프레시 토큰이 존재하지 않습니다."),
-    EXPIRED_TOKEN(BAD_REQUEST, "LOGIN4009", "만료된 토큰입니다."),
-    INVALID_USER_HANDLE(BAD_REQUEST, "LOGIN4010", "주어진 handle로 유저를 찾을 수 없습니다."),
+    EXPIRED_ACCESS_TOKEN(BAD_REQUEST, "LOGIN4009", "만료된 액세스 토큰입니다."),
+    EXPIRED_REFRESH_TOKEN(BAD_REQUEST, "LOGIN4010", "만료된 리프레시 토큰입니다."),
     INVALID_PUBLIC_KEY(BAD_REQUEST, "LOGIN4011", "공개키를 가져올 수 없습니다."),
     INVALID_USER_INFO(BAD_REQUEST, "LOGIN4012", "유저 정보를 가져올 수 없습니다."),
     INVALID_OAUTH_TOKEN(BAD_REQUEST, "LOGIN4013", "토큰을 가져올 수 없습니다."),
+    FAIL_VALIDATE_TOKEN(BAD_REQUEST, "LOGIN4013", "토큰 유효성 검사 중 오류가 발생했습니다."),
 
     // Member
     INVALID_MEMBER_ID(BAD_REQUEST, "MEMBER4001", "유효하지 않은 멤버의 아이디입니다."),

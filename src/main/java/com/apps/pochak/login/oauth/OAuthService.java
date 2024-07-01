@@ -4,10 +4,13 @@ import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.comment.domain.repository.CommentRepository;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
+import com.apps.pochak.global.api_payload.exception.handler.InvalidJwtException;
 import com.apps.pochak.global.s3.S3Service;
 import com.apps.pochak.like.domain.repository.LikeRepository;
 import com.apps.pochak.login.dto.request.MemberInfoRequest;
 import com.apps.pochak.login.dto.response.OAuthMemberResponse;
+import com.apps.pochak.login.dto.response.PostTokenResponse;
+import com.apps.pochak.login.jwt.JwtHeaderUtil;
 import com.apps.pochak.login.jwt.JwtService;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.SocialType;
@@ -20,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.EXIST_USER;
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 import static com.apps.pochak.global.s3.DirName.MEMBER;
 
 @Service
@@ -63,6 +66,26 @@ public class OAuthService {
         String accessToken = jwtService.createAccessToken(member.getId().toString());
 
         return new OAuthMemberResponse(member, false, accessToken);
+    }
+
+    @Transactional(readOnly = true)
+    public PostTokenResponse reissueAccessToken() {
+        String accessToken = JwtHeaderUtil.getAccessToken();
+        String refreshToken = JwtHeaderUtil.getRefreshToken();
+        if (jwtService.isValidRefreshAndInvalidAccess(refreshToken, accessToken)) {
+            String id = jwtService.getSubject(accessToken);
+            Member member = memberRepository.findMemberByIdAndRefreshToken(Long.parseLong(id), refreshToken)
+                    .orElseThrow(() -> new InvalidJwtException(INVALID_REFRESH_TOKEN));
+            return PostTokenResponse.builder()
+                    .accessToken(jwtService.createAccessToken(member.getId().toString()))
+                    .build();
+        }
+        if (jwtService.isValidRefreshAndValidAccess(refreshToken, accessToken)) {
+            return PostTokenResponse.builder()
+                    .accessToken(jwtService.createAccessToken(accessToken))
+                    .build();
+        }
+        throw new InvalidJwtException(FAIL_VALIDATE_TOKEN);
     }
 
     public void logout(final String handle) {

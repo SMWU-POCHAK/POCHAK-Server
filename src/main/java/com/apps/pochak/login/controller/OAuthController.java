@@ -2,6 +2,8 @@ package com.apps.pochak.login.controller;
 
 import com.apps.pochak.global.api_payload.ApiResponse;
 import com.apps.pochak.login.dto.request.MemberInfoRequest;
+import com.apps.pochak.login.dto.response.OAuthMemberResponse;
+import com.apps.pochak.login.dto.response.PostTokenResponse;
 import com.apps.pochak.login.jwt.JwtHeaderUtil;
 import com.apps.pochak.login.jwt.JwtService;
 import com.apps.pochak.login.oauth.AppleOAuthService;
@@ -28,13 +30,13 @@ public class OAuthController {
     private final GoogleOAuthService googleOAuthService;
 
     @PostMapping(value = "/api/v2/member/signup")
-    public ApiResponse<?> signup(@ModelAttribute final MemberInfoRequest memberInfoRequest) {
+    public ApiResponse<OAuthMemberResponse> signup(@ModelAttribute final MemberInfoRequest memberInfoRequest) {
         return ApiResponse.onSuccess(oAuthService.signup(memberInfoRequest));
     }
 
     @PostMapping("/api/v2/member/refresh")
-    public ApiResponse<?> refresh() {
-        return ApiResponse.onSuccess(jwtService.reissueAccessToken());
+    public ApiResponse<PostTokenResponse> refresh() {
+        return ApiResponse.onSuccess(oAuthService.reissueAccessToken());
     }
 
     @PostMapping("/apple/login")
