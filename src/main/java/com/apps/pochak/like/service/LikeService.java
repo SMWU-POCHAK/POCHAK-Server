@@ -1,6 +1,7 @@
 package com.apps.pochak.like.service;
 
 import com.apps.pochak.alarm.domain.Alarm;
+import com.apps.pochak.alarm.domain.LikeAlarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.like.domain.LikeEntity;
 import com.apps.pochak.like.domain.repository.LikeRepository;
@@ -72,19 +73,18 @@ public class LikeService {
     }
 
     private void sendLikeAlarm(final LikeEntity like) {
-        final Alarm likeAlarm = Alarm.getLikeAlarm(like, like.getLikedPost().getOwner());
+        final Alarm likeAlarm = new LikeAlarm(like, like.getLikedPost().getOwner());
         alarmRepository.save(likeAlarm);
 
         final List<Tag> tagList = tagRepository.findTagsByPost(like.getLikedPost());
         final List<Alarm> alarmList = tagList.stream().map(
-                tag -> Alarm.getLikeAlarm(like, tag.getMember())
+                tag -> new LikeAlarm(like, tag.getMember())
         ).collect(Collectors.toList());
         alarmRepository.saveAll(alarmList);
     }
 
     private void deleteAlarm(LikeEntity like) {
-        final List<Alarm> alarmList = alarmRepository.findAlarmByLike(like);
-        alarmRepository.deleteAll(alarmList);
+        alarmRepository.deleteAlarmByLike(like);
     }
 
     @Transactional(readOnly = true)

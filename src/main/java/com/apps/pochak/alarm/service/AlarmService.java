@@ -21,6 +21,7 @@ public class AlarmService {
     private final AlarmRepository alarmRepository;
     private final JwtService jwtService;
 
+    @Transactional(readOnly = true)
     public AlarmElements getAllAlarms(Pageable pageable) {
         final Member loginMember = jwtService.getLoginMember();
         final Page<Alarm> alarmPage = alarmRepository.getAllAlarm(loginMember.getId(), pageable);

@@ -1,6 +1,8 @@
 package com.apps.pochak.comment.service;
 
 import com.apps.pochak.alarm.domain.Alarm;
+import com.apps.pochak.alarm.domain.AlarmType;
+import com.apps.pochak.alarm.domain.CommentAlarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.comment.domain.Comment;
 import com.apps.pochak.comment.domain.repository.CommentRepository;
@@ -121,9 +123,10 @@ public class CommentService {
             final Comment comment,
             final Member receiver
     ) {
-        final Alarm alarm = Alarm.getPostOwnerCommentAlarm(
+        final CommentAlarm alarm = new CommentAlarm(
                 comment,
-                receiver
+                receiver,
+                AlarmType.OWNER_COMMENT
         );
         alarmRepository.save(alarm);
     }
@@ -139,7 +142,11 @@ public class CommentService {
             final Member taggedMember = tag.getMember();
             if (!excludeMemberId.equals(taggedMember.getId())) {
                 alarmList.add(
-                        Alarm.getTaggedPostCommentAlarm(comment, taggedMember)
+                        new CommentAlarm(
+                                comment,
+                                taggedMember,
+                                AlarmType.TAGGED_COMMENT
+                        )
                 );
             }
         }
@@ -151,13 +158,15 @@ public class CommentService {
             final Comment comment,
             final Member receiver
     ) {
-        final Alarm commentReplyAlarm = Alarm.getCommentReplyAlarm(
         if (comment.getMember().equals(receiver)) return;
+
+        final CommentAlarm alarm = new CommentAlarm(
                 comment,
-                receiver
+                receiver,
+                AlarmType.COMMENT_REPLY
         );
 
-        alarmRepository.save(commentReplyAlarm);
+        alarmRepository.save(alarm);
     }
 
     public void deleteComment(

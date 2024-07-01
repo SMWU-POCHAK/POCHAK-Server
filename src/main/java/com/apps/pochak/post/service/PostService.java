@@ -1,6 +1,7 @@
 package com.apps.pochak.post.service;
 
 import com.apps.pochak.alarm.domain.Alarm;
+import com.apps.pochak.alarm.domain.TagAlarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.comment.domain.Comment;
 import com.apps.pochak.comment.domain.repository.CommentRepository;
@@ -111,10 +112,7 @@ public class PostService {
 
     private void saveTagApprovalAlarms(List<Tag> tagList) {
         final List<Alarm> tagApprovalAlarmList = tagList.stream().map(
-                tag -> Alarm.getTagApprovalAlarm(
-                        tag,
-                        tag.getMember()
-                )
+                tag -> new TagAlarm(tag, tag.getMember())
         ).collect(Collectors.toList());
         alarmRepository.saveAll(tagApprovalAlarmList);
     }

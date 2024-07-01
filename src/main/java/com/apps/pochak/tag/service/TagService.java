@@ -38,8 +38,7 @@ public class TagService {
 
     private BaseCode acceptPost(Tag tag) {
         tag.setIsAccepted(true);
-        final List<Alarm> alarmList = alarmRepository.findAlarmByTag(tag);
-        alarmRepository.deleteAll(alarmList);
+        alarmRepository.deleteAlarmByTag(tag);
 
         final Post post = tag.getPost();
         final List<Tag> tagList = tagRepository.findTagsByPost(post);
@@ -55,9 +54,8 @@ public class TagService {
     private BaseCode rejectPost(Tag tag) {
         final Post post = tag.getPost();
         final List<Tag> tagList = tagRepository.findTagsByPost(post);
-        final List<Alarm> alarmList = alarmRepository.findAlarmByTagIn(tagList);
 
-        alarmRepository.deleteAll(alarmList);
+        alarmRepository.deleteAlarmByTagList(tagList);
         tagRepository.deleteAll(tagList);
         postRepository.delete(post);
 
