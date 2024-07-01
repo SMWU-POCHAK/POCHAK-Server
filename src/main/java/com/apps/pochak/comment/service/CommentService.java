@@ -152,6 +152,7 @@ public class CommentService {
             final Member receiver
     ) {
         final Alarm commentReplyAlarm = Alarm.getCommentReplyAlarm(
+        if (comment.getMember().equals(receiver)) return;
                 comment,
                 receiver
         );
