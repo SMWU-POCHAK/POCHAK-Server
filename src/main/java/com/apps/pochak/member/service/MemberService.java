@@ -56,14 +56,15 @@ public class MemberService {
     public ProfileUpdateResponse updateProfileDetail(final String handle,
                                                      final ProfileUpdateRequest profileUpdateRequest){
         final Member loginMember = jwtService.getLoginMember();
-        final Member updateMember = findMemberByHandle(handle, loginMember);
-        if (loginMember.equals(updateMember)) {
+        final Member updateMember = memberRepository.findByHandleWithoutLogin(handle);
+        if (!loginMember.equals(updateMember)) {
             throw new GeneralException(UNAUTHORIZED_MEMBER_REQUEST);
         }
-        awsS3Service.deleteFileFromS3(updateMember.getProfileImage());
         String profileImageUrl = updateMember.getProfileImage();
-        if (profileUpdateRequest.getProfieImage() != null)
+        if (profileUpdateRequest.getProfieImage() != null) {
+            awsS3Service.deleteFileFromS3(updateMember.getProfileImage());
             profileImageUrl = awsS3Service.upload(profileUpdateRequest.getProfieImage(), MEMBER);
+        }
         updateMember.updateMember(profileUpdateRequest, profileImageUrl);
 
         return ProfileUpdateResponse.builder()
