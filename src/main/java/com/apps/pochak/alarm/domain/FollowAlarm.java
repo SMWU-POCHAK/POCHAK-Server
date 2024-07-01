@@ -2,6 +2,7 @@ package com.apps.pochak.alarm.domain;
 
 import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.member.domain.Member;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -14,6 +15,7 @@ import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
+@DiscriminatorValue("FOLLOW_ALARM")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FollowAlarm extends Alarm {
 

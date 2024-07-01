@@ -17,6 +17,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @DynamicInsert
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn
 @SQLRestriction("status = 'ACTIVE'")
 @NoArgsConstructor(access = PROTECTED)
 public abstract class Alarm extends BaseEntity {
