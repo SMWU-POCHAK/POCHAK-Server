@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureRestDocs
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 class CommentControllerTest {
-    @Value("${test.authorization.dayeon}")
+    @Value("${test.authorization.master1}")
     String authorization;
 
     @Autowired

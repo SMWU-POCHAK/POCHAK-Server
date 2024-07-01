@@ -14,7 +14,7 @@ public enum SocialType {
 
     public static SocialType of(String code) {
         return Arrays.stream(SocialType.values())
-                .filter(r -> r.getCode().equals(code))
+                .filter(r -> r.getCode().equals(code.toLowerCase()))
                 .findAny()
                 .orElse(null);
     }

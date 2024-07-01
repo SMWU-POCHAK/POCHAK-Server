@@ -114,7 +114,7 @@ public class JwtService {
 
     private Jws<Claims> parseToken(final String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token);
     }

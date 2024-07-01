@@ -39,10 +39,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 public class LikeControllerTest {
 
-    @Value("${test.authorization.goeun}")
-    String authorization;
+    @Value("${test.authorization.master1}")
+    String authorization1;
 
-    @Value("${test.authorization.dayeon}")
+    @Value("${test.authorization.master2}")
     String authorization2;
 
 
@@ -67,7 +67,7 @@ public class LikeControllerTest {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .post("/api/v2/posts/{postId}/like", 2)
-                                .header("Authorization", authorization2)
+                                .header("Authorization", authorization1)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
@@ -97,7 +97,7 @@ public class LikeControllerTest {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .get("/api/v2/posts/{postId}/like", 2)
-                                .header("Authorization", authorization)
+                                .header("Authorization", authorization1)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(

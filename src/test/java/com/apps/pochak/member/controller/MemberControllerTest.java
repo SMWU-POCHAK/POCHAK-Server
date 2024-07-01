@@ -37,11 +37,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureRestDocs
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 class MemberControllerTest {
-    @Value("${test.authorization.dayeon}")
+    @Value("${test.authorization.master1}")
     String authorization1;
 
-    @Value("${test.authorization.goeun}")
-    String authorization3;
+    @Value("${test.authorization.master2}")
+    String authorization2;
 
     @Autowired
     MockMvc mockMvc;
@@ -68,7 +68,7 @@ class MemberControllerTest {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .get("/api/v2/members/{handle}", handle)
-                                .header("Authorization", authorization3)
+                                .header("Authorization", authorization1)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(

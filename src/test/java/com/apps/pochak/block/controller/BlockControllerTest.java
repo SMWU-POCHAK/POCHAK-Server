@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureRestDocs
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 class BlockControllerTest {
-    @Value("${test.authorization.dayeon}")
+    @Value("${test.authorization.master1}")
     String authorization;
 
     @Autowired
@@ -94,7 +94,7 @@ class BlockControllerTest {
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .get("/api/v2/members/{handle}/block", "dxxynni")
+                                .get("/api/v2/members/{handle}/block", "master1")
                                 .header("Authorization", authorization)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
@@ -156,7 +156,7 @@ class BlockControllerTest {
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .delete("/api/v2/members/{handle}/block", "dxxynni")
+                                .delete("/api/v2/members/{handle}/block", "master1")
                                 .queryParam("blockedMemberHandle", blockedMemberHandle)
                                 .header("Authorization", authorization)
                                 .contentType(APPLICATION_JSON)

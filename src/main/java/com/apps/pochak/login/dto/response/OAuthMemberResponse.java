@@ -44,6 +44,7 @@ public class OAuthMemberResponse {
     ) {
         this.id = member.getId();
         this.socialId = member.getSocialId();
+        this.name = member.getName();
         this.email = member.getEmail();
         this.socialType = member.getSocialType().name();
         this.accessToken = accessToken;

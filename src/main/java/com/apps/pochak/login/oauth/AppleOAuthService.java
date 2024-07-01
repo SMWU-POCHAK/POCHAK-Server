@@ -6,6 +6,7 @@ import com.apps.pochak.login.dto.response.AppleTokenResponse;
 import com.apps.pochak.login.dto.response.OAuthMemberResponse;
 import com.apps.pochak.login.jwt.JwtService;
 import com.apps.pochak.member.domain.Member;
+import com.apps.pochak.member.domain.SocialType;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,17 +81,18 @@ public class AppleOAuthService {
             return OAuthMemberResponse.builder()
                     .socialId(sub)
                     .email(email)
-                    .socialType("apple")
+                    .socialType(SocialType.APPLE.name())
                     .refreshToken(appleRefreshToken)
                     .isNewMember(false)
                     .build();
         }
 
         String appRefreshToken = jwtService.createRefreshToken();
-        String appAccessToken = jwtService.createAccessToken(member.getHandle());
+        String appAccessToken = jwtService.createAccessToken(member.getId().toString());
 
         member.updateRefreshToken(appRefreshToken);
         memberRepository.save(member);
+
         return OAuthMemberResponse.builder()
                 .socialId(sub)
                 .email(email)
@@ -152,11 +154,11 @@ public class AppleOAuthService {
         } catch (MalformedJwtException e) {
             throw new AppleOAuthException(MALFORMED_TOKEN);
         } catch (ExpiredJwtException e) {
-            throw new AppleOAuthException(EXPIRED_TOKEN);
+            throw new AppleOAuthException(EXPIRED_ACCESS_TOKEN);
         } catch (UnsupportedJwtException e) {
             throw new AppleOAuthException(UNSUPPORTED_TOKEN);
         } catch (IllegalArgumentException e) {
-            throw new AppleOAuthException(INVALID_TOKEN);
+            throw new AppleOAuthException(INVALID_ACCESS_TOKEN);
         }
     }
 

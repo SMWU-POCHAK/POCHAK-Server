@@ -30,7 +30,6 @@ import static com.apps.pochak.global.s3.DirName.MEMBER;
 @RequiredArgsConstructor
 @Transactional
 public class OAuthService {
-
     private final JwtService jwtService;
     private final AlarmRepository alarmRepository;
     private final CommentRepository commentRepository;
