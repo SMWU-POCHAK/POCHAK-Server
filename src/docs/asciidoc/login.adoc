@@ -34,19 +34,17 @@ include::{snippets}/signup/response-fields.adoc[]
 
 리프레쉬 토큰 재발급 API
 
-=> 테스트 코드 에러로 현재 확인 중 일단 노션에 정리 예정
+=== Request
 
-// === Request
-//
-// include::{snippets}/refresh/curl-request.adoc[]
-//
-// ==== request headers
-// include::{snippets}/refresh/request-headers.adoc[]
-//
-// === Response
-// ==== response body
-// include::{snippets}/refresh/response-body.adoc[]
-// include::{snippets}/refresh/response-fields.adoc[]
+include::{snippets}/refresh/curl-request.adoc[]
+
+==== request headers
+include::{snippets}/refresh/request-headers.adoc[]
+
+=== Response
+==== response body
+include::{snippets}/refresh/response-body.adoc[]
+include::{snippets}/refresh/response-fields.adoc[]
 
 == `GET` Logout API
 
