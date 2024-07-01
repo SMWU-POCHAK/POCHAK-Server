@@ -11,8 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class ProfileUpdateRequest {
     private String name;
 
-    private String handle;
-
     private String message;
 
     private MultipartFile profieImage;

@@ -4,6 +4,7 @@ import com.apps.pochak.global.api_payload.ApiResponse;
 import com.apps.pochak.global.api_payload.exception.handler.AppleOAuthException;
 import com.apps.pochak.member.dto.request.ProfileUpdateRequest;
 import com.apps.pochak.member.dto.response.MemberElements;
+import com.apps.pochak.member.dto.response.ProfileUpdateResponse;
 import com.apps.pochak.member.service.MemberService;
 import com.apps.pochak.post.dto.PostElements;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,14 @@ public class MemberController {
         else
             return ApiResponse.onSuccess(memberService.getTaggedPosts(handle, pageable));
     }
+
+    @PutMapping("/{handle}")
+    public ApiResponse<ProfileUpdateResponse> updateProfileDetail(
+            @PathVariable("handle") final String handle,
+            @ModelAttribute final ProfileUpdateRequest profileUpdateRequest){
+        return ApiResponse.onSuccess(memberService.updateProfileDetail(handle, profileUpdateRequest));
+    }
+
 
     @GetMapping("/{handle}/upload")
     public ApiResponse<PostElements> getUploadPosts(

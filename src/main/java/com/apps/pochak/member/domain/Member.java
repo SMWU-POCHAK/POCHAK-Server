@@ -1,6 +1,7 @@
 package com.apps.pochak.member.domain;
 
 import com.apps.pochak.global.BaseEntity;
+import com.apps.pochak.member.dto.request.ProfileUpdateRequest;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -69,6 +70,18 @@ public class Member extends BaseEntity {
         this.socialId = socialId;
         this.socialType = socialType;
         this.socialRefreshToken = socialRefreshToken;
+    }
+
+    public void updateMember(ProfileUpdateRequest profileUpdateRequest, String profileImageUrl){
+        this.name = getOrDefault(profileUpdateRequest.getName(), this.name);
+        this.message = getOrDefault(profileUpdateRequest.getMessage(), this.message);
+        this.profileImage = getOrDefault(profileImageUrl, this.profileImage);
+    }
+
+    private <T> T getOrDefault(T property, T alternative){
+        if (property != null)
+            return property;
+        return alternative;
     }
 
     @Override

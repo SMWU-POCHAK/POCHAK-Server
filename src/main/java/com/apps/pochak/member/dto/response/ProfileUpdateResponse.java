@@ -1,19 +1,19 @@
 package com.apps.pochak.member.dto.response;
 
-import com.apps.pochak.member.dto.request.ProfileUpdateRequest;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import static lombok.AccessLevel.PRIVATE;
-
 @Getter
-@RequiredArgsConstructor(access = PRIVATE)
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class ProfileUpdateResponse {
-    private final String name;
-    private final String handle;
-    private final String message;
-    private final String profileImage;
+    private String name;
+    private String handle;
+    private String message;
+    private String profileImage;
 
     @Builder
     public static ProfileUpdateResponse of(
