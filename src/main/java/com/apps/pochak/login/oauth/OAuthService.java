@@ -43,7 +43,8 @@ public class OAuthService {
     private final S3Service awsS3Service;
 
     public OAuthMemberResponse signup(MemberInfoRequest memberInfoRequest) {
-        Optional<Member> findMember = memberRepository.findMemberBySocialId(memberInfoRequest.getSocialId());
+        SocialType socialType = SocialType.of(memberInfoRequest.getSocialType());
+        Optional<Member> findMember = memberRepository.findMemberBySocialIdAndSocialType(memberInfoRequest.getSocialId(), socialType);
         if (findMember.isPresent()) throw new GeneralException(EXIST_USER);
 
 
@@ -58,7 +59,7 @@ public class OAuthService {
                 .socialId(memberInfoRequest.getSocialId())
                 .profileImage(profileImageUrl)
                 .refreshToken(refreshToken)
-                .socialType(SocialType.of(memberInfoRequest.getSocialType()))
+                .socialType(socialType)
                 .socialRefreshToken(memberInfoRequest.getSocialRefreshToken())
                 .build();
         memberRepository.save(member);

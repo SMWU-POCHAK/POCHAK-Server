@@ -2,6 +2,7 @@ package com.apps.pochak.member.domain.repository;
 
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.member.domain.Member;
+import com.apps.pochak.member.domain.SocialType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -62,7 +63,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findMemberByIdAndRefreshToken(final Long id, final String refreshToken);
 
-    Optional<Member> findMemberBySocialId(final String socialId);
+    Optional<Member> findMemberBySocialIdAndSocialType(final String socialId, final SocialType socialType);
 
     @Query("select m from Member m " +
             "where (m.handle ilike concat('%', :keyword, '%') or m.name ilike concat('%', :keyword, '%')) " +
