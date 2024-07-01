@@ -79,14 +79,13 @@ public class MemberService {
             final Pageable pageable
     ) {
         Member loginMember = jwtService.getLoginMember();
-        Page<Member> memberPage = memberRepository.searchByHandle(keyword, loginMember, pageable);
+        Page<Member> memberPage = memberRepository.searchByKeyword(keyword, loginMember, pageable);
         return MemberElements.from(memberPage);
     }
 
-    private void checkHandleDuplication(String handle) {
-        if (memberRepository.existsByHandle(handle)) {
-            throw new GeneralException(DUPLICATE_HANDLE);
-        }
+    @Transactional(readOnly = true)
+    public void checkDuplicate(String handle) {
+        memberRepository.checkDuplicateHandle(handle);
     }
 }
 

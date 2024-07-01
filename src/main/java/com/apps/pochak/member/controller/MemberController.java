@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
+import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.VALID_HANDLE;
 
 @RestController
 @RequiredArgsConstructor
@@ -47,5 +48,13 @@ public class MemberController {
             @PageableDefault(DEFAULT_PAGING_SIZE) final Pageable pageable
     ) {
         return ApiResponse.onSuccess(memberService.search(keyword, pageable));
+    }
+
+    @GetMapping("/duplicate")
+    public ApiResponse<Void> checkDuplicate(
+            @RequestParam("handle") final String handle
+    ) {
+        memberService.checkDuplicate(handle);
+        return ApiResponse.of(VALID_HANDLE);
     }
 }

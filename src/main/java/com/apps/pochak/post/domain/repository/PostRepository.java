@@ -66,7 +66,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     );
 
     @Query("select p from Post p " +
-            "where p.owner = :owner and p.status = 'ACTIVE' and (p.owner = :loginMember or p.postStatus = 'PUBLIC') " +
+            "where p.owner = :owner and p.status = 'ACTIVE' and p.postStatus = 'PUBLIC' " +
             "   and p.owner not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
             "   and :loginMember not in (select b.blockedMember from Block b where b.blocker = p.owner) " +
             "   and not exists (select t.member from Tag t where t.post = p intersect select b.blockedMember from Block b where b.blocker = :loginMember) " +
