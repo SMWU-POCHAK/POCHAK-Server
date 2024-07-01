@@ -54,16 +54,16 @@ public class OAuthController {
     @GetMapping("/api/v2/member/logout")
     public ApiResponse<?> logout() {
         String accessToken = JwtHeaderUtil.getAccessToken();
-        String handle = jwtService.getSubject(accessToken);
-        oAuthService.logout(handle);
+        String id = jwtService.getSubject(accessToken);
+        oAuthService.logout(id);
         return ApiResponse.of(SUCCESS_LOG_OUT);
     }
 
     @DeleteMapping("/api/v2/member/signout")
     public ApiResponse<?> signout() {
         String accessToken = JwtHeaderUtil.getAccessToken();
-        String handle = jwtService.getSubject(accessToken);
-        oAuthService.signout(handle);
+        String id = jwtService.getSubject(accessToken);
+        oAuthService.signout(id);
         return ApiResponse.of(SUCCESS_SIGN_OUT);
     }
 }

@@ -106,7 +106,7 @@ public class AppleOAuthService {
     /**
      * Get alg, kid From JWT Header
      */
-    public Map<String, String> getHeaderFromIdToken(String idToken) throws JsonProcessingException {
+    private Map<String, String> getHeaderFromIdToken(String idToken) throws JsonProcessingException {
         String idTokenHeader = idToken.substring(0, idToken.indexOf("."));
         String decodeIdTokenHeader = new String(Base64.getDecoder().decode((idTokenHeader)));
         return objectMapper.readValue(decodeIdTokenHeader, Map.class);
@@ -115,7 +115,7 @@ public class AppleOAuthService {
     /**
      * Get Public Key
      */
-    public Claims verifyIdToken(String kid, String alg, String idToken) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    private Claims verifyIdToken(String kid, String alg, String idToken) throws NoSuchAlgorithmException, InvalidKeySpecException {
         try {
             WebClient webClient = WebClient
                     .builder()
@@ -172,7 +172,7 @@ public class AppleOAuthService {
         return converter.getPrivateKey(object);
     }
 
-    public String makeClientSecret() throws IOException {
+    private String makeClientSecret() throws IOException {
         Date expirationDate = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
         return Jwts.builder()
                 .setHeaderParam("kid", KEY_ID)
@@ -190,7 +190,7 @@ public class AppleOAuthService {
      * Get Apple Refresh Token
      * For Delete Account
      */
-    public String getAppleRefreshToken(String authorizationCode) {
+    private String getAppleRefreshToken(String authorizationCode) {
         WebClient webClient = WebClient
                 .builder()
                 .baseUrl(PUBLIC_KEY_URL)

@@ -1,6 +1,5 @@
 package com.apps.pochak.login.oauth;
 
-import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.comment.domain.repository.CommentRepository;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
@@ -21,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
@@ -31,7 +31,6 @@ import static com.apps.pochak.global.s3.DirName.MEMBER;
 @Transactional
 public class OAuthService {
     private final JwtService jwtService;
-    private final AlarmRepository alarmRepository;
     private final CommentRepository commentRepository;
     private final FollowRepository followRepository;
     private final LikeRepository likeRepository;
@@ -88,23 +87,25 @@ public class OAuthService {
         throw new InvalidJwtException(FAIL_VALIDATE_TOKEN);
     }
 
-    public void logout(final String handle) {
-        final Member member = memberRepository.findByHandleWithoutLogin(handle);
+    public void logout(final String id) {
+        final Member member = memberRepository.findById(Long.parseLong(id))
+                .orElseThrow(() -> new GeneralException(INVALID_ACCESS_TOKEN));
         member.updateRefreshToken(null);
-        memberRepository.save(member);
     }
 
-    public void signout(final String handle) {
-        final Member member = memberRepository.findByHandleWithoutLogin(handle);
+    public void signout(final String id) {
+        final Member member = memberRepository.findById(Long.parseLong(id))
+                .orElseThrow(() -> new GeneralException(INVALID_ACCESS_TOKEN));
         if (member.getSocialType().equals(SocialType.APPLE)) {
             appleOAuthService.revoke(member.getRefreshToken());
         }
-        alarmRepository.deleteAlarmByMemberId(member.getId());
-        commentRepository.deleteCommentByMemberId(member.getId());
-        followRepository.deleteFollowByMemberId(member.getId());
-        likeRepository.deleteLikeByMemberId(member.getId());
-        tagRepository.deleteTagByMemberId(member.getId());
-        postRepository.deletePostByMemberId(member.getId());
+
+        List<Long> postIdList = postRepository.findPostIdListByOwnerOrTaggedMember(member);
+        commentRepository.deleteCommentByMemberOrPostList(member.getId(), postIdList);
+        followRepository.deleteFollowByMember(member.getId());
+        likeRepository.deleteLikeByMemberOrPostList(member.getId(), postIdList);
+        tagRepository.deleteTagByMemberOrPostList(member.getId(), postIdList);
+        postRepository.deleteAllPost(postIdList);
         memberRepository.deleteMemberByMemberId(member.getId());
     }
 }

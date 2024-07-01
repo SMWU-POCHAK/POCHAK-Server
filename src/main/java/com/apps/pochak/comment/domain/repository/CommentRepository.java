@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.INVALID_COMMENT_ID;
@@ -75,4 +76,16 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "set c.status = 'DELETED' " +
             "where c.id = :id or c.parentComment.id = :id")
     void deleteCommentById(@Param("id") final Long id);
+
+    @Modifying
+    @Query(value = """
+            update comment c, alarm a set c.status = 'DELETED', a.status = 'DELETED'
+            where (c.member_id = :memberId or c.post_id in :postIdList)
+                and c.id = a.comment_id
+            """,
+            nativeQuery = true)
+    void deleteCommentByMemberOrPostList(
+            @Param("memberId") final Long memberId,
+            @Param("postIdList") final List<Long> postIdList
+    );
 }

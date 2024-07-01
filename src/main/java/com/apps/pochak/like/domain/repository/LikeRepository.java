@@ -54,11 +54,6 @@ public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
     );
 
     @Modifying
-    @Query("update LikeEntity like set like.status = 'DELETED' " +
-            "where like.likeMember.id = :memberId or like.likedPost.owner.id = :memberId")
-    void deleteLikeByMemberId(@Param("memberId") final Long memberId);
-
-    @Modifying
     @Query("update LikeEntity l " +
             "set l.status = 'DELETED' " +
             "where (l.likeMember = :memberA and l.likedPost.id in (select p.id from Post p where p.owner = :memberB))" +
@@ -68,5 +63,17 @@ public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
     void deleteLikesBetweenMembers(
             @Param("memberA") final Member memberA,
             @Param("memberB") final Member memberB
+    );
+
+    @Modifying
+    @Query(value = """
+            update like_entity l, alarm a set l.status = 'DELETED', a.status = 'DELETED'
+            where (l.like_member_id = :memberId or l.liked_post_id in :postIdList)
+                and l.id = a.like_id
+            """,
+            nativeQuery = true)
+    void deleteLikeByMemberOrPostList(
+            @Param("memberId") Long memberId,
+            @Param("postIdList") List<Long> postList
     );
 }

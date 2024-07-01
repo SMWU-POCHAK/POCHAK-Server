@@ -5,6 +5,7 @@ import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.like.domain.LikeEntity;
 import com.apps.pochak.member.domain.Member;
+import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.tag.domain.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,9 +23,7 @@ import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.NOT_YOU
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 
     @Override
-    @Query("select a from Alarm a " +
-            "join fetch a.receiver " +
-            "where a.id = :id ")
+    @Query("select a from Alarm a join fetch a.receiver where a.id = :id ")
     Optional<Alarm> findById(@Param("id") final Long id);
 
     default Alarm findAlarmById(
@@ -39,8 +38,17 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     }
 
     @Modifying
-    @Query("update Alarm alarm set alarm.status = 'DELETED' where alarm.receiver.id = :receiverId")
-    void deleteAlarmByMemberId(@Param("receiverId") final Long receiverId);
+    @Query("""
+            UPDATE Alarm a set a.status = 'DELETED'
+            where a.receiver = :member
+            or a.tag.post in :postList
+            or a.comment.post in :postList
+            or a.like.likedPost in :postList
+            """)
+    void deleteAlarmByMemberId(
+            @Param("member") final Member member,
+            @Param("postLis") final List<Post> postList
+    );
 
     @Query("select a from Alarm a " +
             "where a.like = :like ")

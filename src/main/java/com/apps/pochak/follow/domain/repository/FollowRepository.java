@@ -43,8 +43,11 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     );
 
     @Modifying
-    @Query("update Follow f " +
-            "set f.status = 'DELETED' " +
-            "where f.receiver.id = :memberId or f.sender.id = :memberId")
-    void deleteFollowByMemberId(@Param("memberId") final Long memberId);
+    @Query(value = """
+            update follow f, alarm a set f.status = 'DELETED', a.status = 'DELETED'
+            where (f.receiver_id = :memberId or f.sender_id = :memberId)
+                and f.id = a.follow_id
+            """,
+            nativeQuery = true)
+    void deleteFollowByMember(@Param("memberId") final Long memberId);
 }
