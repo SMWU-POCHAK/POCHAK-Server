@@ -1,12 +1,18 @@
 package com.apps.pochak.member.service;
 
 import com.apps.pochak.follow.domain.repository.FollowRepository;
+import com.apps.pochak.global.api_payload.exception.GeneralException;
+import com.apps.pochak.global.s3.S3Service;
 import com.apps.pochak.login.jwt.JwtService;
+import com.apps.pochak.member.dto.request.ProfileUpdateRequest;
+import com.apps.pochak.member.dto.response.ProfileUpdateResponse;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.member.dto.response.MemberElements;
 import com.apps.pochak.member.dto.response.ProfileResponse;
 import com.apps.pochak.post.domain.Post;
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
+import static com.apps.pochak.global.s3.DirName.MEMBER;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.post.dto.PostElements;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +29,7 @@ public class MemberService {
     private final FollowRepository followRepository;
     private final PostRepository postRepository;
     private final JwtService jwtService;
+    private final S3Service awsS3Service;
 
     @Transactional(readOnly = true)
     public ProfileResponse getProfileDetail(final String handle,
@@ -43,6 +50,28 @@ public class MemberService {
                 .followerCount(followerCount)
                 .followingCount(followingCount)
                 .isFollow(isFollow)
+                .build();
+    }
+
+    public ProfileUpdateResponse updateProfileDetail(final String handle,
+                                                     final ProfileUpdateRequest profileUpdateRequest){
+        final Member loginMember = jwtService.getLoginMember();
+        final Member updateMember = memberRepository.findByHandleWithoutLogin(handle);
+        if (!loginMember.equals(updateMember)) {
+            throw new GeneralException(UNAUTHORIZED_MEMBER_REQUEST);
+        }
+        String profileImageUrl = updateMember.getProfileImage();
+        if (profileUpdateRequest.getProfieImage() != null) {
+            awsS3Service.deleteFileFromS3(updateMember.getProfileImage());
+            profileImageUrl = awsS3Service.upload(profileUpdateRequest.getProfieImage(), MEMBER);
+        }
+        updateMember.updateMember(profileUpdateRequest, profileImageUrl);
+
+        return ProfileUpdateResponse.builder()
+                .name(updateMember.getName())
+                .handle(updateMember.getHandle())
+                .message(updateMember.getMessage())
+                .profileImage(updateMember.getProfileImage())
                 .build();
     }
 
@@ -78,8 +107,13 @@ public class MemberService {
         return MemberElements.from(memberPage);
     }
 
+    private Member findMemberByHandle(final String handle, final Member loginMember) {
+        return memberRepository.findByHandle(handle, loginMember);
+    }
+
     @Transactional(readOnly = true)
     public void checkDuplicate(String handle) {
         memberRepository.checkDuplicateHandle(handle);
     }
 }
+

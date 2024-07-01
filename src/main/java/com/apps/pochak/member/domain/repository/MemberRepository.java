@@ -62,6 +62,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("update Member member set member.status = 'DELETED' where member.id = :memberId")
     void deleteMemberByMemberId(@Param("memberId") final Long memberId);
 
+
     @Query("select m from Member m " +
             "where (m.handle ilike concat('%', :keyword, '%') or m.name ilike concat('%', :keyword, '%')) " +
             "   and m not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +

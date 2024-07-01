@@ -55,6 +55,7 @@ public enum ErrorStatus implements BaseErrorCode {
     // Member
     INVALID_MEMBER_HANDLE(BAD_REQUEST, "MEMBER4001", "유효하지 않은 멤버의 handle입니다."),
     DUPLICATE_HANDLE(BAD_REQUEST, "MEMBER4002", "중복되는 handle(아이디) 입니다."),
+    UNAUTHORIZED_MEMBER_REQUEST(FORBIDDEN, "MEMBER4003", "프로필을 수정할 권한이 없습니다."),
 
     // Post
     INVALID_POST_ID(BAD_REQUEST, "POST4001", "유효하지 않은 게시물 아이디입니다."),
@@ -68,7 +69,8 @@ public enum ErrorStatus implements BaseErrorCode {
     // Image
     DELETE_FILE_ERROR(SERVICE_UNAVAILABLE, "IMAGE501", "파일 삭제를 실패하였습니다."),
     S3_UPLOAD_ERROR(SERVICE_UNAVAILABLE, "IMAGE502", "S3 업로드를 실패하였습니다."),
-    CONVERT_FILE_ERROR(SERVICE_UNAVAILABLE, "IMAGE503", "MultipartFile을 File로 전환 실패하였습니다.");
+    CONVERT_FILE_ERROR(SERVICE_UNAVAILABLE, "IMAGE503", "MultipartFile을 File로 전환 실패하였습니다."),
+    NULL_FILE(BAD_REQUEST, "IMAGE504", "파일이 존재하지 않습니다.");
 
 
     private final HttpStatus httpStatus;
