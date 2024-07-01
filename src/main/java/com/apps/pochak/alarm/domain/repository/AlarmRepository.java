@@ -21,9 +21,8 @@ import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.NOT_YOU
 
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 
-    @Override
     @Query("select a from Alarm a join fetch a.receiver where a.id = :id ")
-    Optional<Alarm> findById(@Param("id") final Long id);
+    Optional<Alarm> findAlarmById(@Param("id") final Long id);
 
     default Alarm findAlarmById(
             final Long id,

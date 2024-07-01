@@ -3,6 +3,7 @@ package com.apps.pochak.post.domain.repository;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
+import com.apps.pochak.tag.domain.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -97,6 +98,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             @Param("loginMember") final Member loginMember,
             final Pageable pageable
     );
+
+    @Query("""
+            select p from Post p
+            join Tag t on t.post = p and t = :tag
+            join fetch p.owner
+            where p.status = 'ACTIVE'
+            """)
+    Optional<Post> findPostByTag(@Param("tag") final Tag tag);
 
     @Query("select p from Post p " +
             "where p.postStatus = 'PUBLIC' and p.status = 'ACTIVE' and p.lastModifiedDate > :nowMinusOneHour ")
