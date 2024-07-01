@@ -32,6 +32,7 @@ public class TagApprovalAlarmElement extends AlarmElement {
         this.postImage = post.getPostImage();
 
         final Member owner = post.getOwner();
+        this.ownerId = owner.getId();
         this.ownerHandle = owner.getHandle();
         this.ownerName = owner.getName();
         this.ownerProfileImage = owner.getProfileImage();

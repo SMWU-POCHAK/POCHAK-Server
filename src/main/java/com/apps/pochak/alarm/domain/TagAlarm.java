@@ -9,12 +9,14 @@ import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
 
 import static com.apps.pochak.alarm.domain.AlarmType.TAG_APPROVAL;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
+@DynamicInsert
 @DiscriminatorValue("TAG_ALARM")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TagAlarm extends Alarm {
