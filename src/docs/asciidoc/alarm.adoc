@@ -1,0 +1,109 @@
+= Alarm API
+pochak server team~~
+:doctype: book
+:icons: font
+:source-highlighter: highlishtjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== `GET` All Alarm API
+
+모든 알람 조회 API
+
+=== Request
+
+include::{snippets}/get-alarms/http-request.adoc[]
+
+==== request headers
+
+include::{snippets}/get-alarms/request-headers.adoc[]
+
+==== query parameters
+
+include::{snippets}/get-alarms/query-parameters.adoc[]
+
+=== Response
+
+==== response body
+
+include::{snippets}/get-alarms/response-body.adoc[]
+include::{snippets}/get-alarms/response-fields.adoc[]
+
+== `GET` Preview Post API
+
+게시물 미리보기 API
+
+=== Request
+
+include::{snippets}/get-preview-post/http-request.adoc[]
+
+==== request headers
+
+include::{snippets}/get-preview-post/request-headers.adoc[]
+
+==== path parameters
+
+include::{snippets}/get-preview-post/path-parameters.adoc[]
+
+=== Response
+
+==== response body
+
+include::{snippets}/get-preview-post/response-body.adoc[]
+
+- 알람 종류
+
+[cols=2*]
+|===
+|`OWNER_COMMENT`
+|내가 올린 게시물에 댓글이 달렸을 경우
+
+|`TAGGED_COMMENT`
+|내가 태그된 게시물에 댓글이 달렸을 경우
+
+|`COMMENT_REPLY`
+|내 댓글에 답글이 달렸을 경우
+
+|`FOLLOW`
+|다른 사람이 날 팔로우했을 경우
+
+|`LIKE`
+|내가 올린 게시물에 좋아요가 달릴 경우
+
+|`TAG_APPROVAL`
+|누군가 날 게시물에 태그했을 경우 (수락/거절 후 삭제되는 알람)
+
+|===
+
+include::{snippets}/get-preview-post/response-fields.adoc[]
+
+== `POST` Check Alarm API
+
+알람 확인 API
+
+=== Request
+
+include::{snippets}/check-alarm/http-request.adoc[]
+
+==== request headers
+
+include::{snippets}/check-alarm/request-headers.adoc[]
+
+==== path parameters
+
+include::{snippets}/check-alarm/path-parameters.adoc[]
+
+=== Response
+
+==== response body
+
+- `TAG_APPROVAL` 타입의 알람만 게시물 미리보기가 가능합니다.
+(다른 경우 `BAD_REQUEST` 오류 발생)
+
+include::{snippets}/check-alarm/response-body.adoc[]
+include::{snippets}/check-alarm/response-fields.adoc[]

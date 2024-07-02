@@ -33,7 +33,6 @@ pochak server team~~
 == API List
 
 === Post 게시물
-
 * link:post.html[Post API]
 * link:comment.html[Comment API]
 * link:like.html[LIKE API]
@@ -44,8 +43,10 @@ pochak server team~~
 * link:search.html[Search API]
 
 === Login 로그인
-
 * link:login.html[Login API]
+
+=== Alarm 알람
+* link:alarm.html[Alarm API]
 
 === Report 신고
 * link:report.html[Report API]
