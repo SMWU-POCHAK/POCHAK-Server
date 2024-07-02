@@ -1,6 +1,7 @@
 package com.apps.pochak.alarm.domain;
 
 import com.apps.pochak.member.domain.Member;
+import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.tag.domain.Tag;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -30,6 +31,9 @@ public class TagAlarm extends Alarm {
     private String taggerName;
     private String taggerProfileImage;
 
+    private Long postId;
+    private String postImage;
+
     public TagAlarm(
             final Tag tag,
             final Member receiver
@@ -42,5 +46,9 @@ public class TagAlarm extends Alarm {
         this.taggerHandle = tagger.getHandle();
         this.taggerName = tagger.getName();
         this.taggerProfileImage = tagger.getProfileImage();
+
+        Post post = tag.getPost();
+        this.postId = post.getId();
+        this.postImage = post.getPostImage();
     }
 }

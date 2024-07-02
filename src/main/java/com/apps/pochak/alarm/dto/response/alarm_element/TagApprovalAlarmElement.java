@@ -22,19 +22,14 @@ public class TagApprovalAlarmElement extends AlarmElement {
     private Long postId;
     private String postImage;
 
-    public TagApprovalAlarmElement(TagAlarm alarm) {
+    public TagApprovalAlarmElement(final TagAlarm alarm) {
         super(alarm);
-        final Tag tag = alarm.getTag();
-        this.tagId = tag.getId();
-
-        final Post post = tag.getPost();
-        this.postId = post.getId();
-        this.postImage = post.getPostImage();
-
-        final Member owner = post.getOwner();
-        this.ownerId = owner.getId();
-        this.ownerHandle = owner.getHandle();
-        this.ownerName = owner.getName();
-        this.ownerProfileImage = owner.getProfileImage();
+        this.tagId = alarm.getTag().getId();
+        this.ownerId = alarm.getTaggerId();
+        this.ownerHandle = alarm.getTaggerHandle();
+        this.ownerName = alarm.getTaggerName();
+        this.ownerProfileImage = alarm.getTaggerProfileImage();
+        this.postId = alarm.getPostId();
+        this.postImage = alarm.getPostImage();
     }
 }
