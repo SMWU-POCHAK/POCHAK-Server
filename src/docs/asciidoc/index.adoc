@@ -53,3 +53,6 @@ pochak server team~~
 
 === Block 차단
 * link:block.html[Block API]
+
+=== Tag 태그
+* link:tag.html[Tag API]

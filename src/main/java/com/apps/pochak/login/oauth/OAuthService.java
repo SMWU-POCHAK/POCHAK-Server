@@ -72,8 +72,7 @@ public class OAuthService {
         String accessToken = JwtHeaderUtil.getAccessToken();
         String refreshToken = JwtHeaderUtil.getRefreshToken();
         if (jwtService.isValidRefreshAndInvalidAccess(refreshToken, accessToken)) {
-            String id = jwtService.getSubject(accessToken);
-            Member member = memberRepository.findMemberByIdAndRefreshToken(Long.parseLong(id), refreshToken)
+            Member member = memberRepository.findMemberByRefreshToken(refreshToken)
                     .orElseThrow(() -> new InvalidJwtException(INVALID_REFRESH_TOKEN));
             return PostTokenResponse.builder()
                     .accessToken(jwtService.createAccessToken(member.getId().toString()))

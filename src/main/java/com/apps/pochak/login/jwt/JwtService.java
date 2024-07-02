@@ -62,35 +62,24 @@ public class JwtService {
                 .compact();
     }
 
-    public void validateAccessToken(final String accessToken) {
+    public boolean validateAccessToken(final String accessToken) {
         try {
             parseToken(accessToken);
-        } catch (SecurityException e) {
-            throw new InvalidJwtException(INVALID_TOKEN_SIGNATURE);
-        } catch (MalformedJwtException e) {
-            throw new InvalidJwtException(MALFORMED_TOKEN);
+            return true;
         } catch (ExpiredJwtException e) {
-            throw new InvalidJwtException(EXPIRED_ACCESS_TOKEN);
-        } catch (UnsupportedJwtException e) {
-            throw new InvalidJwtException(UNSUPPORTED_TOKEN);
+            throw new ExpiredPeriodJwtException(EXPIRED_ACCESS_TOKEN);
         } catch (JwtException | IllegalArgumentException e) {
-            throw new InvalidJwtException(INVALID_ACCESS_TOKEN);
+            throw new InvalidJwtException(FAIL_VALIDATE_TOKEN);
         }
     }
 
     private void validateRefreshToken(final String refreshToken) {
         try {
             parseToken(refreshToken);
-        } catch (SecurityException e) {
-            throw new InvalidJwtException(INVALID_TOKEN_SIGNATURE);
-        } catch (MalformedJwtException e) {
-            throw new InvalidJwtException(MALFORMED_TOKEN);
         } catch (ExpiredJwtException e) {
-            throw new InvalidJwtException(EXPIRED_REFRESH_TOKEN);
-        } catch (UnsupportedJwtException e) {
-            throw new InvalidJwtException(UNSUPPORTED_TOKEN);
+            throw new ExpiredPeriodJwtException(EXPIRED_REFRESH_TOKEN);
         } catch (JwtException | IllegalArgumentException e) {
-            throw new InvalidJwtException(INVALID_REFRESH_TOKEN);
+            throw new InvalidJwtException(FAIL_VALIDATE_TOKEN);
         }
     }
 

@@ -61,7 +61,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             throw new GeneralException(DUPLICATE_HANDLE);
     }
 
-    Optional<Member> findMemberByIdAndRefreshToken(final Long id, final String refreshToken);
+    Optional<Member> findMemberByRefreshToken(final String refreshToken);
 
     Optional<Member> findMemberBySocialId(final String socialId);
 

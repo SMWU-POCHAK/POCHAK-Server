@@ -83,7 +83,7 @@ public class LoginControllerTest {
         );
 
         this.mockMvc.perform(
-                        multipart("/api/v2/members/signup")
+                        multipart("/api/v2/signup")
                                 .file(profileImage)
                                 .queryParam("name", "user1")
                                 .queryParam("email", "user1@email.com")
@@ -133,7 +133,7 @@ public class LoginControllerTest {
     void refresh() throws Exception {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .post("/api/v2/members/refresh")
+                                .post("/api/v2/refresh")
                                 .header("Authorization", authorization1)
                                 .header("RefreshToken", refreshToken)
                                 .contentType(APPLICATION_JSON)
@@ -144,7 +144,9 @@ public class LoginControllerTest {
                                 getDocumentResponse(),
                                 requestHeaders(
                                         headerWithName("Authorization")
-                                                .description("Basic auth credentials")
+                                                .description("Basic auth credentials"),
+                                        headerWithName("RefreshToken")
+                                                .description("리프레시 토큰")
                                 ),
                                 responseFields(
                                         fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),
@@ -163,7 +165,7 @@ public class LoginControllerTest {
     void logout() throws Exception {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .get("/api/v2/members/logout")
+                                .get("/api/v2/logout")
                                 .header("Authorization", authorization1)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
@@ -190,7 +192,7 @@ public class LoginControllerTest {
     void signout() throws Exception {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .delete("/api/v2/members/signout")
+                                .delete("/api/v2/signout")
                                 .header("Authorization", authorization1)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
