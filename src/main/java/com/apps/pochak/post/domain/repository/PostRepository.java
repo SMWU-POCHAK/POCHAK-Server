@@ -149,7 +149,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("select p from Post p " +
             "left join LikeEntity l on l.likedPost = p " +
-            "where p.postStatus = 'PUBLIC' " +
+            "where p.postStatus = 'PUBLIC' and p.status = 'ACTIVE' " +
             "group by p.id " +
             "order by count(l) desc, p.allowedDate desc ")
     Page<Post> findPopularPost(final Pageable pageable);

@@ -88,7 +88,7 @@ public class FollowService {
     }
 
     private void deleteFollowAlarm(final Follow follow) {
-        alarmRepository.deleteAlarmByFollow(follow);
+        alarmRepository.deleteAlarmByFollow(follow.getId());
     }
 
     public BaseCode deleteFollower(final String handle,

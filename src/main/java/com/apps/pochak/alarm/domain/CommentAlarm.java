@@ -3,7 +3,6 @@ package com.apps.pochak.alarm.domain;
 import com.apps.pochak.comment.domain.Comment;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -17,7 +16,6 @@ import static jakarta.persistence.FetchType.LAZY;
 @Entity
 @Getter
 @DynamicInsert
-@DiscriminatorValue("COMMENT_ALARM")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CommentAlarm extends Alarm {
 

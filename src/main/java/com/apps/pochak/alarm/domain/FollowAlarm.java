@@ -17,7 +17,6 @@ import static jakarta.persistence.FetchType.LAZY;
 @Entity
 @Getter
 @DynamicInsert
-@DiscriminatorValue("FOLLOW_ALARM")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FollowAlarm extends Alarm {
 

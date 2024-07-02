@@ -84,7 +84,7 @@ public class LikeService {
     }
 
     private void deleteAlarm(LikeEntity like) {
-        alarmRepository.deleteAlarmByLike(like);
+        alarmRepository.deleteAlarmByLike(like.getId());
     }
 
     @Transactional(readOnly = true)

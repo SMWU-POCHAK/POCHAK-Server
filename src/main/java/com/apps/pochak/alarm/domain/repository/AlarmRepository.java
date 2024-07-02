@@ -45,6 +45,10 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
             final Pageable pageable
     );
 
+    // TODO: TREAT() 에러 확인하기
+    /*
+    에러 메소드들
+     */
     @Modifying
     @Query("""
             update Alarm a set a.status = 'DELETED'
@@ -71,5 +75,45 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
             update Alarm a set a.status = 'DELETED'
             where treat(a as TagAlarm).tag in :tagList
             """)
-    void deleteAlarmByTagList(@Param("tagList") final List<Tag> tag);
+    void deleteAlarmByTagList(@Param("tagList") final List<Tag> tagList);
+
+    /*
+    임시 메소드들
+     */
+    @Modifying
+    @Query(value = """
+            update alarm a set a.status = 'DELETED'
+                   where a.like_id = :likeId
+                     and a.dtype = 'LikeAlarm' and (a.status = 'ACTIVE')
+            """,
+            nativeQuery = true)
+    void deleteAlarmByLike(@Param("likeId") final Long likeId);
+
+    @Modifying
+    @Query(value = """
+            update alarm a set a.status = 'DELETED'
+                   where a.follow_id = :followId
+                     and a.dtype = 'FollowAlarm' and (a.status = 'ACTIVE')
+            """,
+            nativeQuery = true)
+    void deleteAlarmByFollow(@Param("followId") final Long followId);
+
+    @Modifying
+    @Query(value = """
+            update alarm a set a.status = 'DELETED'
+                   where a.tag_approval_id = :tagId
+                     and a.dtype='TAG_ALARM' and (a.status = 'ACTIVE')
+            """,
+            nativeQuery = true)
+    void deleteAlarmByTag(@Param("tagId") final Long tagId);
+
+
+    @Modifying
+    @Query(value = """
+            update alarm a set a.status = 'DELETED'
+                   where a.tag_approval_id in :tagIdList
+                     and a.dtype='TagAlarm' and (a.status = 'ACTIVE')
+            """,
+            nativeQuery = true)
+    void deleteAlarmByTagIdList(@Param("tagIdList") final List<Long> tagIdList);
 }

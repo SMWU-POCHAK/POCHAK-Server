@@ -18,7 +18,6 @@ import static jakarta.persistence.FetchType.LAZY;
 @Entity
 @Getter
 @DynamicInsert
-@DiscriminatorValue("LIKE_ALARM")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LikeAlarm extends Alarm {
 
