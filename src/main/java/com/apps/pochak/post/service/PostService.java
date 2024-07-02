@@ -1,6 +1,7 @@
 package com.apps.pochak.post.service;
 
 import com.apps.pochak.alarm.domain.Alarm;
+import com.apps.pochak.alarm.domain.TagAlarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.comment.domain.Comment;
 import com.apps.pochak.comment.domain.repository.CommentRepository;
@@ -16,6 +17,7 @@ import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.post.dto.PostElements;
 import com.apps.pochak.post.dto.request.PostUploadRequest;
 import com.apps.pochak.post.dto.response.PostDetailResponse;
+import com.apps.pochak.post.dto.response.PostPreviewResponse;
 import com.apps.pochak.tag.domain.Tag;
 import com.apps.pochak.tag.domain.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
@@ -111,10 +113,7 @@ public class PostService {
 
     private void saveTagApprovalAlarms(List<Tag> tagList) {
         final List<Alarm> tagApprovalAlarmList = tagList.stream().map(
-                tag -> Alarm.getTagApprovalAlarm(
-                        tag,
-                        tag.getMember()
-                )
+                tag -> new TagAlarm(tag, tag.getMember())
         ).collect(Collectors.toList());
         alarmRepository.saveAll(tagApprovalAlarmList);
     }
@@ -133,5 +132,19 @@ public class PostService {
     public PostElements getSearchTab(Pageable pageable) {
         final Page<Post> postPage = postRepository.findPopularPost(pageable);
         return PostElements.from(postPage);
+    }
+
+    @Transactional(readOnly = true)
+    public PostPreviewResponse getPreviewPost(final Long alarmId) {
+        Member loginMember = jwtService.getLoginMember();
+        Alarm alarm = alarmRepository.findAlarmByIdAndReceiver(alarmId, loginMember)
+                .orElseThrow(() -> new GeneralException(INVALID_ALARM_ID));
+
+        if (!(alarm instanceof TagAlarm tagAlarm)) throw new GeneralException(CANNOT_PREVIEW);
+
+        Post previewPost = postRepository.findPostByTag(tagAlarm.getTag()).orElseThrow(() -> new GeneralException(INVALID_POST_ID));
+        List<Tag> tagList = tagRepository.findTagsByPost(previewPost);
+
+        return new PostPreviewResponse(previewPost, tagList);
     }
 }

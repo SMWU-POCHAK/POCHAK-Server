@@ -3,6 +3,7 @@ package com.apps.pochak.post.domain.repository;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
+import com.apps.pochak.tag.domain.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -98,6 +99,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             final Pageable pageable
     );
 
+    @Query("""
+            select p from Post p
+            join Tag t on t.post = p and t = :tag
+            join fetch p.owner
+            where p.status = 'ACTIVE'
+            """)
+    Optional<Post> findPostByTag(@Param("tag") final Tag tag);
+
     @Query("select p from Post p " +
             "where p.postStatus = 'PUBLIC' and p.status = 'ACTIVE' and p.lastModifiedDate > :nowMinusOneHour ")
     List<Post> findModifiedPostWithinOneHour(@Param("nowMinusOneHour") final LocalDateTime nowMinusOneHour);
@@ -140,7 +149,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("select p from Post p " +
             "left join LikeEntity l on l.likedPost = p " +
-            "where p.postStatus = 'PUBLIC' " +
+            "where p.postStatus = 'PUBLIC' and p.status = 'ACTIVE' " +
             "group by p.id " +
             "order by count(l) desc, p.allowedDate desc ")
     Page<Post> findPopularPost(final Pageable pageable);

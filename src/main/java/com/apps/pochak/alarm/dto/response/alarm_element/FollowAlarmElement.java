@@ -1,23 +1,23 @@
 package com.apps.pochak.alarm.dto.response.alarm_element;
 
-import com.apps.pochak.alarm.domain.Alarm;
+import com.apps.pochak.alarm.domain.FollowAlarm;
 import com.apps.pochak.alarm.dto.response.AlarmElement;
-import com.apps.pochak.member.domain.Member;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class FollowAlarmElement extends AlarmElement {
-    private String handle;
-    private String name;
-    private String profileImage;
+    private Long memberId;
+    private String memberHandle;
+    private String memberName;
+    private String memberProfileImage;
 
-    public FollowAlarmElement(Alarm alarm) {
+    public FollowAlarmElement(FollowAlarm alarm) {
         super(alarm);
-        final Member sender = alarm.getFollow().getSender();
-        this.handle = sender.getHandle();
-        this.name = sender.getName();
-        this.profileImage = sender.getProfileImage();
+        this.memberId = alarm.getSenderId();
+        this.memberHandle = alarm.getSenderHandle();
+        this.memberName = alarm.getSenderName();
+        this.memberProfileImage = alarm.getSenderProfileImage();
     }
 }

@@ -1,6 +1,7 @@
 package com.apps.pochak.alarm.dto.response.alarm_element;
 
 import com.apps.pochak.alarm.domain.Alarm;
+import com.apps.pochak.alarm.domain.TagAlarm;
 import com.apps.pochak.alarm.dto.response.AlarmElement;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
@@ -13,6 +14,7 @@ import lombok.Setter;
 public class TagApprovalAlarmElement extends AlarmElement {
     private Long tagId;
 
+    private Long ownerId;
     private String ownerHandle;
     private String ownerName;
     private String ownerProfileImage;
@@ -20,18 +22,14 @@ public class TagApprovalAlarmElement extends AlarmElement {
     private Long postId;
     private String postImage;
 
-    public TagApprovalAlarmElement(Alarm alarm) {
+    public TagApprovalAlarmElement(final TagAlarm alarm) {
         super(alarm);
-        final Tag tag = alarm.getTag();
-        this.tagId = tag.getId();
-
-        final Post post = tag.getPost();
-        this.postId = post.getId();
-        this.postImage = post.getPostImage();
-
-        final Member owner = post.getOwner();
-        this.ownerHandle = owner.getHandle();
-        this.ownerName = owner.getName();
-        this.ownerProfileImage = owner.getProfileImage();
+        this.tagId = alarm.getTag().getId();
+        this.ownerId = alarm.getTaggerId();
+        this.ownerHandle = alarm.getTaggerHandle();
+        this.ownerName = alarm.getTaggerName();
+        this.ownerProfileImage = alarm.getTaggerProfileImage();
+        this.postId = alarm.getPostId();
+        this.postImage = alarm.getPostImage();
     }
 }

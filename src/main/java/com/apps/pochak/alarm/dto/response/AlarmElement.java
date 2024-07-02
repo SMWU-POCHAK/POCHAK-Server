@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AlarmElement {
+public abstract class AlarmElement {
     private Long alarmId;
     private AlarmType alarmType;
     private Boolean isChecked;

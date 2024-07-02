@@ -1,6 +1,5 @@
 package com.apps.pochak.tag.service;
 
-import com.apps.pochak.alarm.domain.Alarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.global.api_payload.code.BaseCode;
 import com.apps.pochak.login.jwt.JwtService;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.*;
 
@@ -27,7 +27,7 @@ public class TagService {
 
     private final JwtService jwtService;
 
-    public BaseCode approveOrRejectTagRequest(Long tagId, Boolean isAccept) {
+    public BaseCode approveOrRejectTagRequest(final Long tagId, final Boolean isAccept) {
         final Member loginMember = jwtService.getLoginMember();
         final Tag tag = tagRepository.findTagByIdAndMember(tagId, loginMember);
         if (isAccept) {
@@ -36,10 +36,9 @@ public class TagService {
             return rejectPost(tag);
     }
 
-    private BaseCode acceptPost(Tag tag) {
+    private BaseCode acceptPost(final Tag tag) {
         tag.setIsAccepted(true);
-        final List<Alarm> alarmList = alarmRepository.findAlarmByTag(tag);
-        alarmRepository.deleteAll(alarmList);
+        alarmRepository.deleteAlarmByTag(tag.getId());
 
         final Post post = tag.getPost();
         final List<Tag> tagList = tagRepository.findTagsByPost(post);
@@ -55,9 +54,12 @@ public class TagService {
     private BaseCode rejectPost(Tag tag) {
         final Post post = tag.getPost();
         final List<Tag> tagList = tagRepository.findTagsByPost(post);
-        final List<Alarm> alarmList = alarmRepository.findAlarmByTagIn(tagList);
 
-        alarmRepository.deleteAll(alarmList);
+        List<Long> tagIdList = tagList.stream().map(
+                Tag::getId
+        ).collect(Collectors.toList());
+
+        alarmRepository.deleteAlarmByTagIdList(tagIdList);
         tagRepository.deleteAll(tagList);
         postRepository.delete(post);
 

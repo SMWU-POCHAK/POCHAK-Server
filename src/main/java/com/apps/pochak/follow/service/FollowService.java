@@ -1,6 +1,7 @@
 package com.apps.pochak.follow.service;
 
 import com.apps.pochak.alarm.domain.Alarm;
+import com.apps.pochak.alarm.domain.FollowAlarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
@@ -82,16 +83,12 @@ public class FollowService {
             final Follow follow,
             final Member receiver
     ) {
-        final Alarm followAlarm = Alarm.getFollowAlarm(
-                follow,
-                receiver
-        );
-        alarmRepository.save(followAlarm);
+        FollowAlarm alarm = new FollowAlarm(follow, receiver);
+        alarmRepository.save(alarm);
     }
 
     private void deleteFollowAlarm(final Follow follow) {
-        final List<Alarm> alarmList = alarmRepository.findAlarmByFollow(follow);
-        alarmRepository.deleteAll(alarmList);
+        alarmRepository.deleteAlarmByFollow(follow.getId());
     }
 
     public BaseCode deleteFollower(final String handle,
