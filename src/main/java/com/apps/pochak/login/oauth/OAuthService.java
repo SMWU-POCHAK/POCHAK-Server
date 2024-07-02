@@ -80,7 +80,7 @@ public class OAuthService {
         }
         if (jwtService.isValidRefreshAndValidAccess(refreshToken, accessToken)) {
             return PostTokenResponse.builder()
-                    .accessToken(jwtService.createAccessToken(accessToken))
+                    .accessToken(accessToken)
                     .build();
         }
         throw new InvalidJwtException(FAIL_VALIDATE_TOKEN);

@@ -37,7 +37,7 @@ public class GoogleOAuthService {
     private String GOOGLE_USER_BASE_URL;
 
     @Transactional
-    public OAuthMemberResponse login(String accessToken) {
+    public OAuthMemberResponse login(final String accessToken) {
         GoogleMemberResponse memberResponse = getUserInfo(accessToken);
 
         Member member = memberRepository.findMemberBySocialId(memberResponse.getId()).orElse(null);
@@ -53,7 +53,7 @@ public class GoogleOAuthService {
         }
 
         String appRefreshToken = jwtService.createRefreshToken();
-        String appAccessToken = jwtService.createAccessToken(member.getHandle());
+        String appAccessToken = jwtService.createAccessToken(member.getId().toString());
 
         member.updateRefreshToken(appRefreshToken);
         memberRepository.save(member);
@@ -69,9 +69,27 @@ public class GoogleOAuthService {
     }
 
     /**
+     * Get User Info Using Access Token
+     */
+    public GoogleMemberResponse getUserInfo(final String accessToken) {
+        GoogleMemberResponse googleMemberResponse = webClient.get()
+                .uri(GOOGLE_USER_BASE_URL, uriBuilder -> uriBuilder.queryParam("access_token", accessToken).build())
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.error(new RuntimeException("Social Access Token is unauthorized")))
+                .onStatus(HttpStatusCode::is5xxServerError, response -> Mono.error(new RuntimeException("Internal Server Error")))
+                .bodyToMono(GoogleMemberResponse.class)
+                .flux()
+                .toStream()
+                .findFirst()
+                .orElseThrow(() -> new GoogleOAuthException(INVALID_USER_INFO));
+
+        return googleMemberResponse;
+    }
+
+    /**
      * Get Access Token
      */
-    public String getAccessToken(String code) {
+    public String getAccessToken(final String code) {
         GoogleTokenResponse googleTokenResponse = webClient.post()
                 .uri(GOOGLE_BASE_URL, uriBuilder -> uriBuilder
                         .queryParam("grant_type", "authorization_code")
@@ -90,23 +108,5 @@ public class GoogleOAuthService {
                 .orElseThrow(() -> new GoogleOAuthException(INVALID_OAUTH_TOKEN));
 
         return googleTokenResponse.getAccessToken();
-    }
-
-    /**
-     * Get User Info Using Access Token
-     */
-    public GoogleMemberResponse getUserInfo(String accessToken) {
-        GoogleMemberResponse googleMemberResponse = webClient.get()
-                .uri(GOOGLE_USER_BASE_URL, uriBuilder -> uriBuilder.queryParam("access_token", accessToken).build())
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.error(new RuntimeException("Social Access Token is unauthorized")))
-                .onStatus(HttpStatusCode::is5xxServerError, response -> Mono.error(new RuntimeException("Internal Server Error")))
-                .bodyToMono(GoogleMemberResponse.class)
-                .flux()
-                .toStream()
-                .findFirst()
-                .orElseThrow(() -> new GoogleOAuthException(INVALID_USER_INFO));
-
-        return googleMemberResponse;
     }
 }

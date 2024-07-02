@@ -91,7 +91,6 @@ public class AppleOAuthService {
         String appAccessToken = jwtService.createAccessToken(member.getId().toString());
 
         member.updateRefreshToken(appRefreshToken);
-        memberRepository.save(member);
 
         return OAuthMemberResponse.builder()
                 .socialId(sub)
