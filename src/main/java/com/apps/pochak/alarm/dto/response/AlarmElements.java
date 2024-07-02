@@ -19,11 +19,11 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class AlarmElements {
     private PageInfo pageInfo;
-    private List<AlarmElement> alarmElementList;
+    private List<AlarmElement> alarmList;
 
     public AlarmElements(final Page<Alarm> alarmPage) {
         this.pageInfo = new PageInfo(alarmPage);
-        this.alarmElementList = alarmPage.stream().map(
+        this.alarmList = alarmPage.stream().map(
                 alarm -> {
                     if (alarm instanceof FollowAlarm) {
                         return new FollowAlarmElement((FollowAlarm) alarm);

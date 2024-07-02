@@ -8,16 +8,16 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FollowAlarmElement extends AlarmElement {
-    private Long id;
-    private String handle;
-    private String name;
-    private String profileImage;
+    private Long memberId;
+    private String memberHandle;
+    private String memberName;
+    private String memberProfileImage;
 
     public FollowAlarmElement(FollowAlarm alarm) {
         super(alarm);
-        this.id = alarm.getSenderId();
-        this.handle = alarm.getSenderHandle();
-        this.name = alarm.getSenderName();
-        this.profileImage = alarm.getSenderProfileImage();
+        this.memberId = alarm.getSenderId();
+        this.memberHandle = alarm.getSenderHandle();
+        this.memberName = alarm.getSenderName();
+        this.memberProfileImage = alarm.getSenderProfileImage();
     }
 }

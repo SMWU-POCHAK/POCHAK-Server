@@ -136,7 +136,8 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PostPreviewResponse getPreviewPost(final Long alarmId) {
-        Alarm alarm = alarmRepository.findById(alarmId)
+        Member loginMember = jwtService.getLoginMember();
+        Alarm alarm = alarmRepository.findAlarmByIdAndReceiver(alarmId, loginMember)
                 .orElseThrow(() -> new GeneralException(INVALID_ALARM_ID));
 
         if (!(alarm instanceof TagAlarm tagAlarm)) throw new GeneralException(CANNOT_PREVIEW);
