@@ -8,7 +8,7 @@ import com.apps.pochak.global.s3.S3Service;
 import com.apps.pochak.like.domain.repository.LikeRepository;
 import com.apps.pochak.login.dto.request.MemberInfoRequest;
 import com.apps.pochak.login.dto.response.OAuthMemberResponse;
-import com.apps.pochak.login.dto.response.PostTokenResponse;
+import com.apps.pochak.login.dto.response.AccessTokenResponse;
 import com.apps.pochak.login.jwt.JwtHeaderUtil;
 import com.apps.pochak.login.jwt.JwtService;
 import com.apps.pochak.member.domain.Member;
@@ -68,18 +68,18 @@ public class OAuthService {
     }
 
     @Transactional(readOnly = true)
-    public PostTokenResponse reissueAccessToken() {
+    public AccessTokenResponse reissueAccessToken() {
         String accessToken = JwtHeaderUtil.getAccessToken();
         String refreshToken = JwtHeaderUtil.getRefreshToken();
         if (jwtService.isValidRefreshAndInvalidAccess(refreshToken, accessToken)) {
             Member member = memberRepository.findMemberByRefreshToken(refreshToken)
                     .orElseThrow(() -> new InvalidJwtException(INVALID_REFRESH_TOKEN));
-            return PostTokenResponse.builder()
+            return AccessTokenResponse.builder()
                     .accessToken(jwtService.createAccessToken(member.getId().toString()))
                     .build();
         }
         if (jwtService.isValidRefreshAndValidAccess(refreshToken, accessToken)) {
-            return PostTokenResponse.builder()
+            return AccessTokenResponse.builder()
                     .accessToken(accessToken)
                     .build();
         }

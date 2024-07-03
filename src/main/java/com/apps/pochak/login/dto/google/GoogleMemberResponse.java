@@ -1,4 +1,4 @@
-package com.apps.pochak.login.dto.response;
+package com.apps.pochak.login.dto.google;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;

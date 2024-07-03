@@ -21,7 +21,6 @@ public class PochakApplication {
 
     @PostConstruct
     public void init() {
-        // timezone 설정
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
     }
 }

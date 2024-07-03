@@ -1,8 +1,9 @@
 package com.apps.pochak.login.oauth;
 
 import com.apps.pochak.global.api_payload.exception.handler.AppleOAuthException;
-import com.apps.pochak.login.dto.response.ApplePublicKeyResponse;
-import com.apps.pochak.login.dto.response.AppleTokenResponse;
+import com.apps.pochak.login.dto.apple.key.ApplePublicKey;
+import com.apps.pochak.login.dto.apple.key.ApplePublicKeyResponse;
+import com.apps.pochak.login.dto.apple.AppleTokenResponse;
 import com.apps.pochak.login.dto.response.OAuthMemberResponse;
 import com.apps.pochak.login.jwt.JwtService;
 import com.apps.pochak.member.domain.Member;
@@ -134,8 +135,7 @@ public class AppleOAuthService {
                     .toStream()
                     .findFirst()
                     .orElseThrow(() -> new AppleOAuthException(INVALID_PUBLIC_KEY));
-            ApplePublicKeyResponse.Key key = publicKeyResponse.getMatchedKeyBy(kid, alg)
-                    .orElseThrow(() -> new NullPointerException("Failed get public key from apple's id server."));
+            ApplePublicKey key = publicKeyResponse.getMatchedKeyBy(kid, alg);
 
             byte[] n = Base64.getDecoder().decode(key.getN());
             byte[] e = Base64.getDecoder().decode(key.getE());

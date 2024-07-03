@@ -3,7 +3,7 @@ package com.apps.pochak.login.controller;
 import com.apps.pochak.global.api_payload.ApiResponse;
 import com.apps.pochak.login.dto.request.MemberInfoRequest;
 import com.apps.pochak.login.dto.response.OAuthMemberResponse;
-import com.apps.pochak.login.dto.response.PostTokenResponse;
+import com.apps.pochak.login.dto.response.AccessTokenResponse;
 import com.apps.pochak.login.jwt.JwtHeaderUtil;
 import com.apps.pochak.login.jwt.JwtService;
 import com.apps.pochak.login.oauth.AppleOAuthService;
@@ -35,7 +35,7 @@ public class OAuthController {
     }
 
     @PostMapping("/api/v2/refresh")
-    public ApiResponse<PostTokenResponse> refresh() {
+    public ApiResponse<AccessTokenResponse> refresh() {
         return ApiResponse.onSuccess(oAuthService.reissueAccessToken());
     }
 

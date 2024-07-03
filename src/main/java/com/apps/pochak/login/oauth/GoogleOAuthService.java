@@ -1,8 +1,8 @@
 package com.apps.pochak.login.oauth;
 
 import com.apps.pochak.global.api_payload.exception.handler.GoogleOAuthException;
-import com.apps.pochak.login.dto.response.GoogleTokenResponse;
-import com.apps.pochak.login.dto.response.GoogleMemberResponse;
+import com.apps.pochak.login.dto.google.GoogleTokenResponse;
+import com.apps.pochak.login.dto.google.GoogleMemberResponse;
 import com.apps.pochak.login.dto.response.OAuthMemberResponse;
 import com.apps.pochak.login.jwt.JwtService;
 import com.apps.pochak.member.domain.Member;
