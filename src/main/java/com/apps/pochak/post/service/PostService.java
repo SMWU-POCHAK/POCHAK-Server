@@ -9,7 +9,7 @@ import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.global.s3.S3Service;
 import com.apps.pochak.like.domain.repository.LikeRepository;
-import com.apps.pochak.login.jwt.JwtService;
+import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
@@ -45,18 +45,18 @@ public class PostService {
     private final AlarmRepository alarmRepository;
 
     private final S3Service s3Service;
-    private final JwtService jwtService;
+    private final JwtProvider jwtProvider;
 
     @Transactional(readOnly = true)
     public PostElements getHomeTab(Pageable pageable) {
-        final Member loginMember = jwtService.getLoginMember();
+        final Member loginMember = jwtProvider.getLoginMember();
         final Page<Post> taggedPost = postRepository.findTaggedPostsOfFollowing(loginMember, pageable);
         return PostElements.from(taggedPost);
     }
 
     @Transactional(readOnly = true)
     public PostDetailResponse getPostDetail(final Long postId) {
-        final Member loginMember = jwtService.getLoginMember();
+        final Member loginMember = jwtProvider.getLoginMember();
         final Post post = postRepository.findPostById(postId, loginMember);
         final List<Tag> tagList = tagRepository.findTagsByPost(post);
         if (post.isPrivate() && !isAccessAuthorized(post, tagList, loginMember)) {
@@ -89,7 +89,7 @@ public class PostService {
     }
 
     public void savePost(final PostUploadRequest request) {
-        final Member loginMember = jwtService.getLoginMember();
+        final Member loginMember = jwtProvider.getLoginMember();
         final String image = s3Service.upload(request.getPostImage(), POST);
         final Post post = request.toEntity(image, loginMember);
         postRepository.save(post);
@@ -119,7 +119,7 @@ public class PostService {
     }
 
     public void deletePost(final Long postId) {
-        final Member loginMember = jwtService.getLoginMember();
+        final Member loginMember = jwtProvider.getLoginMember();
         final Post post = postRepository.findById(postId).orElseThrow(() -> new GeneralException(INVALID_POST_ID));
         if (!post.getOwner().getId().equals(loginMember.getId())) {
             throw new GeneralException(NOT_YOUR_POST);
@@ -136,7 +136,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PostPreviewResponse getPreviewPost(final Long alarmId) {
-        Member loginMember = jwtService.getLoginMember();
+        Member loginMember = jwtProvider.getLoginMember();
         Alarm alarm = alarmRepository.findAlarmByIdAndReceiver(alarmId, loginMember)
                 .orElseThrow(() -> new GeneralException(INVALID_ALARM_ID));
 

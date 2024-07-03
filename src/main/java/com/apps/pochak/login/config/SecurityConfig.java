@@ -1,7 +1,7 @@
 package com.apps.pochak.login.config;
 
-import com.apps.pochak.login.jwt.JwtAuthorizationFilter;
-import com.apps.pochak.login.jwt.JwtService;
+import com.apps.pochak.login.filter.JwtAuthorizationFilter;
+import com.apps.pochak.login.provider.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtService jwtService;
+    private final JwtProvider jwtProvider;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,6 +38,6 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtService);
+        return new JwtAuthorizationFilter(jwtProvider);
     }
 }

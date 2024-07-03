@@ -6,7 +6,7 @@ import com.apps.pochak.block.dto.response.BlockElements;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.like.domain.repository.LikeRepository;
-import com.apps.pochak.login.jwt.JwtService;
+import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.repository.PostRepository;
@@ -29,10 +29,10 @@ public class BlockService {
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
 
-    private final JwtService jwtService;
+    private final JwtProvider jwtProvider;
 
     public void blockMember(String handle) {
-        Member blocker = jwtService.getLoginMember();
+        Member blocker = jwtProvider.getLoginMember();
         Member blockedMember = memberRepository.findByHandle(handle, blocker);
 
         if (blocker.getId().equals(blockedMember.getId())) {
@@ -62,7 +62,7 @@ public class BlockService {
             final String handle,
             final Pageable pageable
     ) {
-        Member loginMember = jwtService.getLoginMember();
+        Member loginMember = jwtProvider.getLoginMember();
         Member member = memberRepository.findByHandleWithoutLogin(handle);
 
         if (!member.equals(loginMember)) {
@@ -80,7 +80,7 @@ public class BlockService {
             final String handle,
             final String blockedMemberHandle
     ) {
-        Member loginMember = jwtService.getLoginMember();
+        Member loginMember = jwtProvider.getLoginMember();
         Member blocker = memberRepository.findByHandleWithoutLogin(handle);
 
         if (!loginMember.equals(blocker)) {

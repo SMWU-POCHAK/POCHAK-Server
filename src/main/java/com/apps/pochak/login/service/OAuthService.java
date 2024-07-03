@@ -1,4 +1,4 @@
-package com.apps.pochak.login.oauth;
+package com.apps.pochak.login.service;
 
 import com.apps.pochak.comment.domain.repository.CommentRepository;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
@@ -9,8 +9,8 @@ import com.apps.pochak.like.domain.repository.LikeRepository;
 import com.apps.pochak.login.dto.request.MemberInfoRequest;
 import com.apps.pochak.login.dto.response.OAuthMemberResponse;
 import com.apps.pochak.login.dto.response.AccessTokenResponse;
-import com.apps.pochak.login.jwt.JwtHeaderUtil;
-import com.apps.pochak.login.jwt.JwtService;
+import com.apps.pochak.login.util.JwtHeaderUtil;
+import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.SocialType;
 import com.apps.pochak.member.domain.repository.MemberRepository;
@@ -30,7 +30,7 @@ import static com.apps.pochak.global.s3.DirName.MEMBER;
 @RequiredArgsConstructor
 @Transactional
 public class OAuthService {
-    private final JwtService jwtService;
+    private final JwtProvider jwtProvider;
     private final CommentRepository commentRepository;
     private final FollowRepository followRepository;
     private final LikeRepository likeRepository;
@@ -47,7 +47,7 @@ public class OAuthService {
 
 
         String profileImageUrl = awsS3Service.upload(memberInfoRequest.getProfileImage(), MEMBER);
-        String refreshToken = jwtService.createRefreshToken();
+        String refreshToken = jwtProvider.createRefreshToken();
 
         Member member = Member.signupMember()
                 .name(memberInfoRequest.getName())
@@ -62,7 +62,7 @@ public class OAuthService {
                 .build();
         memberRepository.save(member);
 
-        String accessToken = jwtService.createAccessToken(member.getId().toString());
+        String accessToken = jwtProvider.createAccessToken(member.getId().toString());
 
         return new OAuthMemberResponse(member, false, accessToken);
     }
@@ -71,14 +71,14 @@ public class OAuthService {
     public AccessTokenResponse reissueAccessToken() {
         String accessToken = JwtHeaderUtil.getAccessToken();
         String refreshToken = JwtHeaderUtil.getRefreshToken();
-        if (jwtService.isValidRefreshAndInvalidAccess(refreshToken, accessToken)) {
+        if (jwtProvider.isValidRefreshAndInvalidAccess(refreshToken, accessToken)) {
             Member member = memberRepository.findMemberByRefreshToken(refreshToken)
                     .orElseThrow(() -> new InvalidJwtException(INVALID_REFRESH_TOKEN));
             return AccessTokenResponse.builder()
-                    .accessToken(jwtService.createAccessToken(member.getId().toString()))
+                    .accessToken(jwtProvider.createAccessToken(member.getId().toString()))
                     .build();
         }
-        if (jwtService.isValidRefreshAndValidAccess(refreshToken, accessToken)) {
+        if (jwtProvider.isValidRefreshAndValidAccess(refreshToken, accessToken)) {
             return AccessTokenResponse.builder()
                     .accessToken(accessToken)
                     .build();

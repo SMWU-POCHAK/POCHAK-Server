@@ -1,11 +1,11 @@
-package com.apps.pochak.login.oauth;
+package com.apps.pochak.login.service;
 
 import com.apps.pochak.global.api_payload.exception.handler.AppleOAuthException;
 import com.apps.pochak.login.dto.apple.key.ApplePublicKey;
 import com.apps.pochak.login.dto.apple.key.ApplePublicKeyResponse;
 import com.apps.pochak.login.dto.apple.AppleTokenResponse;
 import com.apps.pochak.login.dto.response.OAuthMemberResponse;
-import com.apps.pochak.login.jwt.JwtService;
+import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.SocialType;
 import com.apps.pochak.member.domain.repository.MemberRepository;
@@ -53,7 +53,7 @@ import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 public class AppleOAuthService {
 
     private final ObjectMapper objectMapper;
-    private final JwtService jwtService;
+    private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
 
     @Value("${oauth2.apple.key-id}")
@@ -88,8 +88,8 @@ public class AppleOAuthService {
                     .build();
         }
 
-        String appRefreshToken = jwtService.createRefreshToken();
-        String appAccessToken = jwtService.createAccessToken(member.getId().toString());
+        String appRefreshToken = jwtProvider.createRefreshToken();
+        String appAccessToken = jwtProvider.createAccessToken(member.getId().toString());
 
         member.updateRefreshToken(appRefreshToken);
 

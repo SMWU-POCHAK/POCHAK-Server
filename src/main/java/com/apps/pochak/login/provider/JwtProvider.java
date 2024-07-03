@@ -1,7 +1,8 @@
-package com.apps.pochak.login.jwt;
+package com.apps.pochak.login.provider;
 
 import com.apps.pochak.global.api_payload.exception.handler.ExpiredPeriodJwtException;
 import com.apps.pochak.global.api_payload.exception.handler.InvalidJwtException;
+import com.apps.pochak.login.util.JwtHeaderUtil;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import io.jsonwebtoken.*;
@@ -10,7 +11,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Base64;
@@ -20,9 +21,9 @@ import static com.apps.pochak.global.Constant.AUTHORITIES_KEY;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 
 @Getter
-@Service
+@Component
 @RequiredArgsConstructor
-public class JwtService {
+public class JwtProvider {
     public static final String EMPTY_SUBJECT = "";
     private final MemberRepository memberRepository;
     private final long accessTokenExpirationTime = 1000L * 60 * 60; // 1H

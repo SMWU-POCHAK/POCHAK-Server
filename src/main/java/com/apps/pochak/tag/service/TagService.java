@@ -2,7 +2,7 @@ package com.apps.pochak.tag.service;
 
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.global.api_payload.code.BaseCode;
-import com.apps.pochak.login.jwt.JwtService;
+import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
@@ -25,10 +25,10 @@ public class TagService {
     private final AlarmRepository alarmRepository;
     private final PostRepository postRepository;
 
-    private final JwtService jwtService;
+    private final JwtProvider jwtProvider;
 
     public BaseCode approveOrRejectTagRequest(final Long tagId, final Boolean isAccept) {
-        final Member loginMember = jwtService.getLoginMember();
+        final Member loginMember = jwtProvider.getLoginMember();
         final Tag tag = tagRepository.findTagByIdAndMember(tagId, loginMember);
         if (isAccept) {
             return acceptPost(tag);

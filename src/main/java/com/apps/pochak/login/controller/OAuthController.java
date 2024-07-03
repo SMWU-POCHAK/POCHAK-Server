@@ -4,11 +4,11 @@ import com.apps.pochak.global.api_payload.ApiResponse;
 import com.apps.pochak.login.dto.request.MemberInfoRequest;
 import com.apps.pochak.login.dto.response.OAuthMemberResponse;
 import com.apps.pochak.login.dto.response.AccessTokenResponse;
-import com.apps.pochak.login.jwt.JwtHeaderUtil;
-import com.apps.pochak.login.jwt.JwtService;
-import com.apps.pochak.login.oauth.AppleOAuthService;
-import com.apps.pochak.login.oauth.GoogleOAuthService;
-import com.apps.pochak.login.oauth.OAuthService;
+import com.apps.pochak.login.util.JwtHeaderUtil;
+import com.apps.pochak.login.provider.JwtProvider;
+import com.apps.pochak.login.service.AppleOAuthService;
+import com.apps.pochak.login.service.GoogleOAuthService;
+import com.apps.pochak.login.service.OAuthService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +24,7 @@ import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCE
 @RestController
 @RequiredArgsConstructor
 public class OAuthController {
-    private final JwtService jwtService;
+    private final JwtProvider jwtProvider;
     private final OAuthService oAuthService;
     private final AppleOAuthService appleOAuthService;
     private final GoogleOAuthService googleOAuthService;
@@ -54,7 +54,7 @@ public class OAuthController {
     @GetMapping("/api/v2/logout")
     public ApiResponse<?> logout() {
         String accessToken = JwtHeaderUtil.getAccessToken();
-        String id = jwtService.getSubject(accessToken);
+        String id = jwtProvider.getSubject(accessToken);
         oAuthService.logout(id);
         return ApiResponse.of(SUCCESS_LOG_OUT);
     }
@@ -62,7 +62,7 @@ public class OAuthController {
     @DeleteMapping("/api/v2/signout")
     public ApiResponse<?> signout() {
         String accessToken = JwtHeaderUtil.getAccessToken();
-        String id = jwtService.getSubject(accessToken);
+        String id = jwtProvider.getSubject(accessToken);
         oAuthService.signout(id);
         return ApiResponse.of(SUCCESS_SIGN_OUT);
     }

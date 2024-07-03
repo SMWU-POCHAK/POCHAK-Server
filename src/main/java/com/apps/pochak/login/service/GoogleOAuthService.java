@@ -1,10 +1,10 @@
-package com.apps.pochak.login.oauth;
+package com.apps.pochak.login.service;
 
 import com.apps.pochak.global.api_payload.exception.handler.GoogleOAuthException;
 import com.apps.pochak.login.dto.google.GoogleTokenResponse;
 import com.apps.pochak.login.dto.google.GoogleMemberResponse;
 import com.apps.pochak.login.dto.response.OAuthMemberResponse;
-import com.apps.pochak.login.jwt.JwtService;
+import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import jakarta.transaction.Transactional;
@@ -23,7 +23,7 @@ import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.INVALID
 public class GoogleOAuthService {
     private final MemberRepository memberRepository;
     private final WebClient webClient;
-    private final JwtService jwtService;
+    private final JwtProvider jwtProvider;
 
     @Value("${oauth2.google.client-id}")
     private String GOOGLE_CLIENT_ID;
@@ -52,8 +52,8 @@ public class GoogleOAuthService {
                     .build();
         }
 
-        String appRefreshToken = jwtService.createRefreshToken();
-        String appAccessToken = jwtService.createAccessToken(member.getId().toString());
+        String appRefreshToken = jwtProvider.createRefreshToken();
+        String appAccessToken = jwtProvider.createAccessToken(member.getId().toString());
 
         member.updateRefreshToken(appRefreshToken);
         memberRepository.save(member);
