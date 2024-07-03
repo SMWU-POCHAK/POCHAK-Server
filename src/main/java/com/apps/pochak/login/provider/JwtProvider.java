@@ -26,7 +26,7 @@ import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 public class JwtProvider {
     public static final String EMPTY_SUBJECT = "";
     private final MemberRepository memberRepository;
-    private final long accessTokenExpirationTime = 1000L * 60 * 60; // 1H
+    private final long accessTokenExpirationTime = 1000L * 60 * 5; // 5M
     private final long refreshTokenExpirationTime = 1000L * 60 * 60 * 24 * 30; // 1M
     private Key key;
 
