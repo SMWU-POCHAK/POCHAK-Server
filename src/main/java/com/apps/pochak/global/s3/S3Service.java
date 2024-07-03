@@ -33,7 +33,7 @@ public class S3Service {
     private String bucket;
 
     public String upload(MultipartFile multipartFile, DirName dirName) {
-        if (multipartFile == null)
+        if (multipartFile.isEmpty())
             throw new GeneralException(NULL_FILE);
         try {
             File uploadFile = convert(multipartFile)
