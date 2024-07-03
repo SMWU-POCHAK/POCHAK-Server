@@ -66,7 +66,7 @@ public enum ErrorStatus implements BaseErrorCode {
     // Member
     INVALID_MEMBER_ID(BAD_REQUEST, "MEMBER4001", "유효하지 않은 멤버의 아이디입니다."),
     INVALID_MEMBER_HANDLE(BAD_REQUEST, "MEMBER4002", "유효하지 않은 멤버의 handle입니다."),
-    DUPLICATE_HANDLE(BAD_REQUEST, "MEMBER4002", "중복되는 handle(아이디) 입니다."),
+    DUPLICATE_HANDLE(OK, "MEMBER4002", "중복되는 handle(아이디) 입니다."),
     UNAUTHORIZED_MEMBER_REQUEST(FORBIDDEN, "MEMBER4003", "프로필을 수정할 권한이 없습니다."),
 
     // Post
