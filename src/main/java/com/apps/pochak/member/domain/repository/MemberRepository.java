@@ -65,7 +65,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findMemberBySocialId(final String socialId);
 
-    Optional<Member> findMemberBySocialIdAndSocialType(final String socialId, final SocialType socialType);
+    Optional<Member> findMemberBySocialIdAndSocialType(
+            final String socialId,
+            final SocialType socialType
+    );
 
 
     @Query("select m from Member m " +

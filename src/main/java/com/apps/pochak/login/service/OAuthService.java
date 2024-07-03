@@ -7,10 +7,10 @@ import com.apps.pochak.global.api_payload.exception.handler.InvalidJwtException;
 import com.apps.pochak.global.s3.S3Service;
 import com.apps.pochak.like.domain.repository.LikeRepository;
 import com.apps.pochak.login.dto.request.MemberInfoRequest;
-import com.apps.pochak.login.dto.response.OAuthMemberResponse;
 import com.apps.pochak.login.dto.response.AccessTokenResponse;
-import com.apps.pochak.login.util.JwtHeaderUtil;
+import com.apps.pochak.login.dto.response.OAuthMemberResponse;
 import com.apps.pochak.login.provider.JwtProvider;
+import com.apps.pochak.login.util.JwtHeaderUtil;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.SocialType;
 import com.apps.pochak.member.domain.repository.MemberRepository;
@@ -42,9 +42,12 @@ public class OAuthService {
 
     public OAuthMemberResponse signup(MemberInfoRequest memberInfoRequest) {
         SocialType socialType = SocialType.of(memberInfoRequest.getSocialType());
+
         Optional<Member> findMember = memberRepository.findMemberBySocialIdAndSocialType(memberInfoRequest.getSocialId(), socialType);
         if (findMember.isPresent()) throw new GeneralException(EXIST_USER);
 
+        Optional<Member> memberByHandle = memberRepository.findMemberByHandle(memberInfoRequest.getHandle());
+        if (memberByHandle.isPresent()) throw new GeneralException(DUPLICATE_HANDLE);
 
         String profileImageUrl = awsS3Service.upload(memberInfoRequest.getProfileImage(), MEMBER);
         String refreshToken = jwtProvider.createRefreshToken();
