@@ -9,6 +9,7 @@ import com.apps.pochak.login.service.AppleOAuthService;
 import com.apps.pochak.login.service.GoogleOAuthService;
 import com.apps.pochak.login.service.OAuthService;
 import com.apps.pochak.login.util.JwtHeaderUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +27,7 @@ public class OAuthController {
     private final GoogleOAuthService googleOAuthService;
 
     @PostMapping(value = "/api/v2/signup")
-    public ApiResponse<OAuthMemberResponse> signup(@ModelAttribute final MemberInfoRequest memberInfoRequest) {
+    public ApiResponse<OAuthMemberResponse> signup(@ModelAttribute @Valid final MemberInfoRequest memberInfoRequest) {
         return ApiResponse.onSuccess(oAuthService.signup(memberInfoRequest));
     }
 

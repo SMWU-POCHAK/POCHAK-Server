@@ -5,6 +5,7 @@ import com.apps.pochak.post.dto.PostElements;
 import com.apps.pochak.post.dto.request.PostUploadRequest;
 import com.apps.pochak.post.dto.response.PostDetailResponse;
 import com.apps.pochak.post.service.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -29,7 +30,7 @@ public class PostController {
 
     @PostMapping("")
     public ApiResponse<Void> uploadPost(
-            @ModelAttribute final PostUploadRequest request
+            @ModelAttribute @Valid final PostUploadRequest request
     ) {
         postService.savePost(request);
         return ApiResponse.of(SUCCESS_UPLOAD_POST);
