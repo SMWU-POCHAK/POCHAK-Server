@@ -1,17 +1,16 @@
-package com.apps.pochak.login.oauth;
+package com.apps.pochak.login.service;
 
 import com.apps.pochak.global.api_payload.exception.handler.AppleOAuthException;
-import com.apps.pochak.login.dto.response.ApplePublicKeyResponse;
-import com.apps.pochak.login.dto.response.AppleTokenResponse;
+import com.apps.pochak.login.dto.apple.AppleTokenResponse;
+import com.apps.pochak.login.dto.apple.key.ApplePublicKeyResponse;
 import com.apps.pochak.login.dto.response.OAuthMemberResponse;
-import com.apps.pochak.login.jwt.JwtService;
+import com.apps.pochak.login.provider.JwtProvider;
+import com.apps.pochak.login.util.ApplePublicKeyGenerator;
+import com.apps.pochak.login.util.JwtValidator;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.SocialType;
 import com.apps.pochak.member.domain.repository.MemberRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -23,24 +22,19 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.RSAPublicKeySpec;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
@@ -50,9 +44,9 @@ import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 @Service
 @RequiredArgsConstructor
 public class AppleOAuthService {
-
-    private final ObjectMapper objectMapper;
-    private final JwtService jwtService;
+    private final JwtProvider jwtProvider;
+    private final ApplePublicKeyGenerator applePublicKeyGenerator;
+    private final JwtValidator jwtValidator;
     private final MemberRepository memberRepository;
 
     @Value("${oauth2.apple.key-id}")
@@ -67,9 +61,9 @@ public class AppleOAuthService {
     private String KEY_ID_PATH;
 
     @Transactional
-    public OAuthMemberResponse login(String idToken, String authorizationCode) throws JsonProcessingException, NoSuchAlgorithmException, InvalidKeySpecException {
-        Map<String, String> idTokenHeaderMap = getHeaderFromIdToken(idToken);
-        Claims claims = verifyIdToken(idTokenHeaderMap.get("kid"), idTokenHeaderMap.get("alg"), idToken);
+    public OAuthMemberResponse login(String idToken, String authorizationCode) {
+        Map<String, String> tokenHeaders = jwtValidator.parseHeaders(idToken);
+        Claims claims = verifyIdToken(tokenHeaders, idToken);
 
         String sub = String.valueOf(claims.get("sub"));
         String email = String.valueOf(claims.get("email"));
@@ -83,15 +77,14 @@ public class AppleOAuthService {
                     .email(email)
                     .socialType(SocialType.APPLE.name())
                     .refreshToken(appleRefreshToken)
-                    .isNewMember(false)
+                    .isNewMember(true)
                     .build();
         }
 
-        String appRefreshToken = jwtService.createRefreshToken();
-        String appAccessToken = jwtService.createAccessToken(member.getId().toString());
+        String appRefreshToken = jwtProvider.createRefreshToken();
+        String appAccessToken = jwtProvider.createAccessToken(member.getId().toString());
 
         member.updateRefreshToken(appRefreshToken);
-        memberRepository.save(member);
 
         return OAuthMemberResponse.builder()
                 .socialId(sub)
@@ -104,18 +97,9 @@ public class AppleOAuthService {
     }
 
     /**
-     * Get alg, kid From JWT Header
-     */
-    private Map<String, String> getHeaderFromIdToken(String idToken) throws JsonProcessingException {
-        String idTokenHeader = idToken.substring(0, idToken.indexOf("."));
-        String decodeIdTokenHeader = new String(Base64.getDecoder().decode((idTokenHeader)));
-        return objectMapper.readValue(decodeIdTokenHeader, Map.class);
-    }
-
-    /**
      * Get Public Key
      */
-    private Claims verifyIdToken(String kid, String alg, String idToken) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    private Claims verifyIdToken(Map<String, String> tokenHeaders, String idToken) {
         try {
             WebClient webClient = WebClient
                     .builder()
@@ -135,22 +119,9 @@ public class AppleOAuthService {
                     .toStream()
                     .findFirst()
                     .orElseThrow(() -> new AppleOAuthException(INVALID_PUBLIC_KEY));
-            ApplePublicKeyResponse.Key key = publicKeyResponse.getMatchedKeyBy(kid, alg)
-                    .orElseThrow(() -> new NullPointerException("Failed get public key from apple's id server."));
 
-            byte[] n = Base64.getDecoder().decode(key.getN());
-            byte[] e = Base64.getDecoder().decode(key.getE());
-
-            RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(new BigInteger(1, n), new BigInteger(1, e));
-            KeyFactory keyFactory = KeyFactory.getInstance(key.getKty());
-            PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
-
-            return Jwts.parserBuilder()
-                    .setSigningKey(publicKey)
-                    .build()
-                    .parseClaimsJws(idToken)
-                    .getBody();
-
+            PublicKey publicKey = applePublicKeyGenerator.generatePublicKey(tokenHeaders, publicKeyResponse);
+            return jwtValidator.getTokenClaims(idToken, publicKey);
         } catch (MalformedJwtException e) {
             throw new AppleOAuthException(MALFORMED_TOKEN);
         } catch (ExpiredJwtException e) {
@@ -160,30 +131,6 @@ public class AppleOAuthService {
         } catch (IllegalArgumentException e) {
             throw new AppleOAuthException(INVALID_ACCESS_TOKEN);
         }
-    }
-
-    private PrivateKey getPrivateKey() throws IOException {
-        ClassPathResource resource = new ClassPathResource(KEY_ID_PATH);
-        String privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
-        Reader pemReader = new StringReader(privateKey);
-        PEMParser pemParser = new PEMParser(pemReader);
-        JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
-        PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
-        return converter.getPrivateKey(object);
-    }
-
-    private String makeClientSecret() throws IOException {
-        Date expirationDate = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
-        return Jwts.builder()
-                .setHeaderParam("kid", KEY_ID)
-                .setHeaderParam("alg", "ES256")
-                .setIssuer(TEAM_ID)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(expirationDate)
-                .setAudience("https://appleid.apple.com")
-                .setSubject(CLIENT_ID)
-                .signWith(getPrivateKey(), SignatureAlgorithm.ES256)
-                .compact();
     }
 
     /**
@@ -223,6 +170,30 @@ public class AppleOAuthService {
                         .orElseThrow(() -> new AppleOAuthException(INVALID_OAUTH_TOKEN));
 
         return appleTokenResponse.getRefreshToken();
+    }
+
+    private String makeClientSecret() throws IOException {
+        Date expirationDate = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
+        return Jwts.builder()
+                .setHeaderParam("kid", KEY_ID)
+                .setHeaderParam("alg", "ES256")
+                .setIssuer(TEAM_ID)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(expirationDate)
+                .setAudience("https://appleid.apple.com")
+                .setSubject(CLIENT_ID)
+                .signWith(getPrivateKey(), SignatureAlgorithm.ES256)
+                .compact();
+    }
+
+    private PrivateKey getPrivateKey() throws IOException {
+        ClassPathResource resource = new ClassPathResource(KEY_ID_PATH);
+        String privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+        Reader pemReader = new StringReader(privateKey);
+        PEMParser pemParser = new PEMParser(pemReader);
+        JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+        PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
+        return converter.getPrivateKey(object);
     }
 
     /**

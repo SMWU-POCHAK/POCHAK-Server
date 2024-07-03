@@ -7,7 +7,7 @@ import com.apps.pochak.like.domain.LikeEntity;
 import com.apps.pochak.like.domain.repository.LikeRepository;
 import com.apps.pochak.like.dto.response.LikeElement;
 import com.apps.pochak.like.dto.response.LikeElements;
-import com.apps.pochak.login.jwt.JwtService;
+import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
@@ -32,10 +32,10 @@ public class LikeService {
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final AlarmRepository alarmRepository;
-    private final JwtService jwtService;
+    private final JwtProvider jwtProvider;
 
     public void likePost(final Long postId) {
-        final Member loginMember = jwtService.getLoginMember();
+        final Member loginMember = jwtProvider.getLoginMember();
         final Post post = postRepository.findPostById(postId, loginMember);
 
         final Optional<LikeEntity> optionalLike = likeRepository.findByLikeMemberAndLikedPost(loginMember, post);
@@ -89,7 +89,7 @@ public class LikeService {
 
     @Transactional(readOnly = true)
     public LikeElements getMemberLikedPost(final Long postId) {
-        final Member loginMember = jwtService.getLoginMember();
+        final Member loginMember = jwtProvider.getLoginMember();
         final Post likedPost = postRepository.findPostById(postId, loginMember);
 
         final List<LikeElement> likeElements = likeRepository.findLikesAndIsFollow(

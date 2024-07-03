@@ -3,7 +3,7 @@ package com.apps.pochak.member.service;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.global.s3.S3Service;
-import com.apps.pochak.login.jwt.JwtService;
+import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.dto.request.ProfileUpdateRequest;
 import com.apps.pochak.member.dto.response.ProfileUpdateResponse;
 import com.apps.pochak.member.domain.Member;
@@ -28,14 +28,14 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
     private final PostRepository postRepository;
-    private final JwtService jwtService;
+    private final JwtProvider jwtProvider;
     private final S3Service awsS3Service;
 
     @Transactional(readOnly = true)
     public ProfileResponse getProfileDetail(final String handle,
                                             final Pageable pageable
     ) {
-        final Member loginMember = jwtService.getLoginMember();
+        final Member loginMember = jwtProvider.getLoginMember();
         final Member member = memberRepository.findByHandle(handle, loginMember);
         final long followerCount = followRepository.countActiveFollowByReceiver(member);
         final long followingCount = followRepository.countActiveFollowBySender(member);
@@ -54,7 +54,7 @@ public class MemberService {
 
     public ProfileUpdateResponse updateProfileDetail(final String handle,
                                                      final ProfileUpdateRequest profileUpdateRequest){
-        final Member loginMember = jwtService.getLoginMember();
+        final Member loginMember = jwtProvider.getLoginMember();
         final Member updateMember = memberRepository.findByHandleWithoutLogin(handle);
         if (!loginMember.equals(updateMember)) {
             throw new GeneralException(UNAUTHORIZED_MEMBER_REQUEST);
@@ -79,7 +79,7 @@ public class MemberService {
             final String handle,
             final Pageable pageable
     ) {
-        final Member loginMember = jwtService.getLoginMember();
+        final Member loginMember = jwtProvider.getLoginMember();
         final Member member = memberRepository.findByHandle(handle, loginMember);
         final Page<Post> taggedPost = postRepository.findTaggedPost(member, loginMember, pageable);
         return PostElements.from(taggedPost);
@@ -90,7 +90,7 @@ public class MemberService {
             final String handle,
             final Pageable pageable
     ) {
-        final Member loginMember = jwtService.getLoginMember();
+        final Member loginMember = jwtProvider.getLoginMember();
         final Member owner = memberRepository.findByHandle(handle, loginMember);
         final Page<Post> taggedPost = postRepository.findUploadPost(owner, loginMember, pageable);
         return PostElements.from(taggedPost);
@@ -101,7 +101,7 @@ public class MemberService {
             final String keyword,
             final Pageable pageable
     ) {
-        Member loginMember = jwtService.getLoginMember();
+        Member loginMember = jwtProvider.getLoginMember();
         Page<Member> memberPage = memberRepository.searchByKeyword(keyword, loginMember, pageable);
         return MemberElements.from(memberPage);
     }

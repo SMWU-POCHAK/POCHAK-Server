@@ -10,7 +10,7 @@ import com.apps.pochak.comment.dto.request.CommentUploadRequest;
 import com.apps.pochak.comment.dto.response.CommentElements;
 import com.apps.pochak.comment.dto.response.ParentCommentElement;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
-import com.apps.pochak.login.jwt.JwtService;
+import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
@@ -37,14 +37,14 @@ public class CommentService {
     private final PostRepository postRepository;
     private final AlarmRepository alarmRepository;
 
-    private final JwtService jwtService;
+    private final JwtProvider jwtProvider;
 
     @Transactional(readOnly = true)
     public CommentElements getComments(
             final Long postId,
             final Pageable pageable
     ) {
-        final Member loginMember = jwtService.getLoginMember();
+        final Member loginMember = jwtProvider.getLoginMember();
         final Post post = postRepository.findPublicPostById(postId, loginMember);
         final Page<Comment> commentList = commentRepository.findParentCommentByPost(post, loginMember, pageable);
         return new CommentElements(loginMember, commentList);
@@ -56,7 +56,7 @@ public class CommentService {
             final Long parentCommentId,
             final Pageable pageable
     ) {
-        final Member loginMember = jwtService.getLoginMember();
+        final Member loginMember = jwtProvider.getLoginMember();
         final Comment comment = commentRepository.findParentCommentById(parentCommentId, loginMember)
                 .orElseThrow(() -> new GeneralException(INVALID_POST_ID));
         return new ParentCommentElement(comment, toPageRequest(pageable));
@@ -66,7 +66,7 @@ public class CommentService {
             final Long postId,
             final CommentUploadRequest request
     ) {
-        final Member loginMember = jwtService.getLoginMember();
+        final Member loginMember = jwtProvider.getLoginMember();
         final Post post = postRepository.findPublicPostById(postId, loginMember);
 
         if (request.checkChildComment()) {
@@ -179,7 +179,7 @@ public class CommentService {
     }
 
     private void checkAuthorized(final Comment comment) {
-        Member member = jwtService.getLoginMember();
+        Member member = jwtProvider.getLoginMember();
         if (comment.isOwner(member)) return;
 
         Post post = comment.getPost();

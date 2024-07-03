@@ -1,7 +1,8 @@
-package com.apps.pochak.login.jwt;
+package com.apps.pochak.login.filter;
 
 import com.apps.pochak.global.api_payload.code.ErrorReasonDTO;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
+import com.apps.pochak.login.provider.JwtProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -30,7 +31,7 @@ import static com.apps.pochak.global.Constant.*;
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    private final JwtProvider jwtProvider;
 
     @Override
     protected void doFilterInternal(
@@ -48,7 +49,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             try {
                 if (headerValue != null && headerValue.startsWith(TOKEN_PREFIX)) {
                     String accessToken = headerValue.substring(TOKEN_PREFIX.length());
-                    if (jwtService.validateAccessToken(accessToken)) {
+                    if (jwtProvider.validateAccessToken(accessToken)) {
                         Authentication authentication = getAuthentication(accessToken);
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
@@ -61,7 +62,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     private Authentication getAuthentication(final String accessToken) {
-        Claims claims = jwtService.getTokenClaims(accessToken);
+        Claims claims = jwtProvider.getTokenClaims(accessToken);
         Collection<? extends GrantedAuthority> authorities =
                 Arrays.stream(new String[]{claims.get(AUTHORITIES_KEY).toString()})
                         .map(SimpleGrantedAuthority::new)
@@ -82,6 +83,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         ObjectMapper mapper = new ObjectMapper();
         String result = mapper.writeValueAsString(errorReasonDTO);
 
+        response.setStatus(errorReasonDTO.getHttpStatus().value());
         response.getWriter().write(result);
     }
 }

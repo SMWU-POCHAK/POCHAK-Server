@@ -1,4 +1,4 @@
-package com.apps.pochak.login.jwt;
+package com.apps.pochak.login.util;
 
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.global.api_payload.exception.handler.InvalidJwtException;
