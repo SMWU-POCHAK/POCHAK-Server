@@ -37,17 +37,17 @@ public class ApplePublicKeyGenerator {
         byte[] nBytes = Base64.getUrlDecoder().decode(publicKey.getN());
         byte[] eBytes = Base64.getUrlDecoder().decode(publicKey.getE());
 
-        RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(
-                new BigInteger(1, nBytes),
-                new BigInteger(1, eBytes)
-        );
+        BigInteger n = new BigInteger(1, nBytes);
+        BigInteger e = new BigInteger(1, eBytes);
+
+        RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(n, e);
 
         try {
             KeyFactory keyFactory = KeyFactory.getInstance(publicKey.getKty());
             return keyFactory.generatePublic(publicKeySpec);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException exception) {
             throw new AppleOAuthException(NO_SUCH_ALGORITHM);
-        } catch (InvalidKeySpecException e) {
+        } catch (InvalidKeySpecException exception) {
             throw new AppleOAuthException(INVALID_KEY_SPEC);
         }
     }

@@ -19,8 +19,8 @@ public class PochakApplication {
         SpringApplication.run(PochakApplication.class, args);
     }
 
-    @PostConstruct
-    public void init() {
-        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
-    }
+//    @PostConstruct
+//    public void init() {
+//        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+//    }
 }

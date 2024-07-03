@@ -1,7 +1,7 @@
 package com.apps.pochak.login.service;
 
+import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.global.api_payload.exception.handler.AppleOAuthException;
-import com.apps.pochak.login.dto.apple.AppleTokenResponse;
 import com.apps.pochak.login.dto.apple.key.ApplePublicKeyResponse;
 import com.apps.pochak.login.dto.response.OAuthMemberResponse;
 import com.apps.pochak.login.provider.JwtProvider;
@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +30,12 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.PrivateKey;
@@ -36,7 +43,9 @@ import java.security.PublicKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 
@@ -107,7 +116,8 @@ public class AppleOAuthService {
                     .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .build();
 
-            ApplePublicKeyResponse publicKeyResponse = webClient.get()
+            ApplePublicKeyResponse publicKeyResponse = webClient
+                    .get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/auth/keys")
                             .build())
@@ -137,63 +147,73 @@ public class AppleOAuthService {
      * Get Apple Refresh Token
      * For Delete Account
      */
-    private String getAppleRefreshToken(String authorizationCode) {
-        WebClient webClient = WebClient
-                .builder()
-                .baseUrl(PUBLIC_KEY_URL)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
+    private String getAppleRefreshToken(final String authorizationCode) {
+        String uriStr = PUBLIC_KEY_URL + "/auth/token";
 
-        AppleTokenResponse appleTokenResponse =
-                webClient
-                        .post()
-                        .uri(uriBuilder -> {
-                            try {
-                                return uriBuilder
-                                        .path("/auth/token")
-                                        .queryParam("client_id", CLIENT_ID)
-                                        .queryParam("code", authorizationCode)
-                                        .queryParam("client_secret", makeClientSecret())
-                                        .queryParam("grant_type", "authorization_code")
-                                        .build();
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
-                        .retrieve()
-                        .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.error(new RuntimeException("Social Access Token is unauthorized")))
-                        .onStatus(HttpStatusCode::is5xxServerError, response -> Mono.error(new RuntimeException("Internal Server Error")))
-                        .bodyToMono(AppleTokenResponse.class)
-                        .flux()
-                        .toStream()
-                        .findFirst()
-                        .orElseThrow(() -> new AppleOAuthException(INVALID_OAUTH_TOKEN));
+        Map<String, String> params = new HashMap<>();
+        params.put("client_secret", makeClientSecret());
+        params.put("code", authorizationCode);
+        params.put("grant_type", "authorization_code");
+        params.put("client_id", CLIENT_ID);
 
-        return appleTokenResponse.getRefreshToken();
+        String errMsg = "";
+        try {
+            HttpRequest getRequest = HttpRequest.newBuilder()
+                    .uri(new URI(uriStr))
+                    .POST(getParamsUrlEncoded(params))
+                    .headers(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                    .build();
+
+            HttpClient httpClient = HttpClient.newHttpClient();
+            HttpResponse<String> getResponse = httpClient.send(getRequest, HttpResponse.BodyHandlers.ofString());
+
+            JSONObject parseData = new JSONObject(getResponse.body());
+            errMsg = getResponse.body();
+            return parseData.get("refresh_token").toString();
+        } catch (Exception e) {
+            throw new RuntimeException(errMsg);
+        }
     }
 
-    private String makeClientSecret() throws IOException {
+    private HttpRequest.BodyPublisher getParamsUrlEncoded(Map<String, String> parameters) {
+        String urlEncoded = parameters.entrySet()
+                .stream()
+                .map(e -> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8))
+                .collect(Collectors.joining("&"));
+        return HttpRequest.BodyPublishers.ofString(urlEncoded);
+    }
+
+    private String makeClientSecret() {
         Date expirationDate = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
+
+        Map<String, Object> jwtHeader = new HashMap<>();
+        jwtHeader.put("kid", KEY_ID);
+        jwtHeader.put("alg", "ES256");
+
         return Jwts.builder()
-                .setHeaderParam("kid", KEY_ID)
-                .setHeaderParam("alg", "ES256")
+                .setHeaderParams(jwtHeader)
                 .setIssuer(TEAM_ID)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(expirationDate)
                 .setAudience("https://appleid.apple.com")
                 .setSubject(CLIENT_ID)
-                .signWith(getPrivateKey(), SignatureAlgorithm.ES256)
+                .signWith(SignatureAlgorithm.ES256, getPrivateKey())
                 .compact();
     }
 
-    private PrivateKey getPrivateKey() throws IOException {
-        ClassPathResource resource = new ClassPathResource(KEY_ID_PATH);
-        String privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
-        Reader pemReader = new StringReader(privateKey);
-        PEMParser pemParser = new PEMParser(pemReader);
-        JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
-        PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
-        return converter.getPrivateKey(object);
+    private PrivateKey getPrivateKey() {
+        try {
+            ClassPathResource resource = new ClassPathResource(KEY_ID_PATH);
+            String privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+
+            Reader pemReader = new StringReader(privateKey);
+            PEMParser pemParser = new PEMParser(pemReader);
+            JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+            PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
+            return converter.getPrivateKey(object);
+        } catch (IOException e) {
+            throw new GeneralException(IO_EXCEPTION);
+        }
     }
 
     /**
@@ -209,16 +229,12 @@ public class AppleOAuthService {
         return webClient
                 .post()
                 .uri(uriBuilder -> {
-                    try {
-                        return uriBuilder
-                                .path("/auth/revoke")
-                                .queryParam("client_id", CLIENT_ID)
-                                .queryParam("client_secret", makeClientSecret())
-                                .queryParam("token", socialRefreshToken)
-                                .build();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    return uriBuilder
+                            .path("/auth/revoke")
+                            .queryParam("client_id", CLIENT_ID)
+                            .queryParam("client_secret", makeClientSecret())
+                            .queryParam("token", socialRefreshToken)
+                            .build();
                 })
                 .retrieve()
                 .bodyToMono(String.class)
