@@ -77,7 +77,7 @@ public class AppleOAuthService {
                     .email(email)
                     .socialType(SocialType.APPLE.name())
                     .refreshToken(appleRefreshToken)
-                    .isNewMember(false)
+                    .isNewMember(true)
                     .build();
         }
 
