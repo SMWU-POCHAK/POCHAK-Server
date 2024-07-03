@@ -82,6 +82,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         ObjectMapper mapper = new ObjectMapper();
         String result = mapper.writeValueAsString(errorReasonDTO);
 
+        response.setStatus(errorReasonDTO.getHttpStatus().value());
         response.getWriter().write(result);
     }
 }
