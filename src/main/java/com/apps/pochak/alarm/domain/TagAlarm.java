@@ -35,12 +35,12 @@ public class TagAlarm extends Alarm {
 
     public TagAlarm(
             final Tag tag,
+            final Member tagger,
             final Member receiver
     ) {
         super(receiver, TAG_APPROVAL);
         this.tag = tag;
 
-        Member tagger = tag.getMember();
         this.taggerId = tagger.getId();
         this.taggerHandle = tagger.getHandle();
         this.taggerName = tagger.getName();

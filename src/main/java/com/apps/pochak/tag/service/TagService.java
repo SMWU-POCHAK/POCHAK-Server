@@ -51,7 +51,7 @@ public class TagService {
         return SUCCESS_ACCEPT;
     }
 
-    private BaseCode rejectPost(Tag tag) {
+    private BaseCode rejectPost(final Tag tag) {
         final Post post = tag.getPost();
         final List<Tag> tagList = tagRepository.findTagsByPost(post);
 

@@ -105,10 +105,13 @@ public class PostService {
         }
 
         final List<Tag> tagList = saveTags(taggedMemberList, post);
-        saveTagApprovalAlarms(tagList);
+        saveTagApprovalAlarms(tagList, loginMember);
     }
 
-    private List<Tag> saveTags(List<Member> taggedMemberList, Post post) {
+    private List<Tag> saveTags(
+            final List<Member> taggedMemberList,
+            final Post post
+    ) {
         final List<Tag> tagList = taggedMemberList.stream().map(
                 member -> Tag.builder()
                         .member(member)
@@ -118,9 +121,12 @@ public class PostService {
         return tagRepository.saveAll(tagList);
     }
 
-    private void saveTagApprovalAlarms(List<Tag> tagList) {
+    private void saveTagApprovalAlarms(
+            final List<Tag> tagList,
+            final Member tagger
+    ) {
         final List<Alarm> tagApprovalAlarmList = tagList.stream().map(
-                tag -> new TagAlarm(tag, tag.getMember())
+                tag -> new TagAlarm(tag, tagger, tag.getMember())
         ).collect(Collectors.toList());
         alarmRepository.saveAll(tagApprovalAlarmList);
     }
