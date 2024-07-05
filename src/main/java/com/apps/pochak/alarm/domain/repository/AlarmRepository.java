@@ -102,7 +102,7 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     @Query(value = """
             update alarm a set a.status = 'DELETED'
                    where a.tag_approval_id = :tagId
-                     and a.dtype='TAG_ALARM' and (a.status = 'ACTIVE')
+                     and a.dtype='TagAlarm' and (a.status = 'ACTIVE')
             """,
             nativeQuery = true)
     void deleteAlarmByTag(@Param("tagId") final Long tagId);
