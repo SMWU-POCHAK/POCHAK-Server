@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BlockElement {
+    private Long memberId;
     private String profileImage;
     private String handle;
     private String name;
@@ -18,6 +19,7 @@ public class BlockElement {
     @Builder(builderMethodName = "from")
     public BlockElement(final Block block) {
         Member blockedMember = block.getBlockedMember();
+        this.memberId = blockedMember.getId();
         this.profileImage = blockedMember.getProfileImage();
         this.handle = blockedMember.getHandle();
         this.name = blockedMember.getName();
