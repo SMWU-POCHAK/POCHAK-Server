@@ -90,6 +90,10 @@ public class PostService {
 
     public void savePost(final PostUploadRequest request) {
         final Member loginMember = jwtProvider.getLoginMember();
+        if (request.getTaggedMemberHandleList().contains(loginMember.getHandle())) {
+            throw new GeneralException(TAGGED_ONESELF);
+        }
+
         final String image = s3Service.upload(request.getPostImage(), POST);
         final Post post = request.toEntity(image, loginMember);
         postRepository.save(post);

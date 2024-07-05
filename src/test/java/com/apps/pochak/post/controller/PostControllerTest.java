@@ -32,7 +32,8 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.requestHe
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -182,13 +183,14 @@ class PostControllerTest {
 
         final String caption = "안녕하세요. 게시물 업로드를 테스트해보겠습니다.";
         final ArrayList<String> taggedMemberHandles = new ArrayList<>();
-        taggedMemberHandles.add("_skf__11");
-        taggedMemberHandles.add("habongee");
+        taggedMemberHandles.add("master2");
+        taggedMemberHandles.add("dxxynni");
+
 
         this.mockMvc.perform(
                         multipart("/api/v2/posts")
                                 .file(postImage)
-                                .queryParam("taggedMemberHandleList", taggedMemberHandles.toString())
+                                .queryParam("taggedMemberHandleList", String.join(", ", taggedMemberHandles))
                                 .queryParam("caption", caption)
                                 .header("Authorization", authorization)
                 ).andExpect(status().isOk())
