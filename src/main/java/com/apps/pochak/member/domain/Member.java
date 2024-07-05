@@ -98,7 +98,11 @@ public class Member extends BaseEntity {
         return Objects.equals(id, member.id);
     }
 
-    public void updateRefreshToken(String refreshToken) {
+    public void updateRefreshToken(final String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public void updateHandle(final String handle) {
+        this.handle = handle;
     }
 }

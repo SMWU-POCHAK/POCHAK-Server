@@ -98,6 +98,7 @@ public class OAuthService {
     public void signout(final String id) {
         final Member member = memberRepository.findById(Long.parseLong(id))
                 .orElseThrow(() -> new GeneralException(INVALID_ACCESS_TOKEN));
+
         if (member.getSocialType().equals(SocialType.APPLE)) {
             appleOAuthService.revoke(member.getRefreshToken());
         }
@@ -108,6 +109,8 @@ public class OAuthService {
         likeRepository.deleteLikeByMemberOrPostList(member.getId(), postIdList);
         tagRepository.deleteTagByMemberOrPostList(member.getId(), postIdList);
         postRepository.deleteAllPost(postIdList);
+
+        member.updateHandle("DELETED " + member.getId() + " | " + member.getHandle());
         memberRepository.deleteMemberByMemberId(member.getId());
     }
 }

@@ -47,7 +47,7 @@ public class PostService {
     private final S3Service s3Service;
     private final JwtProvider jwtProvider;
 
-    public static final int MAX_TAG_COUNT = 5;
+    private static final int MAX_TAG_COUNT = 5;
 
     @Transactional(readOnly = true)
     public PostElements getHomeTab(Pageable pageable) {

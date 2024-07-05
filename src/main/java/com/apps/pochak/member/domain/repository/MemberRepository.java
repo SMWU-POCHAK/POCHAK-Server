@@ -10,12 +10,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import javax.swing.text.html.Option;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.DUPLICATE_HANDLE;
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.INVALID_MEMBER_HANDLE;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
