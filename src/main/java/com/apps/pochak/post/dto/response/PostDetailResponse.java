@@ -5,6 +5,7 @@ import com.apps.pochak.comment.dto.response.CommentElement;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.tag.domain.Tag;
+import com.apps.pochak.tag.dto.response.TagElement;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,9 +18,10 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostDetailResponse {
+    private Long ownerId;
     private String ownerHandle;
     private String ownerProfileImage;
-    private List<String> taggedMemberHandle;
+    private List<TagElement> tagList;
     private Boolean isFollow;
     private String postImage;
     private Boolean isLike;
@@ -39,8 +41,8 @@ public class PostDetailResponse {
         final Member owner = post.getOwner();
         this.ownerHandle = owner.getHandle();
         this.ownerProfileImage = owner.getProfileImage();
-        this.taggedMemberHandle = tagList.stream().map(
-                tag -> tag.getMember().getHandle()
+        this.tagList = tagList.stream().map(
+                TagElement::new
         ).collect(Collectors.toList());
         this.isFollow = isFollow;
         this.postImage = post.getPostImage();

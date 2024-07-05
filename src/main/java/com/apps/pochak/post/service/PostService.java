@@ -59,7 +59,7 @@ public class PostService {
         final Member loginMember = jwtProvider.getLoginMember();
         final Post post = postRepository.findPostById(postId, loginMember);
         final List<Tag> tagList = tagRepository.findTagsByPost(post);
-        if (post.isPrivate() && !isAccessAuthorized(post, tagList, loginMember)) {
+        if (post.isPrivate()) {
             throw new GeneralException(PRIVATE_POST);
         }
         final Boolean isFollow = post.isOwner(loginMember) ?
@@ -76,16 +76,6 @@ public class PostService {
                 .likeCount(likeCount)
                 .recentComment(comment)
                 .build();
-    }
-
-    private boolean isAccessAuthorized(final Post post,
-                                       final List<Tag> tagList,
-                                       final Member loginMember) {
-        final List<String> taggedMemberHandleList = tagList.stream()
-                .map(
-                        tag -> tag.getMember().getHandle()
-                ).collect(Collectors.toList());
-        return post.isOwner(loginMember) || taggedMemberHandleList.contains(loginMember.getHandle());
     }
 
     public void savePost(final PostUploadRequest request) {
