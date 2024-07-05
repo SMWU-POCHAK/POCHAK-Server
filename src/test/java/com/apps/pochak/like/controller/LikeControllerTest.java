@@ -117,8 +117,10 @@ public class LikeControllerTest {
                                         fieldWithPath("message").type(STRING).description("결과 메세지"),
                                         fieldWithPath("result").type(OBJECT).description("결과 데이터"),
                                         fieldWithPath("result.likeMembersList").description("좋아요를 누른 사람들의 리스트").type(ARRAY),
+                                        fieldWithPath("result.likeMembersList[].memberId").type(NUMBER)
+                                                .description("유저 아이디").optional(),
                                         fieldWithPath("result.likeMembersList[].handle").type(STRING)
-                                                .description("유저 닉네임").optional(),
+                                                .description("유저 핸들").optional(),
                                         fieldWithPath("result.likeMembersList[].profileImage").type(STRING)
                                                 .description("프로필 이미지 url").optional(),
                                         fieldWithPath("result.likeMembersList[].name").type(STRING)

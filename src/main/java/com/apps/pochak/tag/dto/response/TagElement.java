@@ -2,27 +2,23 @@ package com.apps.pochak.tag.dto.response;
 
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.tag.domain.Tag;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class TagElement {
     private Long memberId;
+    private String profileImage;
     private String handle;
     private String name;
-
-    @Builder
-    public TagElement(Long memberId, String handle, String name) {
-        this.memberId = memberId;
-        this.handle = handle;
-        this.name = name;
-    }
 
     public TagElement(Tag tag) {
         Member member = tag.getMember();
         this.memberId = member.getId();
+        this.profileImage = member.getProfileImage();
         this.handle = member.getHandle();
         this.name = member.getName();
     }

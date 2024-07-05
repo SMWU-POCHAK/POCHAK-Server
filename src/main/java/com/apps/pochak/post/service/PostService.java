@@ -47,6 +47,8 @@ public class PostService {
     private final S3Service s3Service;
     private final JwtProvider jwtProvider;
 
+    public static final int MAX_TAG_COUNT = 5;
+
     @Transactional(readOnly = true)
     public PostElements getHomeTab(Pageable pageable) {
         final Member loginMember = jwtProvider.getLoginMember();
@@ -59,7 +61,7 @@ public class PostService {
         final Member loginMember = jwtProvider.getLoginMember();
         final Post post = postRepository.findPostById(postId, loginMember);
         final List<Tag> tagList = tagRepository.findTagsByPost(post);
-        if (post.isPrivate() && !isAccessAuthorized(post, tagList, loginMember)) {
+        if (post.isPrivate()) {
             throw new GeneralException(PRIVATE_POST);
         }
         final Boolean isFollow = post.isOwner(loginMember) ?
@@ -78,17 +80,12 @@ public class PostService {
                 .build();
     }
 
-    private boolean isAccessAuthorized(final Post post,
-                                       final List<Tag> tagList,
-                                       final Member loginMember) {
-        final List<String> taggedMemberHandleList = tagList.stream()
-                .map(
-                        tag -> tag.getMember().getHandle()
-                ).collect(Collectors.toList());
-        return post.isOwner(loginMember) || taggedMemberHandleList.contains(loginMember.getHandle());
-    }
-
     public void savePost(final PostUploadRequest request) {
+        int requestTagCount = request.getTaggedMemberHandleList().size();
+        if (requestTagCount > MAX_TAG_COUNT) {
+            throw new GeneralException(EXCEED_TAG_LIMIT);
+        }
+
         final Member loginMember = jwtProvider.getLoginMember();
         if (request.getTaggedMemberHandleList().contains(loginMember.getHandle())) {
             throw new GeneralException(TAGGED_ONESELF);
@@ -100,6 +97,12 @@ public class PostService {
 
         final List<String> taggedMemberHandles = request.getTaggedMemberHandleList();
         final List<Member> taggedMemberList = memberRepository.findMemberByHandleList(taggedMemberHandles, loginMember);
+
+        int foundTagSize = taggedMemberList.size();
+        if (requestTagCount != foundTagSize) {
+            s3Service.deleteFileFromS3(image);
+            throw new GeneralException(INVALID_TAG_INFO);
+        }
 
         final List<Tag> tagList = saveTags(taggedMemberList, post);
         saveTagApprovalAlarms(tagList);

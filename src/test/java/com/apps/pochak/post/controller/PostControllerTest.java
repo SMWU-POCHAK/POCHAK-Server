@@ -247,9 +247,14 @@ class PostControllerTest {
                                         fieldWithPath("code").type(STRING).description("결과 코드"),
                                         fieldWithPath("message").type(STRING).description("결과 메세지"),
                                         fieldWithPath("result").type(OBJECT).description("결과 데이터"),
-                                        fieldWithPath("result.ownerHandle").type(STRING).description("게시자 아이디 (handle)"),
+                                        fieldWithPath("result.ownerId").type(NUMBER).description("게시자 아이디"),
+                                        fieldWithPath("result.ownerHandle").type(STRING).description("게시자 핸들 (handle)"),
                                         fieldWithPath("result.ownerProfileImage").type(STRING).description("게시자 프로필 이미지"),
-                                        fieldWithPath("result.taggedMemberHandle").type(ARRAY).description("태그된 유저들의 아이디"),
+                                        fieldWithPath("result.tagList").type(ARRAY).description("태그된 유저 리스트"),
+                                        fieldWithPath("result.tagList[].memberId").type(NUMBER).description("태그된 리스트 | 유저 아이디"),
+                                        fieldWithPath("result.tagList[].profileImage").type(STRING).description("태그된 리스트 | 유저 프로필 이미지"),
+                                        fieldWithPath("result.tagList[].handle").type(STRING).description("태그된 리스트 | 유저 핸들"),
+                                        fieldWithPath("result.tagList[].name").type(STRING).description("태그된 리스트 | 유저 이름"),
                                         fieldWithPath("result.isFollow").type(BOOLEAN)
                                                 .description(
                                                         "현재 로그인한 유저가 게시자를 팔로우하고 있는지 여부 \n" +
@@ -270,13 +275,17 @@ class PostControllerTest {
                                                 .description(
                                                         "게시물의 가장 최근 댓글 : 댓글 아이디"
                                                 ).optional(),
+                                        fieldWithPath("result.recentComment.memberId").type(NUMBER)
+                                                .description(
+                                                        "게시물의 가장 최근 댓글 : 댓글 작성자 아이디"
+                                                ).optional(),
                                         fieldWithPath("result.recentComment.profileImage").type(STRING)
                                                 .description(
                                                         "게시물의 가장 최근 댓글 : 댓글 게시자의 프로필 이미지"
                                                 ).optional(),
                                         fieldWithPath("result.recentComment.handle").type(STRING)
                                                 .description(
-                                                        "게시물의 가장 최근 댓글 : 댓글 게시자의 아이디 (handle)"
+                                                        "게시물의 가장 최근 댓글 : 댓글 게시자의 핸들 (handle)"
                                                 ).optional(),
                                         fieldWithPath("result.recentComment.createdDate").type(STRING)
                                                 .description(
