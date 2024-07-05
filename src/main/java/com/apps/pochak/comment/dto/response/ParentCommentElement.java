@@ -21,6 +21,7 @@ import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
 @AllArgsConstructor
 public class ParentCommentElement {
     private Long commentId;
+    private Long memberId;
     private String profileImage;
     private String handle;
     private LocalDateTime createdDate;
@@ -43,6 +44,7 @@ public class ParentCommentElement {
     ) {
         final Member member = parentComment.getMember();
         this.commentId = parentComment.getId();
+        this.memberId = member.getId();
         this.profileImage = member.getProfileImage();
         this.handle = member.getHandle();
         this.createdDate = parentComment.getCreatedDate();

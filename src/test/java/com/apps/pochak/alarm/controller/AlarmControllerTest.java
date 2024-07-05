@@ -197,6 +197,7 @@ class AlarmControllerTest {
                                         fieldWithPath("result.ownerProfileImage").type(STRING).description("포착한 유저의 프로필 이미지"),
                                         fieldWithPath("result.tagList").type(ARRAY).description("태그된 리스트"),
                                         fieldWithPath("result.tagList[].memberId").type(NUMBER).description("태그된 리스트 | 유저 아이디"),
+                                        fieldWithPath("result.tagList[].profileImage").type(STRING).description("태그된 리스트 | 유저 프로필 이미지"),
                                         fieldWithPath("result.tagList[].handle").type(STRING).description("태그된 리스트 | 유저 핸들"),
                                         fieldWithPath("result.tagList[].name").type(STRING).description("태그된 리스트 | 유저 이름"),
                                         fieldWithPath("result.postImage").type(STRING).description("게시물 미리보기 이미지")

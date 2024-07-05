@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CommentElement {
     private Long commentId;
+    private Long memberId;
     private String profileImage;
     private String handle;
     private LocalDateTime createdDate;
@@ -23,6 +24,7 @@ public class CommentElement {
     public CommentElement(final Comment comment) {
         final Member member = comment.getMember();
         this.commentId = comment.getId();
+        this.memberId = member.getId();
         this.profileImage = member.getProfileImage();
         this.handle = member.getHandle();
         this.createdDate = comment.getCreatedDate();

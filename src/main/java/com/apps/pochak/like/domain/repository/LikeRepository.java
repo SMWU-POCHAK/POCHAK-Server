@@ -36,6 +36,7 @@ public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
 
     @Query("select  " +
             "new com.apps.pochak.like.dto.response.LikeElement(" +
+            "   m.id, " +
             "   m.handle, " +
             "   m.profileImage, " +
             "   m.name, " +
