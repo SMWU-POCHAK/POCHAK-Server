@@ -9,6 +9,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
+import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_DELETE_FOLLOWER;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,6 +46,7 @@ public class FollowController {
             @PathVariable("handle") final String handle,
             @RequestParam("followerHandle") final String followerHandle
     ) {
-        return ApiResponse.of(followService.deleteFollower(handle, followerHandle));
+        followService.deleteFollower(handle, followerHandle);
+        return ApiResponse.of(SUCCESS_DELETE_FOLLOWER);
     }
 }
