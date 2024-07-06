@@ -2,6 +2,7 @@ package com.apps.pochak.follow.service;
 
 import com.apps.pochak.alarm.domain.FollowAlarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
+import com.apps.pochak.alarm.service.FollowAlarmService;
 import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.api_payload.code.BaseCode;
@@ -34,6 +35,7 @@ public class FollowService {
     private final MemberRepository memberRepository;
     private final CustomMemberRepository customMemberRepository;
     private final JwtProvider jwtProvider;
+    private final FollowAlarmService followAlarmService;
 
     public BaseCode follow(final String handle) {
         final Member loginMember = jwtProvider.getLoginMember();
@@ -55,11 +57,11 @@ public class FollowService {
     private BaseCode toggleFollowStatus(Follow follow) {
         if (follow.getStatus().equals(ACTIVE)) {
             follow.setStatus(DELETED);
-            deleteFollowAlarm(follow);
+            followAlarmService.deleteFollowAlarm(follow);
             return SUCCESS_UNFOLLOW;
         } else {
             follow.setStatus(ACTIVE);
-            sendFollowAlarm(follow, follow.getReceiver());
+            followAlarmService.sendFollowAlarm(follow, follow.getReceiver());
             return SUCCESS_FOLLOW;
         }
     }
@@ -73,23 +75,11 @@ public class FollowService {
                 .receiver(receiver)
                 .build();
         final Follow follow = followRepository.save(newFollow);
-        sendFollowAlarm(follow, receiver);
+        followAlarmService.sendFollowAlarm(follow, receiver);
         return SUCCESS_FOLLOW;
     }
 
-    private void sendFollowAlarm(
-            final Follow follow,
-            final Member receiver
-    ) {
-        FollowAlarm alarm = new FollowAlarm(follow, receiver);
-        alarmRepository.save(alarm);
-    }
-
-    private void deleteFollowAlarm(final Follow follow) {
-        alarmRepository.deleteAlarmByFollow(follow.getId());
-    }
-
-    public BaseCode deleteFollower(final String handle,
+    public void deleteFollower(final String handle,
                                    final String followerHandle
     ) {
         // TODO: Refactor permission checking part using annotations.
@@ -104,7 +94,6 @@ public class FollowService {
             throw new GeneralException(NOT_FOLLOW);
         }
         follow.toggleCurrentStatus();
-        return SUCCESS_DELETE_FOLLOWER;
     }
 
     @Transactional(readOnly = true)

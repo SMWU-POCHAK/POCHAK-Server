@@ -72,8 +72,11 @@ include::{snippets}/get-preview-post/response-body.adoc[]
 |`FOLLOW`
 |다른 사람이 날 팔로우했을 경우
 
-|`LIKE`
+|`OWNER_LIKE`
 |내가 올린 게시물에 좋아요가 달릴 경우
+
+|`TAGGED_LIKE`
+|내가 태그된 게시물에 좋아요가 달릴 경우
 
 |`TAG_APPROVAL`
 |누군가 날 게시물에 태그했을 경우 (수락/거절 후 삭제되는 알람)

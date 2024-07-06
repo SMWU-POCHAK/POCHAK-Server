@@ -42,23 +42,4 @@ public abstract class Alarm extends BaseEntity {
         this.receiver = receiver;
         this.alarmType = alarmType;
     }
-
-    public boolean isCommentAlarm() {
-        final AlarmType type = this.alarmType;
-        return type.equals(AlarmType.COMMENT_REPLY) ||
-                type.equals(AlarmType.TAGGED_COMMENT) ||
-                type.equals(AlarmType.OWNER_COMMENT);
-    }
-
-    public boolean isFollowAlarm() {
-        return this.alarmType.equals(AlarmType.FOLLOW);
-    }
-
-    public boolean isLikeAlarm() {
-        return this.alarmType.equals(AlarmType.LIKE);
-    }
-
-    public boolean isTagApprovalAlarm() {
-        return this.alarmType.equals(AlarmType.TAG_APPROVAL);
-    }
 }

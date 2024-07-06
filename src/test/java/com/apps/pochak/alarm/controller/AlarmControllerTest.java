@@ -152,7 +152,7 @@ class AlarmControllerTest {
                                                 .description("[댓글 알람] 알람 리스트 | 댓글이 달린 게시물 아이디").optional(),
                                         fieldWithPath("result.alarmList[].postImage").type(STRING)
                                                 .description("[댓글 알람] 알람 리스트 | 댓글이 달린 게시물 이미지").optional(),
-                                        fieldWithPath("result.alarmList[].memberId").type(STRING)
+                                        fieldWithPath("result.alarmList[].memberId").type(NUMBER)
                                                 .description("[댓글 알람] 알람 리스트 | 댓글 단 유저 아이디").optional(),
                                         fieldWithPath("result.alarmList[].memberHandle").type(STRING)
                                                 .description("[댓글 알람] 알람 리스트 | 댓글 단 유저 핸들").optional(),

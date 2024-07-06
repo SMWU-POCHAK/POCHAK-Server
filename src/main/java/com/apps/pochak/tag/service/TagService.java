@@ -1,6 +1,7 @@
 package com.apps.pochak.tag.service;
 
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
+import com.apps.pochak.alarm.service.TagAlarmService;
 import com.apps.pochak.global.api_payload.code.BaseCode;
 import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.*;
 
@@ -24,7 +24,7 @@ public class TagService {
     private final TagRepository tagRepository;
     private final AlarmRepository alarmRepository;
     private final PostRepository postRepository;
-
+    private final TagAlarmService tagAlarmService;
     private final JwtProvider jwtProvider;
 
     public BaseCode approveOrRejectTagRequest(final Long tagId, final Boolean isAccept) {
@@ -38,7 +38,7 @@ public class TagService {
 
     private BaseCode acceptPost(final Tag tag) {
         tag.setIsAccepted(true);
-        alarmRepository.deleteAlarmByTag(tag.getId());
+        tagAlarmService.deleteAlarmByTag(tag);
 
         final Post post = tag.getPost();
         final List<Tag> tagList = tagRepository.findTagsByPost(post);
@@ -55,11 +55,7 @@ public class TagService {
         final Post post = tag.getPost();
         final List<Tag> tagList = tagRepository.findTagsByPost(post);
 
-        List<Long> tagIdList = tagList.stream().map(
-                Tag::getId
-        ).collect(Collectors.toList());
-
-        alarmRepository.deleteAlarmByTagIdList(tagIdList);
+        tagAlarmService.deleteAlarmByTagList(tagList);
         tagRepository.deleteAll(tagList);
         postRepository.delete(post);
 

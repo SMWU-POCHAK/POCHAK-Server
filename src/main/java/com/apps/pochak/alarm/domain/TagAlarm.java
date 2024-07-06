@@ -3,7 +3,6 @@ package com.apps.pochak.alarm.domain;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.tag.domain.Tag;
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
