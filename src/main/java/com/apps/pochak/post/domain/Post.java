@@ -61,7 +61,7 @@ public class Post extends BaseEntity {
     }
 
     public boolean isOwner(final Member member) {
-        return this.owner.getId().equals(member.getId());
+        return this.owner.equals(member);
     }
 
     public void makePublic() {

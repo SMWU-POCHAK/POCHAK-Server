@@ -77,4 +77,7 @@ public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
             @Param("memberId") Long memberId,
             @Param("postIdList") List<Long> postList
     );
+
+    @Modifying
+    void deleteByLikedPost(Post post);
 }

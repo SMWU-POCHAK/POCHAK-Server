@@ -3,6 +3,8 @@ package com.apps.pochak.post.service;
 import com.apps.pochak.alarm.domain.Alarm;
 import com.apps.pochak.alarm.domain.TagAlarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
+import com.apps.pochak.alarm.service.CommentAlarmService;
+import com.apps.pochak.alarm.service.LikeAlarmService;
 import com.apps.pochak.alarm.service.TagAlarmService;
 import com.apps.pochak.comment.domain.Comment;
 import com.apps.pochak.comment.domain.repository.CommentRepository;
@@ -49,6 +51,8 @@ public class PostService {
     private final JwtProvider jwtProvider;
 
     private static final int MAX_TAG_COUNT = 5;
+    private final CommentAlarmService commentAlarmService;
+    private final LikeAlarmService likeAlarmService;
 
     @Transactional(readOnly = true)
     public PostElements getHomeTab(Pageable pageable) {
@@ -125,12 +129,29 @@ public class PostService {
     public void deletePost(final Long postId) {
         final Member loginMember = jwtProvider.getLoginMember();
         final Post post = postRepository.findById(postId).orElseThrow(() -> new GeneralException(INVALID_POST_ID));
-        if (!post.getOwner().getId().equals(loginMember.getId())) {
-            throw new GeneralException(NOT_YOUR_POST);
-        }
+        checkAuthorized(post, loginMember);
         postRepository.delete(post);
-        commentRepository.bulkDeleteByPost(post);
+        commentRepository.deleteByPost(post);
+        tagRepository.deleteByPost(post);
+        likeRepository.deleteByLikedPost(post);
+        alarmRepository.deleteByPost(post.getId());
     }
+
+
+    private void checkAuthorized(
+            final Post post,
+            final Member member
+    ) {
+        if (post.isOwner(member)) return;
+
+        List<Tag> tagList = tagRepository.findTagsByPost(post);
+        for (Tag tag : tagList) {
+            if (tag.isMember(member)) return;
+        }
+
+        throw new GeneralException(NOT_YOUR_POST);
+    }
+
 
     @Transactional(readOnly = true)
     public PostElements getSearchTab(Pageable pageable) {
