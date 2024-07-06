@@ -63,7 +63,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Modifying
     @Query("update Comment c set c.status = 'DELETED' " +
             "where c.post = :post ")
-    void bulkDeleteByPost(@Param("post") final Post post);
+    void deleteByPost(@Param("post") final Post post);
 
     @Modifying
     @Query("update Comment comment " +

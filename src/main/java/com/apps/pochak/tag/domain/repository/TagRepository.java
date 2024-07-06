@@ -52,4 +52,7 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
             @Param("memberId") final Long memberId,
             @Param("postIdList") final List<Long> postIdList
     );
+
+    @Modifying
+    void deleteByPost(final Post post);
 }

@@ -5,6 +5,7 @@ import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.like.domain.LikeEntity;
 import com.apps.pochak.member.domain.Member;
+import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.tag.domain.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -92,6 +93,15 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     @Modifying
     @Query(value = """
             update alarm a set a.status = 'DELETED'
+                   where (a.comment_id = :commentId or a.parent_comment_id = :commentId)
+                     and a.dtype = 'CommentAlarm' and (a.status = 'ACTIVE')
+            """,
+            nativeQuery = true)
+    void deleteAlarmByComment(@Param("commentId") final Long commentId);
+
+    @Modifying
+    @Query(value = """
+            update alarm a set a.status = 'DELETED'
                    where a.follow_id = :followId
                      and a.dtype = 'FollowAlarm' and (a.status = 'ACTIVE')
             """,
@@ -116,4 +126,12 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
             """,
             nativeQuery = true)
     void deleteAlarmByTagIdList(@Param("tagIdList") final List<Long> tagIdList);
+
+    @Modifying
+    @Query(value = """
+            update alarm a set a.status = 'DELETED'
+                   where a.post_id = :postId or a.liked_post_id = :postId
+            """,
+            nativeQuery = true)
+    void deleteByPost(@Param("postId") final Long postId);
 }

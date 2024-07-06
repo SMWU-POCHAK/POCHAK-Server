@@ -4,6 +4,7 @@ import com.apps.pochak.alarm.domain.Alarm;
 import com.apps.pochak.alarm.domain.AlarmType;
 import com.apps.pochak.alarm.domain.CommentAlarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
+import com.apps.pochak.alarm.service.CommentAlarmService;
 import com.apps.pochak.comment.domain.Comment;
 import com.apps.pochak.comment.domain.repository.CommentRepository;
 import com.apps.pochak.comment.dto.request.CommentUploadRequest;
@@ -35,8 +36,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final TagRepository tagRepository;
     private final PostRepository postRepository;
-    private final AlarmRepository alarmRepository;
-
+    private final CommentAlarmService commentAlarmService;
     private final JwtProvider jwtProvider;
 
     @Transactional(readOnly = true)
@@ -86,87 +86,37 @@ public class CommentService {
 
     private void saveChildComment(
             final CommentUploadRequest request,
-            final Member member,
+            final Member loginMember,
             final Post post
     ) {
         final Comment parentComment = commentRepository
-                .findParentCommentById(request.getParentCommentId(), member)
+                .findParentCommentById(request.getParentCommentId(), loginMember)
                 .orElseThrow(() -> new GeneralException(INVALID_COMMENT_ID));
         final Comment comment = commentRepository.save(
                 request.toEntity(
-                        member,
+                        loginMember,
                         post,
                         parentComment
                 )
         );
         final Member parentCommentWriter = parentComment.getMember();
-        sendCommentReplyAlarm(comment, parentCommentWriter);
-
-        final Member owner = post.getOwner();
-        if (!owner.getId().equals(parentCommentWriter.getId())) {
-            sendPostOwnerCommentAlarm(comment, owner);
-        }
-        sendTaggedPostCommentAlarm(comment, parentCommentWriter.getId());
+        commentAlarmService.sendChildCommentAlarm(
+                comment,
+                post.getOwner(),
+                parentCommentWriter
+        );
     }
 
     private void saveParentComment(
             final CommentUploadRequest request,
-            final Member member,
+            final Member loginMember,
             final Post post
     ) {
-        final Comment comment = commentRepository.save(request.toEntity(member, post));
-        sendPostOwnerCommentAlarm(comment, post.getOwner());
-        sendTaggedPostCommentAlarm(comment, 0L);
-    }
-
-    private void sendPostOwnerCommentAlarm(
-            final Comment comment,
-            final Member receiver
-    ) {
-        final CommentAlarm alarm = new CommentAlarm(
+        final Comment comment = commentRepository.save(request.toEntity(loginMember, post));
+        commentAlarmService.sendParentCommentAlarm(
                 comment,
-                receiver,
-                AlarmType.OWNER_COMMENT
+                post.getOwner()
         );
-        alarmRepository.save(alarm);
-    }
-
-    private void sendTaggedPostCommentAlarm(
-            final Comment comment,
-            final Long excludeMemberId
-    ) {
-        final List<Tag> tagList = tagRepository.findTagsByPost(comment.getPost());
-
-        final List<Alarm> alarmList = new ArrayList<>();
-        for (Tag tag : tagList) {
-            final Member taggedMember = tag.getMember();
-            if (!excludeMemberId.equals(taggedMember.getId())) {
-                alarmList.add(
-                        new CommentAlarm(
-                                comment,
-                                taggedMember,
-                                AlarmType.TAGGED_COMMENT
-                        )
-                );
-            }
-        }
-
-        alarmRepository.saveAll(alarmList);
-    }
-
-    private void sendCommentReplyAlarm(
-            final Comment comment,
-            final Member receiver
-    ) {
-        if (comment.getMember().equals(receiver)) return;
-
-        final CommentAlarm alarm = new CommentAlarm(
-                comment,
-                receiver,
-                AlarmType.COMMENT_REPLY
-        );
-
-        alarmRepository.save(alarm);
     }
 
     public void deleteComment(
@@ -176,6 +126,7 @@ public class CommentService {
         Comment comment = commentRepository.findCommentById(commentId);
         checkAuthorized(comment);
         commentRepository.deleteCommentById(commentId);
+        commentAlarmService.deleteAlarmByComment(comment);
     }
 
     private void checkAuthorized(final Comment comment) {

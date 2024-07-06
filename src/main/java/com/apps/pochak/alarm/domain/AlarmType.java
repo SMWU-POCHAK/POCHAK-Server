@@ -6,5 +6,7 @@ public enum AlarmType {
     COMMENT_REPLY,
     FOLLOW,
     LIKE,
+    TAGGED_LIKE,
+    OWNER_LIKE,
     TAG_APPROVAL
 }

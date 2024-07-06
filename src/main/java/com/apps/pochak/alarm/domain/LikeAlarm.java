@@ -3,7 +3,6 @@ package com.apps.pochak.alarm.domain;
 import com.apps.pochak.like.domain.LikeEntity;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -12,7 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
-import static com.apps.pochak.alarm.domain.AlarmType.LIKE;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
@@ -35,9 +33,10 @@ public class LikeAlarm extends Alarm {
 
     public LikeAlarm(
             final LikeEntity like,
-            final Member receiver
+            final Member receiver,
+            final AlarmType alarmType
     ) {
-        super(receiver, LIKE);
+        super(receiver, alarmType);
         this.like = like;
 
         Member likeMember = like.getLikeMember();
