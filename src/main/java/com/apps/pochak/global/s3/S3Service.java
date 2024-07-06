@@ -32,6 +32,9 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    @Value("${cloud.aws.cloudfront.domain}")
+    private String domain;
+
     public String upload(MultipartFile multipartFile, DirName dirName) {
         if (multipartFile.isEmpty())
             throw new GeneralException(NULL_FILE);
@@ -46,7 +49,8 @@ public class S3Service {
 
     private String upload(File uploadFile, DirName dirName) {
         String fileName = dirName.getDirName() + "/" + UUID.randomUUID() + uploadFile.getName();
-        String uploadImageUrl = putS3(uploadFile, fileName);
+        putS3(uploadFile, fileName);
+        String uploadImageUrl = domain+"/"+fileName;
         deleteFile(uploadFile);
         return uploadImageUrl;
     }
