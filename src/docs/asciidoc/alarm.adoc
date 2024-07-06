@@ -30,6 +30,29 @@ include::{snippets}/get-alarms/query-parameters.adoc[]
 === Response
 
 ==== response body
+- 알람 종류
+
+[cols=2*]
+|===
+|`OWNER_COMMENT`
+|내가 올린 게시물에 댓글이 달렸을 경우
+
+|`TAGGED_COMMENT`
+|내가 태그된 게시물에 댓글이 달렸을 경우
+
+|`COMMENT_REPLY`
+|내 댓글에 답글이 달렸을 경우
+
+|`FOLLOW`
+|다른 사람이 날 팔로우했을 경우
+
+|`LIKE`
+|내가 올린 게시물에 좋아요가 달릴 경우
+
+|`TAG_APPROVAL`
+|누군가 날 게시물에 태그했을 경우 (수락/거절 후 삭제되는 알람)
+
+|===
 
 include::{snippets}/get-alarms/response-body.adoc[]
 include::{snippets}/get-alarms/response-fields.adoc[]
@@ -55,31 +78,6 @@ include::{snippets}/get-preview-post/path-parameters.adoc[]
 ==== response body
 
 include::{snippets}/get-preview-post/response-body.adoc[]
-
-- 알람 종류
-
-[cols=2*]
-|===
-|`OWNER_COMMENT`
-|내가 올린 게시물에 댓글이 달렸을 경우
-
-|`TAGGED_COMMENT`
-|내가 태그된 게시물에 댓글이 달렸을 경우
-
-|`COMMENT_REPLY`
-|내 댓글에 답글이 달렸을 경우
-
-|`FOLLOW`
-|다른 사람이 날 팔로우했을 경우
-
-|`LIKE`
-|내가 올린 게시물에 좋아요가 달릴 경우
-
-|`TAG_APPROVAL`
-|누군가 날 게시물에 태그했을 경우 (수락/거절 후 삭제되는 알람)
-
-|===
-
 include::{snippets}/get-preview-post/response-fields.adoc[]
 
 == `POST` Check Alarm API
