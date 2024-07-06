@@ -126,6 +126,7 @@ public class CommentService {
         Comment comment = commentRepository.findCommentById(commentId);
         checkAuthorized(comment);
         commentRepository.deleteCommentById(commentId);
+        commentAlarmService.deleteAlarmByComment(comment);
     }
 
     private void checkAuthorized(final Comment comment) {

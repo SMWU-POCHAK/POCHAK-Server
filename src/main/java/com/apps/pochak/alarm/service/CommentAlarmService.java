@@ -94,4 +94,8 @@ public class CommentAlarmService {
     ) {
         return comment.getMember().equals(receiver);
     }
+
+    public void deleteAlarmByComment(Comment comment) {
+        alarmRepository.deleteAlarmByComment(comment.getId());
+    }
 }

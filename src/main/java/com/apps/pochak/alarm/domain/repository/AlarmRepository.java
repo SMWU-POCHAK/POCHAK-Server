@@ -92,6 +92,15 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     @Modifying
     @Query(value = """
             update alarm a set a.status = 'DELETED'
+                   where (a.comment_id = :commentId or a.parent_comment_id = :commentId)
+                     and a.dtype = 'CommentAlarm' and (a.status = 'ACTIVE')
+            """,
+            nativeQuery = true)
+    void deleteAlarmByComment(@Param("commentId") final Long commentId);
+
+    @Modifying
+    @Query(value = """
+            update alarm a set a.status = 'DELETED'
                    where a.follow_id = :followId
                      and a.dtype = 'FollowAlarm' and (a.status = 'ACTIVE')
             """,
