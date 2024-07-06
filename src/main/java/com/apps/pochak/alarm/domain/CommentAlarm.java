@@ -23,6 +23,7 @@ public class CommentAlarm extends Alarm {
     @JoinColumn(name = "comment_id")
     private Comment comment;
     private String content;
+    private Long parentCommentId;
 
     private Long postId;
     private String postImage;
@@ -40,6 +41,8 @@ public class CommentAlarm extends Alarm {
         super(receiver, alarmType);
         this.comment = comment;
         this.content = comment.getContent();
+        if (comment.isChildComment())
+            this.parentCommentId = comment.getParentComment().getId();
 
         Post post = comment.getPost();
         this.postId = post.getId();

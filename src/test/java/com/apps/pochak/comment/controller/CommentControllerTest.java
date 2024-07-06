@@ -303,7 +303,7 @@ class CommentControllerTest {
     @DisplayName("Comment Upload API Document")
     void uploadCommentTest() throws Exception {
 
-        final CommentUploadRequest uploadRequest = new CommentUploadRequest("댓글 내용 테스트", 13L);
+        final CommentUploadRequest uploadRequest = new CommentUploadRequest("댓글 업로드 테스트", null);
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
