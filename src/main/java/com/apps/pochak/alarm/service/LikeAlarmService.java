@@ -71,7 +71,7 @@ public class LikeAlarmService {
         return like.getLikeMember().equals(receiver);
     }
 
-    public void deleteAlarmByLike(LikeEntity like) {
+    public void deleteAlarmByLike(final LikeEntity like) {
         alarmRepository.deleteAlarmByLike(like.getId());
     }
 }

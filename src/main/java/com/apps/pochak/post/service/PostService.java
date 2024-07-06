@@ -3,6 +3,7 @@ package com.apps.pochak.post.service;
 import com.apps.pochak.alarm.domain.Alarm;
 import com.apps.pochak.alarm.domain.TagAlarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
+import com.apps.pochak.alarm.service.TagAlarmService;
 import com.apps.pochak.comment.domain.Comment;
 import com.apps.pochak.comment.domain.repository.CommentRepository;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
@@ -43,7 +44,7 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
     private final AlarmRepository alarmRepository;
-
+    private final TagAlarmService tagAlarmService;
     private final S3Service s3Service;
     private final JwtProvider jwtProvider;
 
@@ -105,7 +106,7 @@ public class PostService {
         }
 
         final List<Tag> tagList = saveTags(taggedMemberList, post);
-        saveTagApprovalAlarms(tagList, loginMember);
+        tagAlarmService.saveTagApprovalAlarms(tagList, loginMember);
     }
 
     private List<Tag> saveTags(
@@ -119,16 +120,6 @@ public class PostService {
                         .build()
         ).collect(Collectors.toList());
         return tagRepository.saveAll(tagList);
-    }
-
-    private void saveTagApprovalAlarms(
-            final List<Tag> tagList,
-            final Member tagger
-    ) {
-        final List<Alarm> tagApprovalAlarmList = tagList.stream().map(
-                tag -> new TagAlarm(tag, tagger, tag.getMember())
-        ).collect(Collectors.toList());
-        alarmRepository.saveAll(tagApprovalAlarmList);
     }
 
     public void deletePost(final Long postId) {
