@@ -98,6 +98,7 @@ public class AppleOAuthService {
         return OAuthMemberResponse.builder()
                 .socialId(sub)
                 .email(email)
+                .handle(member.getHandle())
                 .socialType("apple")
                 .accessToken(appAccessToken)
                 .refreshToken(appRefreshToken)

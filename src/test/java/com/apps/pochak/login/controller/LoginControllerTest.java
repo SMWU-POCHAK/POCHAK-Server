@@ -118,6 +118,7 @@ public class LoginControllerTest {
                                         fieldWithPath("result.socialId").type(STRING).description("소셜 아이디"),
                                         fieldWithPath("result.name").type(STRING).description("회원 이름"),
                                         fieldWithPath("result.email").type(STRING).description("회원 이메일"),
+                                        fieldWithPath("result.handle").type(STRING).description("회원 아이디 (핸들)"),
                                         fieldWithPath("result.socialType").type(STRING).description("소셜 타입 (google, apple)"),
                                         fieldWithPath("result.accessToken").type(STRING).description("엑세스 토큰"),
                                         fieldWithPath("result.refreshToken").type(STRING).description("리프레쉬 토큰"),

@@ -169,12 +169,12 @@ class AlarmControllerTest {
     @Test
     @DisplayName("Get preview post API Document")
     void getPreviewPostTest() throws Exception {
-        Long alarmId = 919L;
+        Long alarmId = 1485L;
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .get("/api/v2/alarms/{alarmId}", alarmId)
-                                .header("Authorization", authorization1)
+                                .header("Authorization", authorization2)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
@@ -211,12 +211,12 @@ class AlarmControllerTest {
     @Transactional
     @DisplayName("Check Alarms API Document")
     void checkAlarmTest() throws Exception {
-        Long alarmId = 919L;
+        Long alarmId = 1485L;
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .post("/api/v2/alarms/{alarmId}", alarmId)
-                                .header("Authorization", authorization1)
+                                .header("Authorization", authorization2)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(

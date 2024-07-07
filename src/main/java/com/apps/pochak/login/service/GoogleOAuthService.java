@@ -61,6 +61,7 @@ public class GoogleOAuthService {
                 .socialId(memberResponse.getId())
                 .name(memberResponse.getName())
                 .email(memberResponse.getEmail())
+                .handle(member.getHandle())
                 .socialType("google")
                 .accessToken(appAccessToken)
                 .refreshToken(appRefreshToken)
