@@ -85,8 +85,15 @@ public class S3Service {
 
     public void deleteFileFromS3(String fileUrl) {
         try {
-            String splitStr = ".com/";
-            String fileName = fileUrl.substring(fileUrl.lastIndexOf(splitStr) + splitStr.length());
+            String[] splitStrs = {".net/", ".com/"};
+            String fileName = null;
+
+            for (String splitStr : splitStrs) {
+                if (fileUrl.contains(splitStr)) {
+                    fileName = fileUrl.substring(fileUrl.lastIndexOf(splitStr) + splitStr.length());
+                    break;
+                }
+            }
             amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
         } catch (AmazonServiceException e) {
             throw new ImageException(DELETE_FILE_ERROR);
