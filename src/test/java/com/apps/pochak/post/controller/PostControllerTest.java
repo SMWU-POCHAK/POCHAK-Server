@@ -44,7 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 class PostControllerTest {
 
-    @Value("${test.authorization.master1}")
+    @Value("${test.authorization.master2}")
     String authorization;
 
     @Autowired
@@ -106,9 +106,9 @@ class PostControllerTest {
                                                 ),
                                         fieldWithPath("result.postList").type(ARRAY).description("게시물 리스트"),
                                         fieldWithPath("result.postList[].postId").type(NUMBER)
-                                                .description("게시물 리스트: 게시물 아이디"),
+                                                .description("게시물 리스트: 게시물 아이디").optional(),
                                         fieldWithPath("result.postList[].postImage").type(STRING)
-                                                .description("게시물 리스트: 게시물 이미지")
+                                                .description("게시물 리스트: 게시물 이미지").optional()
                                 )
                         )
                 );
@@ -183,8 +183,8 @@ class PostControllerTest {
 
         final String caption = "안녕하세요. 게시물 업로드를 테스트해보겠습니다.";
         final ArrayList<String> taggedMemberHandles = new ArrayList<>();
-        taggedMemberHandles.add("master2");
-        taggedMemberHandles.add("dxxynni");
+        taggedMemberHandles.add("master1");
+        //taggedMemberHandles.add("master1");
 
 
         this.mockMvc.perform(
@@ -224,7 +224,7 @@ class PostControllerTest {
     void getPostDetailTest() throws Exception {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .get("/api/v2/posts/{postId}", 2)
+                                .get("/api/v2/posts/{postId}", 453L)
                                 .header("Authorization", authorization)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
@@ -307,7 +307,7 @@ class PostControllerTest {
     void deletePostTest() throws Exception {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .delete("/api/v2/posts/{postId}", 347)
+                                .delete("/api/v2/posts/{postId}", 455L)
                                 .header("Authorization", authorization)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())

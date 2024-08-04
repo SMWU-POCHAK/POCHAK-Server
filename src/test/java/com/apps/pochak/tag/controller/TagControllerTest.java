@@ -40,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 class TagControllerTest {
 
-    @Value("${test.authorization.master1}")
+    @Value("${test.authorization.master2}")
     String authorization;
 
     @Autowired
@@ -64,7 +64,7 @@ class TagControllerTest {
     @DisplayName("Approve Tag API Document")
     void approveTagTest() throws Exception {
 
-        Long tagId = 371L;
+        Long tagId = 497L;
         Boolean isAccept = true;
 
         this.mockMvc.perform(

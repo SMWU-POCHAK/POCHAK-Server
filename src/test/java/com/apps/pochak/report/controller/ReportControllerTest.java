@@ -63,7 +63,7 @@ class ReportControllerTest {
     @DisplayName("Report Upload API Document")
     void uploadReportTest() throws Exception {
 
-        final ReportUploadRequest uploadRequest = new ReportUploadRequest(174L, ReportType.NOT_INTERESTED);
+        final ReportUploadRequest uploadRequest = new ReportUploadRequest(453L, ReportType.NOT_INTERESTED);
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders

@@ -66,7 +66,7 @@ public class LikeControllerTest {
     void likePost() throws Exception {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .post("/api/v2/posts/{postId}/like", 2)
+                                .post("/api/v2/posts/{postId}/like", 453L)
                                 .header("Authorization", authorization1)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
@@ -96,7 +96,7 @@ public class LikeControllerTest {
     void getMemberLikedPost() throws Exception {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .get("/api/v2/posts/{postId}/like", 2)
+                                .get("/api/v2/posts/{postId}/like", 453L)
                                 .header("Authorization", authorization1)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())

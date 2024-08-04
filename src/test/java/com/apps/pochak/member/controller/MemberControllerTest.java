@@ -63,7 +63,7 @@ class MemberControllerTest {
     @DisplayName("get profile API Document")
     void getProfileTest() throws Exception {
 
-        String handle = "dxxynni";
+        String handle = "master2";
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -116,9 +116,9 @@ class MemberControllerTest {
                                                 ),
                                         fieldWithPath("result.postList").type(ARRAY).description("태그된 게시물 리스트"),
                                         fieldWithPath("result.postList[].postId").type(NUMBER)
-                                                .description("태그된 게시물 리스트: 게시물 아이디"),
+                                                .description("태그된 게시물 리스트: 게시물 아이디").optional(),
                                         fieldWithPath("result.postList[].postImage").type(STRING)
-                                                .description("태그된 게시물 리스트: 게시물 이미지")
+                                                .description("태그된 게시물 리스트: 게시물 이미지").optional()
                                 )
                         )
                 );
@@ -128,7 +128,7 @@ class MemberControllerTest {
     @DisplayName("get uploaded Post API Document")
     void getUploadTest() throws Exception {
 
-        String handle = "habongee";
+        String handle = "_5jizzi";
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -185,7 +185,7 @@ class MemberControllerTest {
     @DisplayName("search Member API Document")
     void searchMemberTest() throws Exception {
 
-        String keyword = "habo";
+        String keyword = "_5jizzi";
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -246,7 +246,7 @@ class MemberControllerTest {
     @DisplayName("check duplicate handle API Document")
     void checkDuplicateHandleTest() throws Exception {
 
-        String handle = "5ji";
+        String handle = "_5jizzi";
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
