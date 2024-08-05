@@ -62,7 +62,7 @@ class CommentControllerTest {
     void getComments() throws Exception {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .get("/api/v2/posts/{postId}/comments", 2)
+                                .get("/api/v2/posts/{postId}/comments", 453L)
                                 .header("Authorization", authorization)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
@@ -193,7 +193,7 @@ class CommentControllerTest {
     void getChildComments() throws Exception {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .get("/api/v2/posts/{postId}/comments/{commentId}", 2, 3)
+                                .get("/api/v2/posts/{postId}/comments/{commentId}", 453L, 348)
                                 .header("Authorization", authorization)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
@@ -307,7 +307,7 @@ class CommentControllerTest {
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .post("/api/v2/posts/{postId}/comments", 2)
+                                .post("/api/v2/posts/{postId}/comments", 453L)
                                 .header("Authorization", authorization)
                                 .content(objectMapper.writeValueAsString(uploadRequest))
                                 .contentType(APPLICATION_JSON)
@@ -350,8 +350,8 @@ class CommentControllerTest {
     @DisplayName("Delete Comment API Document")
     void deleteCommentTest() throws Exception {
 
-        Long postId = 2L;
-        String commentId = "3";
+        Long postId = 453L;
+        String commentId = "353";
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders

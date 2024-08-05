@@ -169,7 +169,7 @@ class AlarmControllerTest {
     @Test
     @DisplayName("Get preview post API Document")
     void getPreviewPostTest() throws Exception {
-        Long alarmId = 1485L;
+        Long alarmId = 1709L;
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -211,7 +211,7 @@ class AlarmControllerTest {
     @Transactional
     @DisplayName("Check Alarms API Document")
     void checkAlarmTest() throws Exception {
-        Long alarmId = 1485L;
+        Long alarmId = 1709L;
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders

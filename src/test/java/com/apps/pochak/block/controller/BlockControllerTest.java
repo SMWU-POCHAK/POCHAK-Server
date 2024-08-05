@@ -63,7 +63,7 @@ class BlockControllerTest {
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .post("/api/v2/members/{handle}/block", "goeun")
+                                .post("/api/v2/members/{handle}/block", "_5jizzi")
                                 .header("Authorization", authorization)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
@@ -152,7 +152,7 @@ class BlockControllerTest {
     @DisplayName("Cancel Block API Document")
     void cancelBlockTest() throws Exception {
 
-        String blockedMemberHandle = "ssok";
+        String blockedMemberHandle = "_5jizzi";
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders

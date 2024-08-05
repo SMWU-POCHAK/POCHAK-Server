@@ -64,7 +64,7 @@ class FollowControllerTest {
     @DisplayName("get followings API Document")
     void getFollowings() throws Exception {
 
-        String handle = "_skf__11";
+        String handle = "_5jizzi";
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -129,7 +129,7 @@ class FollowControllerTest {
     @DisplayName("get follower API Document")
     void getFollowers() throws Exception {
 
-        String handle = "dxxynni";
+        String handle = "_5jizzi";
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
