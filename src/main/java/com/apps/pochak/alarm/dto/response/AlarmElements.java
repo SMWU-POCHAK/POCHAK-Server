@@ -1,6 +1,6 @@
 package com.apps.pochak.alarm.dto.response;
 
-import com.apps.pochak.alarm.domain.Alarm;
+import com.apps.pochak.alarm.domain.*;
 import com.apps.pochak.alarm.dto.response.alarm_element.CommentAlarmElement;
 import com.apps.pochak.alarm.dto.response.alarm_element.FollowAlarmElement;
 import com.apps.pochak.alarm.dto.response.alarm_element.LikeAlarmElement;
@@ -19,20 +19,20 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class AlarmElements {
     private PageInfo pageInfo;
-    private List<AlarmElement> alarmElementList;
+    private List<AlarmElement> alarmList;
 
-    public AlarmElements(Page<Alarm> alarmPage) {
+    public AlarmElements(final Page<Alarm> alarmPage) {
         this.pageInfo = new PageInfo(alarmPage);
-        this.alarmElementList = alarmPage.stream().map(
+        this.alarmList = alarmPage.stream().map(
                 alarm -> {
-                    if (alarm.isFollowAlarm()) {
-                        return new FollowAlarmElement(alarm);
-                    } else if (alarm.isCommentAlarm()) {
-                        return new CommentAlarmElement(alarm);
-                    } else if (alarm.isTagApprovalAlarm()) {
-                        return new TagApprovalAlarmElement(alarm);
+                    if (alarm instanceof FollowAlarm) {
+                        return new FollowAlarmElement((FollowAlarm) alarm);
+                    } else if (alarm instanceof CommentAlarm) {
+                        return new CommentAlarmElement((CommentAlarm) alarm);
+                    } else if (alarm instanceof TagAlarm) {
+                        return new TagApprovalAlarmElement((TagAlarm) alarm);
                     } else { // like alarm
-                        return new LikeAlarmElement(alarm);
+                        return new LikeAlarmElement((LikeAlarm) alarm);
                     }
                 }
         ).collect(Collectors.toList());

@@ -38,11 +38,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureRestDocs
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 class FollowControllerTest {
-    @Value("${test.authorization.dayeon}")
+    @Value("${test.authorization.master1}")
     String authorization1;
 
-    @Value("${test.authorization.goeun}")
-    String authorization3;
+    @Value("${test.authorization.master2}")
+    String authorization2;
 
     @Autowired
     MockMvc mockMvc;
@@ -64,12 +64,12 @@ class FollowControllerTest {
     @DisplayName("get followings API Document")
     void getFollowings() throws Exception {
 
-        String handle = "_skf__11";
+        String handle = "_5jizzi";
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .get("/api/v2/members/{handle}/following", handle)
-                                .header("Authorization", authorization3)
+                                .header("Authorization", authorization2)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
@@ -108,10 +108,12 @@ class FollowControllerTest {
                                                         "팔로잉 페이징 정보: 페이징 사이즈"
                                                 ),
                                         fieldWithPath("result.memberList").type(ARRAY).description("팔로잉 리스트"),
+                                        fieldWithPath("result.memberList[].memberId").type(NUMBER)
+                                                .description("팔로워 리스트: 멤버 아이디").optional(),
                                         fieldWithPath("result.memberList[].profileImage").type(STRING)
                                                 .description("팔로잉 리스트: 프로필 이미지").optional(),
                                         fieldWithPath("result.memberList[].handle").type(STRING)
-                                                .description("팔로잉 리스트: 멤버 아이디").optional(),
+                                                .description("팔로잉 리스트: 멤버 핸들").optional(),
                                         fieldWithPath("result.memberList[].name").type(STRING)
                                                 .description("팔로잉 리스트: 멤버 이름").optional(),
                                         fieldWithPath("result.memberList[].isFollow").type(BOOLEAN)
@@ -127,12 +129,12 @@ class FollowControllerTest {
     @DisplayName("get follower API Document")
     void getFollowers() throws Exception {
 
-        String handle = "dxxynni";
+        String handle = "_5jizzi";
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .get("/api/v2/members/{handle}/follower", handle)
-                                .header("Authorization", authorization3)
+                                .header("Authorization", authorization2)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
@@ -171,10 +173,12 @@ class FollowControllerTest {
                                                         "팔로워 페이징 정보: 페이징 사이즈"
                                                 ),
                                         fieldWithPath("result.memberList").type(ARRAY).description("팔로워 리스트"),
+                                        fieldWithPath("result.memberList[].memberId").type(NUMBER)
+                                                .description("팔로워 리스트: 멤버 아이디").optional(),
                                         fieldWithPath("result.memberList[].profileImage").type(STRING)
                                                 .description("팔로워 리스트: 프로필 이미지").optional(),
                                         fieldWithPath("result.memberList[].handle").type(STRING)
-                                                .description("팔로워 리스트: 멤버 아이디").optional(),
+                                                .description("팔로워 리스트: 멤버 핸들").optional(),
                                         fieldWithPath("result.memberList[].name").type(STRING)
                                                 .description("팔로워 리스트: 멤버 이름").optional(),
                                         fieldWithPath("result.memberList[].isFollow").type(BOOLEAN)
@@ -191,12 +195,12 @@ class FollowControllerTest {
     @DisplayName("follow member API Document")
     void followTest() throws Exception {
 
-        String handle = "dxxynni";
+        String handle = "master1";
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .post("/api/v2/members/{handle}/follow", handle)
-                                .header("Authorization", authorization3)
+                                .header("Authorization", authorization2)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
@@ -227,8 +231,8 @@ class FollowControllerTest {
     @DisplayName("delete follower API Document")
     void deleteFollowerTest() throws Exception {
 
-        String handle = "dxxynni";
-        String followerHandle = "habongee";
+        String handle = "master1";
+        String followerHandle = "master2";
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders

@@ -32,7 +32,7 @@ include::{snippets}/signup/response-fields.adoc[]
 
 == `POST` Refresh API
 
-리프레쉬 토큰 재발급 API
+액세스 토큰 재발급 API
 
 === Request
 
@@ -52,7 +52,7 @@ include::{snippets}/refresh/response-fields.adoc[]
 
 === Request
 
-include::{snippets}/logout/curl-request.adoc[]
+include::{snippets}/logout/http-request.adoc[]
 
 ==== request headers
 include::{snippets}/logout/request-headers.adoc[]
@@ -68,7 +68,7 @@ include::{snippets}/logout/response-fields.adoc[]
 
 === Request
 
-include::{snippets}/signout/curl-request.adoc[]
+include::{snippets}/signout/http-request.adoc[]
 
 ==== request headers
 include::{snippets}/signout/request-headers.adoc[]

@@ -1,0 +1,33 @@
+= Tag API
+pochak server team~~
+:doctype: book
+:icons: font
+:source-highlighter: highlishtjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== `GET` Approve Tag API
+
+게시물 수락 API
+
+=== Request
+include::{snippets}/approve-tag/http-request.adoc[]
+
+==== request headers
+include::{snippets}/approve-tag/request-headers.adoc[]
+
+==== path parameters
+include::{snippets}/approve-tag/path-parameters.adoc[]
+
+==== query parameters
+include::{snippets}/approve-tag/query-parameters.adoc[]
+
+=== Response
+==== response body
+include::{snippets}/approve-tag/response-body.adoc[]
+include::{snippets}/approve-tag/response-fields.adoc[]

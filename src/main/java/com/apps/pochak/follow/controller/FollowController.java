@@ -8,6 +8,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
+import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
+import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_DELETE_FOLLOWER;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v2/members")
@@ -17,7 +20,7 @@ public class FollowController {
     @GetMapping("/{handle}/following")
     public ApiResponse<MemberElements> getFollowings(
             @PathVariable("handle") final String handle,
-            @PageableDefault(30) final Pageable pageable
+            @PageableDefault(DEFAULT_PAGING_SIZE) final Pageable pageable
     ) {
         return ApiResponse.onSuccess(followService.getFollowings(handle, pageable));
     }
@@ -25,7 +28,7 @@ public class FollowController {
     @GetMapping("/{handle}/follower")
     public ApiResponse<MemberElements> getFollowers(
             @PathVariable("handle") final String handle,
-            @PageableDefault(30) final Pageable pageable
+            @PageableDefault(DEFAULT_PAGING_SIZE) final Pageable pageable
     ) {
         return ApiResponse.onSuccess(followService.getFollowers(handle, pageable));
     }
@@ -43,6 +46,7 @@ public class FollowController {
             @PathVariable("handle") final String handle,
             @RequestParam("followerHandle") final String followerHandle
     ) {
-        return ApiResponse.of(followService.deleteFollower(handle, followerHandle));
+        followService.deleteFollower(handle, followerHandle);
+        return ApiResponse.of(SUCCESS_DELETE_FOLLOWER);
     }
 }

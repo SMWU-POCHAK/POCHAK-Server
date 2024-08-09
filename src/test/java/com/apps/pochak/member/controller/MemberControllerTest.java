@@ -37,11 +37,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureRestDocs
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 class MemberControllerTest {
-    @Value("${test.authorization.dayeon}")
+    @Value("${test.authorization.master1}")
     String authorization1;
 
-    @Value("${test.authorization.goeun}")
-    String authorization3;
+    @Value("${test.authorization.master2}")
+    String authorization2;
 
     @Autowired
     MockMvc mockMvc;
@@ -63,12 +63,12 @@ class MemberControllerTest {
     @DisplayName("get profile API Document")
     void getProfileTest() throws Exception {
 
-        String handle = "dxxynni";
+        String handle = "master2";
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .get("/api/v2/members/{handle}", handle)
-                                .header("Authorization", authorization3)
+                                .header("Authorization", authorization1)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
@@ -116,9 +116,9 @@ class MemberControllerTest {
                                                 ),
                                         fieldWithPath("result.postList").type(ARRAY).description("태그된 게시물 리스트"),
                                         fieldWithPath("result.postList[].postId").type(NUMBER)
-                                                .description("태그된 게시물 리스트: 게시물 아이디"),
+                                                .description("태그된 게시물 리스트: 게시물 아이디").optional(),
                                         fieldWithPath("result.postList[].postImage").type(STRING)
-                                                .description("태그된 게시물 리스트: 게시물 이미지")
+                                                .description("태그된 게시물 리스트: 게시물 이미지").optional()
                                 )
                         )
                 );
@@ -128,7 +128,7 @@ class MemberControllerTest {
     @DisplayName("get uploaded Post API Document")
     void getUploadTest() throws Exception {
 
-        String handle = "habongee";
+        String handle = "_5jizzi";
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -176,6 +176,95 @@ class MemberControllerTest {
                                                 .description("업로드한 게시물 리스트: 게시물 아이디"),
                                         fieldWithPath("result.postList[].postImage").type(STRING)
                                                 .description("업로드한 게시물 리스트: 게시물 이미지")
+                                )
+                        )
+                );
+    }
+
+    @Test
+    @DisplayName("search Member API Document")
+    void searchMemberTest() throws Exception {
+
+        String keyword = "_5jizzi";
+
+        this.mockMvc.perform(
+                        RestDocumentationRequestBuilders
+                                .get("/api/v2/members/search")
+                                .queryParam("keyword", keyword)
+                                .header("Authorization", authorization1)
+                                .contentType(APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andDo(
+                        document("search-member",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(
+                                        headerWithName("Authorization").description("Basic auth credentials")
+                                ),
+                                queryParameters(
+                                        parameterWithName("keyword").description("검색하고자 하는 멤버의 아이디"),
+                                        parameterWithName("page").description("조회할 페이지 [default: 0]").optional()
+                                ),
+                                responseFields(
+                                        fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),
+                                        fieldWithPath("code").type(STRING).description("결과 코드"),
+                                        fieldWithPath("message").type(STRING).description("결과 메세지"),
+                                        fieldWithPath("result").type(OBJECT).description("결과 데이터"),
+                                        fieldWithPath("result.pageInfo").type(OBJECT).description("검색된 멤버들 페이징 정보"),
+                                        fieldWithPath("result.pageInfo.lastPage").type(BOOLEAN)
+                                                .description(
+                                                        "검색된 멤버들 페이징 정보: 현재 페이지가 마지막 페이지인지의 여부"
+                                                ),
+                                        fieldWithPath("result.pageInfo.totalPages").type(NUMBER)
+                                                .description(
+                                                        "검색된 멤버들 페이징 정보: 총 페이지 수"
+                                                ),
+                                        fieldWithPath("result.pageInfo.totalElements").type(NUMBER)
+                                                .description(
+                                                        "검색된 멤버들 페이징 정보: 총 검색된 멤버들의 수"
+                                                ),
+                                        fieldWithPath("result.pageInfo.size").type(NUMBER)
+                                                .description(
+                                                        "검색된 멤버들 페이징 정보: 페이징 사이즈"
+                                                ),
+                                        fieldWithPath("result.memberList").type(ARRAY).description("검색된 멤버 리스트"),
+                                        fieldWithPath("result.memberList[].memberId").type(NUMBER)
+                                                .description("검색된 멤버 리스트: 멤버 아이디").optional(),
+                                        fieldWithPath("result.memberList[].profileImage").type(STRING)
+                                                .description("검색된 멤버 리스트: 프로필 이미지").optional(),
+                                        fieldWithPath("result.memberList[].handle").type(STRING)
+                                                .description("검색된 멤버 리스트: 멤버 핸들").optional(),
+                                        fieldWithPath("result.memberList[].name").type(STRING)
+                                                .description("검색된 멤버 리스트: 멤버 이름").optional(),
+                                        fieldWithPath("result.memberList[].isFollow").description("(이 데이터는 무시해주세요~ 어차피 전부 null로 전달됨!)").type(BOOLEAN).optional()
+                                )
+                        )
+                );
+    }
+
+    @Test
+    @DisplayName("check duplicate handle API Document")
+    void checkDuplicateHandleTest() throws Exception {
+
+        String handle = "_5jizzi";
+
+        this.mockMvc.perform(
+                        RestDocumentationRequestBuilders
+                                .get("/api/v2/members/duplicate")
+                                .queryParam("handle", handle)
+                                .contentType(APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andDo(
+                        document("check-duplicate-handle",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                queryParameters(
+                                        parameterWithName("handle").description("검색하고자 하는 handle")
+                                ),
+                                responseFields(
+                                        fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부 (중복시 실패 처리됨)"),
+                                        fieldWithPath("code").type(STRING).description("결과 코드"),
+                                        fieldWithPath("message").type(STRING).description("결과 메세지")
                                 )
                         )
                 );

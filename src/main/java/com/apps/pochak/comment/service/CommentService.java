@@ -1,167 +1,146 @@
 package com.apps.pochak.comment.service;
 
 import com.apps.pochak.alarm.domain.Alarm;
+import com.apps.pochak.alarm.domain.AlarmType;
+import com.apps.pochak.alarm.domain.CommentAlarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
+import com.apps.pochak.alarm.service.CommentAlarmService;
 import com.apps.pochak.comment.domain.Comment;
 import com.apps.pochak.comment.domain.repository.CommentRepository;
 import com.apps.pochak.comment.dto.request.CommentUploadRequest;
 import com.apps.pochak.comment.dto.response.CommentElements;
 import com.apps.pochak.comment.dto.response.ParentCommentElement;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
-import com.apps.pochak.login.jwt.JwtService;
+import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.tag.domain.Tag;
 import com.apps.pochak.tag.domain.repository.TagRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.INVALID_COMMENT_ID;
-import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.INVALID_POST_ID;
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 import static com.apps.pochak.global.converter.PageableToPageRequestConverter.toPageRequest;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CommentService {
-    public static final int DEFAULT_PAGING_SIZE = 30;
-
     private final CommentRepository commentRepository;
     private final TagRepository tagRepository;
     private final PostRepository postRepository;
-    private final AlarmRepository alarmRepository;
+    private final CommentAlarmService commentAlarmService;
+    private final JwtProvider jwtProvider;
 
-    private final JwtService jwtService;
-
-    @Transactional
+    @Transactional(readOnly = true)
     public CommentElements getComments(
             final Long postId,
             final Pageable pageable
     ) {
-        final Member loginMember = jwtService.getLoginMember();
-        final Post post = postRepository.findPublicPostById(postId);
-        final Page<Comment> commentList = commentRepository.findParentCommentByPost(post, pageable);
+        final Member loginMember = jwtProvider.getLoginMember();
+        final Post post = postRepository.findPublicPostById(postId, loginMember);
+        final Page<Comment> commentList = commentRepository.findParentCommentByPost(post, loginMember, pageable);
         return new CommentElements(loginMember, commentList);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ParentCommentElement getChildCommentsByParentCommentId(
             final Long postId,
             final Long parentCommentId,
             final Pageable pageable
     ) {
-        final Comment comment = commentRepository.findParentCommentById(parentCommentId)
+        final Member loginMember = jwtProvider.getLoginMember();
+        final Comment comment = commentRepository.findParentCommentById(parentCommentId, loginMember)
                 .orElseThrow(() -> new GeneralException(INVALID_POST_ID));
-        final Post post = postRepository.findPublicPostById(postId);
         return new ParentCommentElement(comment, toPageRequest(pageable));
     }
 
-    @Transactional
-    public void saveComment(Long postId, CommentUploadRequest request) {
-        final Member member = jwtService.getLoginMember();
-        final Post post = postRepository.findPublicPostById(postId);
+    public void saveComment(
+            final Long postId,
+            final CommentUploadRequest request
+    ) {
+        final Member loginMember = jwtProvider.getLoginMember();
+        final Post post = postRepository.findPublicPostById(postId, loginMember);
 
-        if (isChildComment(request)) {
+        if (request.checkChildComment()) {
             saveChildComment(
                     request,
-                    member,
+                    loginMember,
                     post
             );
         } else {
             saveParentComment(
                     request,
-                    member,
+                    loginMember,
                     post
             );
         }
     }
 
-    private Boolean isChildComment(CommentUploadRequest request) {
-        return request.getParentCommentId() != null;
-    }
-
-    private Comment saveChildComment(
+    private void saveChildComment(
             final CommentUploadRequest request,
-            final Member member,
+            final Member loginMember,
             final Post post
     ) {
         final Comment parentComment = commentRepository
-                .findParentCommentById(request.getParentCommentId())
+                .findParentCommentById(request.getParentCommentId(), loginMember)
                 .orElseThrow(() -> new GeneralException(INVALID_COMMENT_ID));
         final Comment comment = commentRepository.save(
                 request.toEntity(
-                        member,
+                        loginMember,
                         post,
                         parentComment
                 )
         );
         final Member parentCommentWriter = parentComment.getMember();
-        sendCommentReplyAlarm(comment, parentCommentWriter);
-
-        final Member owner = post.getOwner();
-        if (!owner.getId().equals(parentCommentWriter.getId())) {
-            sendPostOwnerCommentAlarm(comment, owner);
-        }
-        sendTaggedPostCommentAlarm(comment, parentCommentWriter.getId());
-
-        return comment;
+        commentAlarmService.sendChildCommentAlarm(
+                comment,
+                post.getOwner(),
+                parentCommentWriter
+        );
     }
 
     private void saveParentComment(
             final CommentUploadRequest request,
-            final Member member,
+            final Member loginMember,
             final Post post
     ) {
-        final Comment comment = commentRepository.save(request.toEntity(member, post));
-        sendPostOwnerCommentAlarm(comment, post.getOwner());
-        sendTaggedPostCommentAlarm(comment, 0L);
-    }
-
-    private void sendPostOwnerCommentAlarm(
-            final Comment comment,
-            final Member receiver
-    ) {
-        final Alarm alarm = Alarm.getPostOwnerCommentAlarm(
+        final Comment comment = commentRepository.save(request.toEntity(loginMember, post));
+        commentAlarmService.sendParentCommentAlarm(
                 comment,
-                receiver
+                post.getOwner()
         );
-        alarmRepository.save(alarm);
     }
 
-    private void sendTaggedPostCommentAlarm(
-            final Comment comment,
-            final Long excludeMemberId
+    public void deleteComment(
+            final Long postId,
+            final Long commentId
     ) {
-        final List<Tag> tagList = tagRepository.findTagsByPost(comment.getPost());
+        Comment comment = commentRepository.findCommentById(commentId);
+        checkAuthorized(comment);
+        commentRepository.deleteCommentById(commentId);
+        commentAlarmService.deleteAlarmByComment(comment);
+    }
 
-        final List<Alarm> alarmList = new ArrayList<>();
+    private void checkAuthorized(final Comment comment) {
+        Member member = jwtProvider.getLoginMember();
+        if (comment.isOwner(member)) return;
+
+        Post post = comment.getPost();
+        if (post.isOwner(member)) return;
+
+        List<Tag> tagList = tagRepository.findTagsByPost(post);
         for (Tag tag : tagList) {
-            final Member taggedMember = tag.getMember();
-            if (!excludeMemberId.equals(taggedMember.getId())) {
-                alarmList.add(
-                        Alarm.getTaggedPostCommentAlarm(comment, taggedMember)
-                );
-            }
+            if (tag.isMember(member)) return;
         }
 
-        alarmRepository.saveAll(alarmList);
-    }
-
-    private void sendCommentReplyAlarm(
-            final Comment comment,
-            final Member receiver
-    ) {
-        final Alarm commentReplyAlarm = Alarm.getCommentReplyAlarm(
-                comment,
-                receiver
-        );
-
-        alarmRepository.save(commentReplyAlarm);
+        throw new GeneralException(_UNAUTHORIZED);
     }
 }

@@ -1,0 +1,58 @@
+= Report API
+pochak server team~~
+:doctype: book
+:icons: font
+:source-highlighter: highlishtjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== `POST` Report Upload API
+
+신고 API
+
+=== Request
+include::{snippets}/upload-report/http-request.adoc[]
+
+==== request headers
+include::{snippets}/upload-report/request-headers.adoc[]
+
+==== request body
+include::{snippets}/upload-report/request-body.adoc[]
+include::{snippets}/upload-report/request-fields.adoc[]
+
+
+* *reportType* 필드는 아래 표를 참고하여 전송해주세요!
+
+ex) "마음에 들지 않습니다."를 선택했을 경우, reportType을 **NOT_INTERESTED**로 전송하기
+
+|===
+|reportType | Description
+
+|NOT_INTERESTED
+|마음에 들지 않습니다.
+
+|SPAM
+|스팸
+
+|NUDITY_OR_SEXUAL_CONTENT
+|나체 이미지 또는 성적 행위
+
+|FRAUD_OR_SCAM
+|사기 또는 거짓
+
+|HATE_SPEECH_OR_SYMBOL
+|혐오 발언 또는 상징
+
+|MISINFORMATION
+|거짓 정보
+|===
+
+=== Response
+==== response body
+include::{snippets}/upload-report/response-body.adoc[]
+include::{snippets}/upload-report/response-fields.adoc[]

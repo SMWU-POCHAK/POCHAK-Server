@@ -24,7 +24,7 @@ include::{snippets}/upload-comment/path-parameters.adoc[]
 ==== request headers
 include::{snippets}/upload-comment/request-headers.adoc[]
 
-=== request body
+==== request body
 include::{snippets}/upload-comment/request-body.adoc[]
 include::{snippets}/upload-comment/request-fields.adoc[]
 
@@ -75,3 +75,24 @@ include::{snippets}/get-child-comments/query-parameters.adoc[]
 ==== response body
 include::{snippets}/get-child-comments/response-body.adoc[]
 include::{snippets}/get-child-comments/response-fields.adoc[]
+
+== `DELETE` Delete Comment API
+
+댓글 삭제 API
+
+=== Request
+include::{snippets}/delete-comment/http-request.adoc[]
+
+==== path parameters
+include::{snippets}/delete-comment/path-parameters.adoc[]
+
+==== request headers
+include::{snippets}/delete-comment/request-headers.adoc[]
+
+==== query parameters
+include::{snippets}/delete-comment/query-parameters.adoc[]
+
+=== Response
+==== response body
+include::{snippets}/delete-comment/response-body.adoc[]
+include::{snippets}/delete-comment/response-fields.adoc[]

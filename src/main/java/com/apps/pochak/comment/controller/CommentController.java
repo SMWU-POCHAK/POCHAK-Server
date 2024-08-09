@@ -11,14 +11,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
-import static com.apps.pochak.comment.service.CommentService.DEFAULT_PAGING_SIZE;
+import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
+import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_DELETE_COMMENT;
 import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_UPLOAD_COMMENT;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v2/posts/{postId}/comments")
 public class CommentController {
-
     private final CommentService commentService;
 
     @GetMapping("")
@@ -45,5 +45,14 @@ public class CommentController {
     ) {
         commentService.saveComment(postId, request);
         return ApiResponse.of(SUCCESS_UPLOAD_COMMENT);
+    }
+
+    @DeleteMapping("")
+    public ApiResponse<Void> deleteComment(
+            @PathVariable("postId") final Long postId,
+            @RequestParam("commentId") final Long commentId
+    ) {
+        commentService.deleteComment(postId, commentId);
+        return ApiResponse.of(SUCCESS_DELETE_COMMENT);
     }
 }

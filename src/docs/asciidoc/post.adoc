@@ -30,6 +30,25 @@ include::{snippets}/get-home-tab/query-parameters.adoc[]
 include::{snippets}/get-home-tab/response-body.adoc[]
 include::{snippets}/get-home-tab/response-fields.adoc[]
 
+== `GET` Search Tab
+탐색 탭 조회 API
+
+=== Request
+
+include::{snippets}/get-search-tab/http-request.adoc[]
+
+==== request headers
+include::{snippets}/get-search-tab/request-headers.adoc[]
+
+==== query params
+include::{snippets}/get-search-tab/query-parameters.adoc[]
+
+
+=== Response
+==== response body
+include::{snippets}/get-search-tab/response-body.adoc[]
+include::{snippets}/get-search-tab/response-fields.adoc[]
+
 == `POST` Post Upload API
 
 게시물 업로드 API

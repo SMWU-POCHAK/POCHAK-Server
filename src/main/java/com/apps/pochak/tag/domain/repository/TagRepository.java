@@ -39,11 +39,20 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     @Query("select t from Tag t " +
             "join fetch t.member " +
             "where t.post = :post ")
-    List<Tag> findTagsByPost(@Param("post") Post post);
+    List<Tag> findTagsByPost(@Param("post") final Post post);
 
     @Modifying
-    @Query("update Tag tag " +
-            "set tag.status = 'DELETED' " +
-            "where tag.member.id = :memberId or tag.post.owner.id = :memberId")
-    void deleteTagByMemberId(@Param("memberId") final Long memberId);
+    @Query(value = """
+            update tag t, alarm a set t.status = 'DELETED', a.status = 'DELETED'
+            where (t.member_id = :memberId or t.post_id in :postIdList)
+                and t.id = a.tag_approval_id
+            """,
+            nativeQuery = true)
+    void deleteTagByMemberOrPostList(
+            @Param("memberId") final Long memberId,
+            @Param("postIdList") final List<Long> postIdList
+    );
+
+    @Modifying
+    void deleteByPost(final Post post);
 }

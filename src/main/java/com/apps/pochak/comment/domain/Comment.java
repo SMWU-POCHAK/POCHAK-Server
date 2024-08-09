@@ -68,4 +68,12 @@ public class Comment extends BaseEntity {
         this.parentComment = parentComment;
         parentComment.getChildCommentList().add(this);
     }
+
+    public Boolean isChildComment() {
+        return this.parentComment != null;
+    }
+
+    public boolean isOwner(final Member member) {
+        return this.member.getId().equals(member.getId());
+    }
 }

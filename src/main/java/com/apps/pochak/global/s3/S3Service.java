@@ -32,7 +32,12 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    @Value("${cloud.aws.cloudfront.domain}")
+    private String domain;
+
     public String upload(MultipartFile multipartFile, DirName dirName) {
+        if (multipartFile.isEmpty())
+            throw new GeneralException(NULL_FILE);
         try {
             File uploadFile = convert(multipartFile)
                     .orElseThrow(() -> new ImageException(CONVERT_FILE_ERROR));
@@ -44,7 +49,8 @@ public class S3Service {
 
     private String upload(File uploadFile, DirName dirName) {
         String fileName = dirName.getDirName() + "/" + UUID.randomUUID() + uploadFile.getName();
-        String uploadImageUrl = putS3(uploadFile, fileName);
+        putS3(uploadFile, fileName);
+        String uploadImageUrl = domain+"/"+fileName;
         deleteFile(uploadFile);
         return uploadImageUrl;
     }
@@ -79,8 +85,15 @@ public class S3Service {
 
     public void deleteFileFromS3(String fileUrl) {
         try {
-            String splitStr = ".com/";
-            String fileName = fileUrl.substring(fileUrl.lastIndexOf(splitStr) + splitStr.length());
+            String[] splitStrs = {".net/", ".com/"};
+            String fileName = null;
+
+            for (String splitStr : splitStrs) {
+                if (fileUrl.contains(splitStr)) {
+                    fileName = fileUrl.substring(fileUrl.lastIndexOf(splitStr) + splitStr.length());
+                    break;
+                }
+            }
             amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
         } catch (AmazonServiceException e) {
             throw new ImageException(DELETE_FILE_ERROR);

@@ -1,9 +1,9 @@
 package com.apps.pochak.tag.service;
 
-import com.apps.pochak.alarm.domain.Alarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
+import com.apps.pochak.alarm.service.TagAlarmService;
 import com.apps.pochak.global.api_payload.code.BaseCode;
-import com.apps.pochak.login.jwt.JwtService;
+import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
@@ -18,17 +18,17 @@ import java.util.List;
 import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.*;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class TagService {
     private final TagRepository tagRepository;
     private final AlarmRepository alarmRepository;
     private final PostRepository postRepository;
+    private final TagAlarmService tagAlarmService;
+    private final JwtProvider jwtProvider;
 
-    private final JwtService jwtService;
-
-    @Transactional
-    public BaseCode approveOrRejectTagRequest(Long tagId, Boolean isAccept) {
-        final Member loginMember = jwtService.getLoginMember();
+    public BaseCode approveOrRejectTagRequest(final Long tagId, final Boolean isAccept) {
+        final Member loginMember = jwtProvider.getLoginMember();
         final Tag tag = tagRepository.findTagByIdAndMember(tagId, loginMember);
         if (isAccept) {
             return acceptPost(tag);
@@ -36,10 +36,9 @@ public class TagService {
             return rejectPost(tag);
     }
 
-    private BaseCode acceptPost(Tag tag) {
+    private BaseCode acceptPost(final Tag tag) {
         tag.setIsAccepted(true);
-        final List<Alarm> alarmList = alarmRepository.findAlarmByTag(tag);
-        alarmRepository.deleteAll(alarmList);
+        tagAlarmService.deleteAlarmByTag(tag);
 
         final Post post = tag.getPost();
         final List<Tag> tagList = tagRepository.findTagsByPost(post);
@@ -52,12 +51,11 @@ public class TagService {
         return SUCCESS_ACCEPT;
     }
 
-    private BaseCode rejectPost(Tag tag) {
+    private BaseCode rejectPost(final Tag tag) {
         final Post post = tag.getPost();
         final List<Tag> tagList = tagRepository.findTagsByPost(post);
-        final List<Alarm> alarmList = alarmRepository.findAlarmByTagIn(tagList);
 
-        alarmRepository.deleteAll(alarmList);
+        tagAlarmService.deleteAlarmByTagList(tagList);
         tagRepository.deleteAll(tagList);
         postRepository.delete(post);
 

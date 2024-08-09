@@ -39,10 +39,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 public class LikeControllerTest {
 
-    @Value("${test.authorization.goeun}")
-    String authorization;
+    @Value("${test.authorization.master1}")
+    String authorization1;
 
-    @Value("${test.authorization.dayeon}")
+    @Value("${test.authorization.master2}")
     String authorization2;
 
 
@@ -66,8 +66,8 @@ public class LikeControllerTest {
     void likePost() throws Exception {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .post("/api/v2/posts/{postId}/like", 2)
-                                .header("Authorization", authorization2)
+                                .post("/api/v2/posts/{postId}/like", 453L)
+                                .header("Authorization", authorization1)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
@@ -96,8 +96,8 @@ public class LikeControllerTest {
     void getMemberLikedPost() throws Exception {
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .get("/api/v2/posts/{postId}/like", 2)
-                                .header("Authorization", authorization)
+                                .get("/api/v2/posts/{postId}/like", 453L)
+                                .header("Authorization", authorization1)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
@@ -117,8 +117,10 @@ public class LikeControllerTest {
                                         fieldWithPath("message").type(STRING).description("결과 메세지"),
                                         fieldWithPath("result").type(OBJECT).description("결과 데이터"),
                                         fieldWithPath("result.likeMembersList").description("좋아요를 누른 사람들의 리스트").type(ARRAY),
+                                        fieldWithPath("result.likeMembersList[].memberId").type(NUMBER)
+                                                .description("유저 아이디").optional(),
                                         fieldWithPath("result.likeMembersList[].handle").type(STRING)
-                                                .description("유저 닉네임").optional(),
+                                                .description("유저 핸들").optional(),
                                         fieldWithPath("result.likeMembersList[].profileImage").type(STRING)
                                                 .description("프로필 이미지 url").optional(),
                                         fieldWithPath("result.likeMembersList[].name").type(STRING)

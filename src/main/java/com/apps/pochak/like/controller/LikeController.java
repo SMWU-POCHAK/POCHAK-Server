@@ -12,16 +12,20 @@ import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCE
 @RequiredArgsConstructor
 @RequestMapping("api/v2/posts/{postId}/like")
 public class LikeController {
-
     private final LikeService likeService;
 
+    // TODO: Paging
     @GetMapping("")
-    public ApiResponse<LikeElements> getLikeMembers(@PathVariable("postId") final Long postId) {
+    public ApiResponse<LikeElements> getLikeMembers(
+            @PathVariable("postId") final Long postId
+    ) {
         return ApiResponse.onSuccess(likeService.getMemberLikedPost(postId));
     }
 
     @PostMapping("")
-    public ApiResponse<Void> likePost(@PathVariable("postId") final Long postId) {
+    public ApiResponse<Void> likePost(
+            @PathVariable("postId") final Long postId
+    ) {
         likeService.likePost(postId);
         return ApiResponse.of(SUCCESS_LIKE);
     }
