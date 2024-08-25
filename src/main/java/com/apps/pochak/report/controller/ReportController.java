@@ -1,5 +1,8 @@
 package com.apps.pochak.report.controller;
 
+import com.apps.pochak.auth.Auth;
+import com.apps.pochak.auth.MemberOnly;
+import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.global.api_payload.ApiResponse;
 import com.apps.pochak.report.dto.request.ReportUploadRequest;
 import com.apps.pochak.report.service.ReportService;
@@ -16,10 +19,12 @@ public class ReportController {
     private final ReportService reportService;
 
     @PostMapping("")
+    @MemberOnly
     public ApiResponse<Void> uploadReport(
-            @RequestBody @Valid ReportUploadRequest request
+            @Auth final Accessor accessor,
+            @RequestBody @Valid final ReportUploadRequest request
     ) {
-        reportService.saveReport(request);
+        reportService.saveReport(accessor, request);
         return ApiResponse.of(SUCCESS_UPLOAD_REPORT);
     }
 }
