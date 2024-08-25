@@ -3,8 +3,6 @@ package com.apps.pochak.post.service;
 import com.apps.pochak.alarm.domain.Alarm;
 import com.apps.pochak.alarm.domain.TagAlarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
-import com.apps.pochak.alarm.service.CommentAlarmService;
-import com.apps.pochak.alarm.service.LikeAlarmService;
 import com.apps.pochak.alarm.service.TagAlarmService;
 import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.comment.domain.Comment;
@@ -13,7 +11,6 @@ import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.global.s3.S3Service;
 import com.apps.pochak.like.domain.repository.LikeRepository;
-import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
@@ -47,24 +44,28 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
     private final AlarmRepository alarmRepository;
+
     private final TagAlarmService tagAlarmService;
     private final S3Service s3Service;
-    private final JwtProvider jwtProvider;
 
     private static final int MAX_TAG_COUNT = 5;
-    private final CommentAlarmService commentAlarmService;
-    private final LikeAlarmService likeAlarmService;
 
     @Transactional(readOnly = true)
-    public PostElements getHomeTab(Pageable pageable) {
-        final Member loginMember = jwtProvider.getLoginMember();
+    public PostElements getHomeTab(
+            final Accessor accessor,
+            final Pageable pageable
+    ) {
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Page<Post> taggedPost = postRepository.findTaggedPostsOfFollowing(loginMember, pageable);
         return PostElements.from(taggedPost);
     }
 
     @Transactional(readOnly = true)
-    public PostDetailResponse getPostDetail(final Long postId) {
-        final Member loginMember = jwtProvider.getLoginMember();
+    public PostDetailResponse getPostDetail(
+            final Accessor accessor,
+            final Long postId
+    ) {
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Post post = postRepository.findPostById(postId, loginMember);
         final List<Tag> tagList = tagRepository.findTagsByPost(post);
         if (post.isPrivate()) {
@@ -86,13 +87,16 @@ public class PostService {
                 .build();
     }
 
-    public void savePost(final PostUploadRequest request) {
+    public void savePost(
+            final Accessor accessor,
+            final PostUploadRequest request
+    ) {
         int requestTagCount = request.getTaggedMemberHandleList().size();
         if (requestTagCount > MAX_TAG_COUNT) {
             throw new GeneralException(EXCEED_TAG_LIMIT);
         }
 
-        final Member loginMember = jwtProvider.getLoginMember();
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         if (request.getTaggedMemberHandleList().contains(loginMember.getHandle())) {
             throw new GeneralException(TAGGED_ONESELF);
         }
@@ -127,8 +131,11 @@ public class PostService {
         return tagRepository.saveAll(tagList);
     }
 
-    public void deletePost(final Long postId) {
-        final Member loginMember = jwtProvider.getLoginMember();
+    public void deletePost(
+            final Accessor accessor,
+            final Long postId
+    ) {
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Post post = postRepository.findById(postId).orElseThrow(() -> new GeneralException(INVALID_POST_ID));
         checkAuthorized(post, loginMember);
         postRepository.delete(post);
@@ -155,7 +162,10 @@ public class PostService {
 
 
     @Transactional(readOnly = true)
-    public PostElements getSearchTab(Pageable pageable) {
+    public PostElements getSearchTab(
+            final Accessor accessor,
+            final Pageable pageable
+    ) {
         final Page<Post> postPage = postRepository.findPopularPost(pageable);
         return PostElements.from(postPage);
     }
