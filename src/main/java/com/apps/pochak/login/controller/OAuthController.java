@@ -1,5 +1,8 @@
 package com.apps.pochak.login.controller;
 
+import com.apps.pochak.auth.Auth;
+import com.apps.pochak.auth.MemberOnly;
+import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.global.api_payload.ApiResponse;
 import com.apps.pochak.login.dto.request.MemberInfoRequest;
 import com.apps.pochak.login.dto.response.AccessTokenResponse;
@@ -21,13 +24,14 @@ import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCE
 @RestController
 @RequiredArgsConstructor
 public class OAuthController {
-    private final JwtProvider jwtProvider;
     private final OAuthService oAuthService;
     private final AppleOAuthService appleOAuthService;
     private final GoogleOAuthService googleOAuthService;
 
     @PostMapping(value = "/api/v2/signup")
-    public ApiResponse<OAuthMemberResponse> signup(@ModelAttribute @Valid final MemberInfoRequest memberInfoRequest) {
+    public ApiResponse<OAuthMemberResponse> signup(
+            @ModelAttribute @Valid final MemberInfoRequest memberInfoRequest
+    ) {
         return ApiResponse.onSuccess(oAuthService.signup(memberInfoRequest));
     }
 
@@ -50,18 +54,20 @@ public class OAuthController {
     }
 
     @GetMapping("/api/v2/logout")
-    public ApiResponse<?> logout() {
-        String accessToken = JwtHeaderUtil.getAccessToken();
-        String id = jwtProvider.getSubject(accessToken);
-        oAuthService.logout(id);
+    @MemberOnly
+    public ApiResponse<?> logout(
+            @Auth Accessor accessor
+    ) {
+        oAuthService.logout(accessor.getMemberId());
         return ApiResponse.of(SUCCESS_LOG_OUT);
     }
 
     @DeleteMapping("/api/v2/signout")
-    public ApiResponse<?> signout() {
-        String accessToken = JwtHeaderUtil.getAccessToken();
-        String id = jwtProvider.getSubject(accessToken);
-        oAuthService.signout(id);
+    @MemberOnly
+    public ApiResponse<?> signout(
+            @Auth Accessor accessor
+    ) {
+        oAuthService.signout(accessor.getMemberId());
         return ApiResponse.of(SUCCESS_SIGN_OUT);
     }
 }

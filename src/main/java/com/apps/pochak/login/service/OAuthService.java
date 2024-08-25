@@ -89,14 +89,14 @@ public class OAuthService {
         throw new InvalidJwtException(FAIL_VALIDATE_TOKEN);
     }
 
-    public void logout(final String id) {
-        final Member member = memberRepository.findById(Long.parseLong(id))
+    public void logout(final Long id) {
+        final Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new GeneralException(INVALID_ACCESS_TOKEN));
         member.updateRefreshToken(null);
     }
 
-    public void signout(final String id) {
-        final Member member = memberRepository.findById(Long.parseLong(id))
+    public void signout(final Long id) {
+        final Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new GeneralException(INVALID_ACCESS_TOKEN));
 
         if (member.getSocialType().equals(SocialType.APPLE)) {
