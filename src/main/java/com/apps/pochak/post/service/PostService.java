@@ -6,6 +6,7 @@ import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.alarm.service.CommentAlarmService;
 import com.apps.pochak.alarm.service.LikeAlarmService;
 import com.apps.pochak.alarm.service.TagAlarmService;
+import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.comment.domain.Comment;
 import com.apps.pochak.comment.domain.repository.CommentRepository;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
@@ -160,8 +161,11 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PostPreviewResponse getPreviewPost(final Long alarmId) {
-        Member loginMember = jwtProvider.getLoginMember();
+    public PostPreviewResponse getPreviewPost(
+            final Accessor accessor,
+            final Long alarmId
+    ) {
+        Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         Alarm alarm = alarmRepository.findAlarmByIdAndReceiver(alarmId, loginMember)
                 .orElseThrow(() -> new GeneralException(INVALID_ALARM_ID));
 
