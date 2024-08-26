@@ -25,6 +25,7 @@ import java.util.List;
 
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
+import static com.apps.pochak.global.MockMultipartFileConverter.getSampleMultipartFile;
 import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
 import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
 import static com.apps.pochak.member.fixture.MemberFixture.MEMBER2;
@@ -203,17 +204,6 @@ class MemberControllerTest extends ControllerTest {
     @Test
     @DisplayName("회원 정보를 수정한다.")
     void updateProfileTest() throws Exception {
-        final String fileName = "APPS_LOGO";
-        final String fileType = "PNG";
-        final FileInputStream fileInputStream
-                = new FileInputStream("src/test/resources/static/" + fileName + "." + fileType);
-        final MockMultipartFile profileImage = new MockMultipartFile(
-                "profileImage",
-                fileName + "." + fileType,
-                "multipart/form-data",
-                fileInputStream
-        );
-
         when(memberService.updateProfile(any(), any(), any()))
                 .thenReturn(
                         ProfileUpdateResponse
@@ -228,7 +218,7 @@ class MemberControllerTest extends ControllerTest {
                                         "/api/v2/members/{handle}",
                                         MEMBER1.getHandle()
                                 )
-                                .file(profileImage)
+                                .file(getSampleMultipartFile())
                                 .queryParam("name", MEMBER1.getName())
                                 .queryParam("message", MEMBER1.getMessage())
                                 .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)

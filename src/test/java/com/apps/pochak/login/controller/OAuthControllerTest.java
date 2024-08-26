@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
+import static com.apps.pochak.global.MockMultipartFileConverter.getSampleMultipartFile;
 import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -62,23 +63,12 @@ public class OAuthControllerTest extends ControllerTest {
     @Test
     @DisplayName("회원가입을 한다.")
     void Signup() throws Exception {
-        final String fileName = "APPS_LOGO";
-        final String fileType = "PNG";
-        final FileInputStream fileInputStream
-                = new FileInputStream("src/test/resources/static/" + fileName + "." + fileType);
-        final MockMultipartFile profileImage = new MockMultipartFile(
-                "profileImage",
-                fileName + "." + fileType,
-                "multipart/form-data",
-                fileInputStream
-        );
-
         when(oAuthService.signup(any()))
                 .thenReturn(new OAuthMemberResponse(MEMBER1, false, ACCESS_TOKEN));
 
         this.mockMvc.perform(
                         multipart("/api/v2/signup")
-                                .file(profileImage)
+                                .file(getSampleMultipartFile())
                                 .queryParam("name", MEMBER1.getName())
                                 .queryParam("email", MEMBER1.getEmail())
                                 .queryParam("handle", MEMBER1.getHandle())
