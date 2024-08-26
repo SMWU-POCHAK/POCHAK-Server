@@ -1,32 +1,29 @@
 package com.apps.pochak.tag.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
+import com.apps.pochak.auth.domain.Accessor;
+import com.apps.pochak.global.ControllerTest;
+import com.apps.pochak.tag.service.TagService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.filter.CharacterEncodingFilter;
 
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
+import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_ACCEPT;
+import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
+import static com.apps.pochak.tag.fixture.TagFixture.WAITING_TAG;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -34,44 +31,36 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 @AutoConfigureRestDocs
-@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
-class TagControllerTest {
+@WebMvcTest(TagController.class)
+@MockBean(JpaMetamodelMappingContext.class)
+class TagControllerTest extends ControllerTest {
 
-    @Value("${test.authorization.master2}")
-    String authorization;
-
-    @Autowired
-    MockMvc mockMvc;
-
-    @Autowired
-    WebApplicationContext wac;
-
-    ObjectMapper objectMapper = new ObjectMapper();
+    @MockBean
+    TagService tagService;
 
     @BeforeEach
-    public void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .addFilter(new CharacterEncodingFilter("UTF-8", true))
-                .apply(documentationConfiguration(restDocumentation))
-                .build();
+    void setUp() {
+        given(jwtProvider.validateAccessToken(any())).willReturn(true);
+        given(jwtProvider.getSubject(any())).willReturn(MEMBER1.getId().toString());
+        given(loginArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                .willReturn(Accessor.member(MEMBER1.getId()));
     }
 
     @Test
-    @Transactional
-    @DisplayName("Approve Tag API Document")
+    @DisplayName("태그를 수락한다.")
     void approveTagTest() throws Exception {
 
-        Long tagId = 497L;
         Boolean isAccept = true;
+
+        when(tagService.approveOrRejectTagRequest(any(), any(), any()))
+                .thenReturn(SUCCESS_ACCEPT);
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .post("/api/v2/tags/{tagId}", tagId)
+                                .post("/api/v2/tags/{tagId}", WAITING_TAG.getId())
                                 .queryParam("isAccept", isAccept.toString())
-                                .header("Authorization", authorization)
+                                .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
