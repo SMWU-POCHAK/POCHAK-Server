@@ -72,13 +72,19 @@ public class Member extends BaseEntity {
         this.socialRefreshToken = socialRefreshToken;
     }
 
-    public void updateMember(ProfileUpdateRequest profileUpdateRequest, String profileImageUrl){
+    public void update(
+            final ProfileUpdateRequest profileUpdateRequest,
+            final String profileImageUrl
+    ){
         this.name = getOrDefault(profileUpdateRequest.getName(), this.name);
         this.message = getOrDefault(profileUpdateRequest.getMessage(), this.message);
         this.profileImage = getOrDefault(profileImageUrl, this.profileImage);
     }
 
-    private <T> T getOrDefault(T property, T alternative){
+    private <T> T getOrDefault(
+            final T property,
+            final T alternative
+    ){
         if (property != null)
             return property;
         return alternative;

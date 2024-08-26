@@ -67,12 +67,12 @@ public class MemberController {
 
     @PutMapping("/{handle}")
     @MemberOnly
-    public ApiResponse<ProfileUpdateResponse> updateProfileDetail(
+    public ApiResponse<ProfileUpdateResponse> updateProfile(
             @Auth final Accessor accessor,
             @PathVariable("handle") final String handle,
             @ModelAttribute final ProfileUpdateRequest profileUpdateRequest) {
         return ApiResponse.onSuccess(
-                memberService.updateProfileDetail(
+                memberService.updateProfile(
                         accessor,
                         handle,
                         profileUpdateRequest

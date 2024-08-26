@@ -1,5 +1,6 @@
 package com.apps.pochak.member.dto.response;
 
+import com.apps.pochak.member.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,17 +17,12 @@ public class ProfileUpdateResponse {
     private String profileImage;
 
     @Builder
-    public static ProfileUpdateResponse of(
-            final String name,
-            final String handle,
-            final String message,
-            final String profileImage
+    public ProfileUpdateResponse(
+            final Member member
     ){
-        return new ProfileUpdateResponse(
-                name,
-                handle,
-                message,
-                profileImage
-        );
+        this.name = member.getName();
+        this.handle = member.getHandle();
+        this.message = member.getMessage();
+        this.profileImage = member.getProfileImage();
     }
 }
