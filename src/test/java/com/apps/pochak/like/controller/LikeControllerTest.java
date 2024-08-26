@@ -1,31 +1,39 @@
 package com.apps.pochak.like.controller;
 
-import jakarta.transaction.Transactional;
+import com.apps.pochak.auth.domain.Accessor;
+import com.apps.pochak.global.ControllerTest;
+import com.apps.pochak.like.domain.LikeEntity;
+import com.apps.pochak.like.dto.response.LikeElement;
+import com.apps.pochak.like.dto.response.LikeElements;
+import com.apps.pochak.like.service.LikeService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.filter.CharacterEncodingFilter;
+
+import java.util.List;
 
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
+import static com.apps.pochak.like.fixture.LikeFixture.LIKE1;
+import static com.apps.pochak.like.fixture.LikeFixture.LIKE2;
+import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
+import static com.apps.pochak.member.fixture.MemberFixture.MEMBER2;
+import static com.apps.pochak.post.fixture.PostFixture.PUBLIC_POST;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -33,41 +41,40 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 @AutoConfigureRestDocs
-@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
-public class LikeControllerTest {
+@WebMvcTest(LikeController.class)
+@MockBean(JpaMetamodelMappingContext.class)
+public class LikeControllerTest extends ControllerTest {
 
-    @Value("${test.authorization.master1}")
-    String authorization1;
+    private static final List<LikeEntity> LIKE_LIST = List.of(
+            LIKE1,
+            LIKE2
+    );
 
-    @Value("${test.authorization.master2}")
-    String authorization2;
-
+    @MockBean
+    LikeService likeService;
 
     @Autowired
-    MockMvc mockMvc;
-
-    @Autowired
-    WebApplicationContext wac;
+    ObjectMapper objectMapper;
 
     @BeforeEach
-    public void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .addFilter(new CharacterEncodingFilter("UTF-8", true))
-                .apply(documentationConfiguration(restDocumentation))
-                .build();
+    void setUp() {
+        given(jwtProvider.validateAccessToken(any())).willReturn(true);
+        given(jwtProvider.getSubject(any())).willReturn(MEMBER1.getId().toString());
+        given(loginArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                .willReturn(Accessor.member(MEMBER1.getId()));
     }
 
     @Test
-    @Transactional
-    @DisplayName("Like Post API Document")
+    @DisplayName("게시물에 좋아요를 누른다.")
     void likePost() throws Exception {
+
+        doNothing().when(likeService).likePost(any(), any());
+
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .post("/api/v2/posts/{postId}/like", 453L)
-                                .header("Authorization", authorization1)
+                                .post("/api/v2/posts/{postId}/like", PUBLIC_POST.getId())
+                                .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
@@ -91,13 +98,21 @@ public class LikeControllerTest {
     }
 
     @Test
-    @Transactional
-    @DisplayName("Get Like API Document")
+    @DisplayName("게시물에 좋아요를 누른 멤버 목록을 조회한다.")
     void getMemberLikedPost() throws Exception {
+
+        List<LikeElement> likeElementList = List.of(
+                new LikeElement(MEMBER1, true),
+                new LikeElement(MEMBER2, true)
+        );
+
+        when(likeService.getMemberLikedPost(any(), any()))
+                .thenReturn(new LikeElements(likeElementList));
+
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .get("/api/v2/posts/{postId}/like", 453L)
-                                .header("Authorization", authorization1)
+                                .get("/api/v2/posts/{postId}/like", PUBLIC_POST.getId())
+                                .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
