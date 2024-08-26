@@ -20,6 +20,8 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 public abstract class ControllerTest {
     protected static final String ACCESS_TOKEN_HEADER = "Authorization";
     protected static final String ACCESS_TOKEN = "accessToken";
+    protected static final String REFRESH_TOKEN_HEADER = "RefreshToken";
+    protected static final String REFRESH_TOKEN = "refreshToken";
 
     @Autowired
     protected MockMvc mockMvc;

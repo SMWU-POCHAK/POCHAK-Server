@@ -40,7 +40,7 @@ public class OAuthService {
     private final AppleOAuthService appleOAuthService;
     private final S3Service awsS3Service;
 
-    public OAuthMemberResponse signup(MemberInfoRequest memberInfoRequest) {
+    public OAuthMemberResponse signup(final MemberInfoRequest memberInfoRequest) {
         SocialType socialType = SocialType.of(memberInfoRequest.getSocialType());
 
         Optional<Member> findMember = memberRepository.findMemberBySocialIdAndSocialType(memberInfoRequest.getSocialId(), socialType);
