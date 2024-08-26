@@ -1,69 +1,81 @@
 package com.apps.pochak.comment.controller;
 
+import com.apps.pochak.auth.domain.Accessor;
+import com.apps.pochak.comment.domain.Comment;
 import com.apps.pochak.comment.dto.request.CommentUploadRequest;
+import com.apps.pochak.comment.dto.response.CommentElements;
+import com.apps.pochak.comment.dto.response.ParentCommentElement;
+import com.apps.pochak.comment.service.CommentService;
+import com.apps.pochak.global.ControllerTest;
+import com.apps.pochak.post.domain.Post;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.filter.CharacterEncodingFilter;
 
+import java.util.List;
+
+import static com.apps.pochak.comment.fixture.CommentFixture.PARENT_COMMENT;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
+import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
+import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
+import static com.apps.pochak.post.fixture.PostFixture.PUBLIC_POST;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 @AutoConfigureRestDocs
-@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
-class CommentControllerTest {
-    @Value("${test.authorization.master1}")
-    String authorization;
+@WebMvcTest(CommentController.class)
+@MockBean(JpaMetamodelMappingContext.class)
+class CommentControllerTest extends ControllerTest {
+
+    private static final Post POST = PUBLIC_POST;
+
+    private static final List<Comment> PARENT_COMMENT_LIST = List.of(
+            PARENT_COMMENT
+    );
+
+    @MockBean
+    CommentService commentService;
 
     @Autowired
-    MockMvc mockMvc;
-
-    @Autowired
-    WebApplicationContext wac;
-
-    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper;
 
     @BeforeEach
-    public void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .addFilter(new CharacterEncodingFilter("UTF-8", true))
-                .apply(documentationConfiguration(restDocumentation))
-                .build();
+    void setUp() {
+        given(jwtProvider.validateAccessToken(any())).willReturn(true);
+        given(jwtProvider.getSubject(any())).willReturn(MEMBER1.getId().toString());
+        given(loginArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                .willReturn(Accessor.member(MEMBER1.getId()));
     }
 
     @Test
-    @DisplayName("Get Comments API Document")
+    @DisplayName("게시물의 댓글창을 조회한다.")
     void getComments() throws Exception {
+
+        when(commentService.getComments(any(), any(), any()))
+                .thenReturn(new CommentElements(MEMBER1, toPage(PARENT_COMMENT_LIST)));
+
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .get("/api/v2/posts/{postId}/comments", 453L)
-                                .header("Authorization", authorization)
+                                .get("/api/v2/posts/{postId}/comments", POST.getId())
+                                .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
@@ -189,12 +201,16 @@ class CommentControllerTest {
     }
 
     @Test
-    @DisplayName("Get Child Comments API Document")
+    @DisplayName("부모 댓글의 자식 댓글들을 조회한다.")
     void getChildComments() throws Exception {
+
+        when(commentService.getChildCommentsByParentCommentId(any(), any(), any(), any()))
+                .thenReturn(new ParentCommentElement(PARENT_COMMENT));
+
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .get("/api/v2/posts/{postId}/comments/{commentId}", 453L, 348)
-                                .header("Authorization", authorization)
+                                .get("/api/v2/posts/{postId}/comments/{commentId}", POST.getId(), PARENT_COMMENT.getId())
+                                .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
@@ -299,16 +315,20 @@ class CommentControllerTest {
     }
 
     @Test
-    @Transactional
-    @DisplayName("Comment Upload API Document")
+    @DisplayName("댓글을 작성하고, 저장한다.")
     void uploadCommentTest() throws Exception {
 
-        final CommentUploadRequest uploadRequest = new CommentUploadRequest("댓글 업로드 테스트", null);
+        doNothing().when(commentService).saveComment(any(), any(), any());
+
+        final CommentUploadRequest uploadRequest = new CommentUploadRequest(
+                "댓글 업로드 테스트",
+                null
+        );
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .post("/api/v2/posts/{postId}/comments", 453L)
-                                .header("Authorization", authorization)
+                                .post("/api/v2/posts/{postId}/comments", POST.getId())
+                                .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
                                 .content(objectMapper.writeValueAsString(uploadRequest))
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
@@ -346,18 +366,16 @@ class CommentControllerTest {
     }
 
     @Test
-    @Transactional
-    @DisplayName("Delete Comment API Document")
+    @DisplayName("댓글을 삭제한다.")
     void deleteCommentTest() throws Exception {
 
-        Long postId = 453L;
-        String commentId = "353";
+        doNothing().when(commentService).deleteComment(any(), any(), any());
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .delete("/api/v2/posts/{postId}/comments", postId)
-                                .queryParam("commentId", commentId)
-                                .header("Authorization", authorization)
+                                .delete("/api/v2/posts/{postId}/comments", POST.getId())
+                                .queryParam("commentId", PARENT_COMMENT.getId().toString())
+                                .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
