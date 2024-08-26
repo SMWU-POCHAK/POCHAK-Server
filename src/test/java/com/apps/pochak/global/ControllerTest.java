@@ -18,6 +18,8 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 
 @ExtendWith(RestDocumentationExtension.class)
 public abstract class ControllerTest {
+    protected static final String ACCESS_TOKEN_HEADER = "Authorization";
+    protected static final String ACCESS_TOKEN = "accessToken";
 
     @Autowired
     protected MockMvc mockMvc;

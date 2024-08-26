@@ -8,11 +8,9 @@ import com.apps.pochak.global.ControllerTest;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.dto.response.PostPreviewResponse;
 import com.apps.pochak.post.service.PostService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -51,8 +49,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AlarmControllerTest extends ControllerTest {
 
     private static final Member MEMBER = MEMBER1;
-    private static final String ACCESS_TOKEN_HEADER = "Authorization";
-    private static final String ACCESS_TOKEN = "accessToken";
 
     private static final List<Alarm> ALARM_LIST = List.of(
             COMMENT_REPLY_ALARM,
@@ -66,9 +62,6 @@ class AlarmControllerTest extends ControllerTest {
 
     @MockBean
     PostService postService;
-
-    @Autowired
-    ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
