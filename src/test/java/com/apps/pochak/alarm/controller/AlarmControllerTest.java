@@ -14,9 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
@@ -25,8 +22,8 @@ import java.util.List;
 import static com.apps.pochak.alarm.fixture.AlarmFixture.*;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
-import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_CHECK_ALARM;
+import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
 import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
 import static com.apps.pochak.tag.fixture.TagFixture.WAITING_TAG;
 import static org.mockito.ArgumentMatchers.any;
@@ -75,14 +72,9 @@ class AlarmControllerTest extends ControllerTest {
     @DisplayName("로그인한 회원의 알람을 전부 조회한다.")
     void getAllAlarmsTest() throws Exception {
 
-        PageRequest pageRequest = PageRequest.of(0, DEFAULT_PAGING_SIZE);
-        int start = (int) pageRequest.getOffset();
-        int end = Math.min((start + pageRequest.getPageSize()), ALARM_LIST.size());
-        Page<Alarm> alarmPage = new PageImpl<>(ALARM_LIST.subList(start, end), pageRequest, ALARM_LIST.size());
-
         when(alarmService.getAllAlarms(any(), any()))
                 .thenReturn(
-                        new AlarmElements(alarmPage)
+                        new AlarmElements(toPage(ALARM_LIST))
                 );
 
         this.mockMvc.perform(

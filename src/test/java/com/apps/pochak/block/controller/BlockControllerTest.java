@@ -11,9 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
@@ -22,7 +19,7 @@ import java.util.List;
 import static com.apps.pochak.block.fixture.BlockFixture.BLOCK;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
-import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
+import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
 import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
 import static com.apps.pochak.member.fixture.MemberFixture.MEMBER2;
 import static org.mockito.ArgumentMatchers.any;
@@ -95,14 +92,9 @@ class BlockControllerTest extends ControllerTest {
     @DisplayName("차단한 멤버들을 조회한다.")
     void getBlockedMemberTest() throws Exception {
 
-        PageRequest pageRequest = PageRequest.of(0, DEFAULT_PAGING_SIZE);
-        int start = (int) pageRequest.getOffset();
-        int end = Math.min((start + pageRequest.getPageSize()), BLOCK_LIST.size());
-        Page<Block> blockPage = new PageImpl<>(BLOCK_LIST.subList(start, end), pageRequest, BLOCK_LIST.size());
-
         when(blockService.getBlockedMember(any(), any(), any()))
                 .thenReturn(
-                        new BlockElements(blockPage)
+                        new BlockElements(toPage(BLOCK_LIST))
                 );
 
         this.mockMvc.perform(
