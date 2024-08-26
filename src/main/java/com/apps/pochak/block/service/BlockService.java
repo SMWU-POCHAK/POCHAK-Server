@@ -1,5 +1,7 @@
 package com.apps.pochak.block.service;
 
+import com.apps.pochak.auth.Auth;
+import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.block.domain.Block;
 import com.apps.pochak.block.domain.repository.BlockRepository;
 import com.apps.pochak.block.dto.response.BlockElements;
@@ -29,10 +31,11 @@ public class BlockService {
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
 
-    private final JwtProvider jwtProvider;
-
-    public void blockMember(String handle) {
-        Member blocker = jwtProvider.getLoginMember();
+    public void blockMember(
+            final Accessor accessor,
+            final String handle
+    ) {
+        Member blocker = memberRepository.findMemberById(accessor.getMemberId());
         Member blockedMember = memberRepository.findByHandle(handle, blocker);
 
         if (blocker.getId().equals(blockedMember.getId())) {
@@ -59,10 +62,11 @@ public class BlockService {
 
     @Transactional(readOnly = true)
     public BlockElements getBlockedMember(
+            final Accessor accessor,
             final String handle,
             final Pageable pageable
     ) {
-        Member loginMember = jwtProvider.getLoginMember();
+        Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         Member member = memberRepository.findByHandleWithoutLogin(handle);
 
         if (!member.equals(loginMember)) {
@@ -77,10 +81,11 @@ public class BlockService {
     }
 
     public void cancelBlock(
+            final Accessor accessor,
             final String handle,
             final String blockedMemberHandle
     ) {
-        Member loginMember = jwtProvider.getLoginMember();
+        Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         Member blocker = memberRepository.findByHandleWithoutLogin(handle);
 
         if (!loginMember.equals(blocker)) {

@@ -29,10 +29,10 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 
     default Alarm findAlarmById(
             final Long id,
-            final Member loginMember
+            final Long memberId
     ) {
         final Alarm alarm = findById(id).orElseThrow(() -> new GeneralException(INVALID_ALARM_ID));
-        if (!alarm.getReceiver().getId().equals(loginMember.getId())) {
+        if (!alarm.getReceiver().getId().equals(memberId)) {
             throw new GeneralException(NOT_YOUR_ALARM);
         }
         return alarm;

@@ -1,16 +1,15 @@
 package com.apps.pochak.like.service;
 
-import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.alarm.service.LikeAlarmService;
+import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.like.domain.LikeEntity;
 import com.apps.pochak.like.domain.repository.LikeRepository;
 import com.apps.pochak.like.dto.response.LikeElement;
 import com.apps.pochak.like.dto.response.LikeElements;
-import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
+import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
-import com.apps.pochak.tag.domain.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,13 +26,14 @@ import static com.apps.pochak.global.BaseEntityStatus.DELETED;
 public class LikeService {
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
-    private final TagRepository tagRepository;
-    private final AlarmRepository alarmRepository;
     private final LikeAlarmService likeAlarmService;
-    private final JwtProvider jwtProvider;
+    private final MemberRepository memberRepository;
 
-    public void likePost(final Long postId) {
-        final Member loginMember = jwtProvider.getLoginMember();
+    public void likePost(
+            final Accessor accessor,
+            final Long postId
+    ) {
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Post post = postRepository.findPostById(postId, loginMember);
 
         final Optional<LikeEntity> optionalLike = likeRepository.findByLikeMemberAndLikedPost(loginMember, post);
@@ -71,8 +71,11 @@ public class LikeService {
     }
 
     @Transactional(readOnly = true)
-    public LikeElements getMemberLikedPost(final Long postId) {
-        final Member loginMember = jwtProvider.getLoginMember();
+    public LikeElements getMemberLikedPost(
+            final Accessor accessor,
+            final Long postId
+    ) {
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Post likedPost = postRepository.findPostById(postId, loginMember);
 
         final List<LikeElement> likeElements = likeRepository.findLikesAndIsFollow(

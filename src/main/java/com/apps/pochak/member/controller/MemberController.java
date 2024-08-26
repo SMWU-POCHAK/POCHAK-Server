@@ -1,7 +1,9 @@
 package com.apps.pochak.member.controller;
 
+import com.apps.pochak.auth.Auth;
+import com.apps.pochak.auth.MemberOnly;
+import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.global.api_payload.ApiResponse;
-import com.apps.pochak.global.api_payload.exception.handler.AppleOAuthException;
 import com.apps.pochak.member.dto.request.ProfileUpdateRequest;
 import com.apps.pochak.member.dto.response.MemberElements;
 import com.apps.pochak.member.dto.response.ProfileUpdateResponse;
@@ -11,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.VALID_HANDLE;
@@ -24,39 +25,76 @@ public class MemberController {
     public static final int PROFILE_PAGING_SIZE = 12;
 
     @GetMapping("/{handle}")
+    @MemberOnly
     public ApiResponse<?> getProfileDetail(
+            @Auth final Accessor accessor,
             @PathVariable("handle") final String handle,
             @PageableDefault(PROFILE_PAGING_SIZE) final Pageable pageable
     ) {
         if (pageable.getPageNumber() == 0)
-            return ApiResponse.onSuccess(memberService.getProfileDetail(handle, pageable));
+            return ApiResponse.onSuccess(
+                    memberService.getProfileDetail(
+                            accessor,
+                            handle,
+                            pageable
+                    )
+            );
         else
-            return ApiResponse.onSuccess(memberService.getTaggedPosts(handle, pageable));
+            return ApiResponse.onSuccess(
+                    memberService.getTaggedPosts(
+                            accessor,
+                            handle,
+                            pageable
+                    )
+            );
     }
 
     @PutMapping("/{handle}")
+    @MemberOnly
     public ApiResponse<ProfileUpdateResponse> updateProfileDetail(
+            @Auth final Accessor accessor,
             @PathVariable("handle") final String handle,
-            @ModelAttribute final ProfileUpdateRequest profileUpdateRequest){
-        return ApiResponse.onSuccess(memberService.updateProfileDetail(handle, profileUpdateRequest));
+            @ModelAttribute final ProfileUpdateRequest profileUpdateRequest) {
+        return ApiResponse.onSuccess(
+                memberService.updateProfileDetail(
+                        accessor,
+                        handle,
+                        profileUpdateRequest
+                ));
     }
 
 
     @GetMapping("/{handle}/upload")
+    @MemberOnly
     public ApiResponse<PostElements> getUploadPosts(
+            @Auth final Accessor accessor,
             @PathVariable("handle") final String handle,
             @PageableDefault(PROFILE_PAGING_SIZE) final Pageable pageable
     ) {
-        return ApiResponse.onSuccess(memberService.getUploadPosts(handle, pageable));
+        return ApiResponse.onSuccess(
+                memberService.getUploadPosts(
+                        accessor,
+                        handle,
+                        pageable
+                )
+        );
     }
 
 
     @GetMapping("/search")
+    @MemberOnly
     public ApiResponse<MemberElements> searchMember(
+            @Auth final Accessor accessor,
             @RequestParam("keyword") final String keyword,
             @PageableDefault(DEFAULT_PAGING_SIZE) final Pageable pageable
     ) {
-        return ApiResponse.onSuccess(memberService.search(keyword, pageable));
+        return ApiResponse.onSuccess(
+                memberService.search(
+                        accessor,
+                        keyword,
+                        pageable
+                )
+        );
     }
 
     @GetMapping("/duplicate")

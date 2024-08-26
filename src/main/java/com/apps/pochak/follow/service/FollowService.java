@@ -1,13 +1,11 @@
 package com.apps.pochak.follow.service;
 
-import com.apps.pochak.alarm.domain.FollowAlarm;
-import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.alarm.service.FollowAlarmService;
+import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.api_payload.code.BaseCode;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
-import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.CustomMemberRepository;
 import com.apps.pochak.member.domain.repository.MemberRepository;
@@ -24,21 +22,23 @@ import java.util.Optional;
 import static com.apps.pochak.global.BaseEntityStatus.ACTIVE;
 import static com.apps.pochak.global.BaseEntityStatus.DELETED;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
-import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.*;
+import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_FOLLOW;
+import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_UNFOLLOW;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class FollowService {
     private final FollowRepository followRepository;
-    private final AlarmRepository alarmRepository;
     private final MemberRepository memberRepository;
     private final CustomMemberRepository customMemberRepository;
-    private final JwtProvider jwtProvider;
     private final FollowAlarmService followAlarmService;
 
-    public BaseCode follow(final String handle) {
-        final Member loginMember = jwtProvider.getLoginMember();
+    public BaseCode follow(
+            final Accessor accessor,
+            final String handle
+    ) {
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Member member = memberRepository.findByHandle(handle, loginMember);
 
         if (loginMember.getId().equals(member.getId())) {
@@ -79,11 +79,12 @@ public class FollowService {
         return SUCCESS_FOLLOW;
     }
 
-    public void deleteFollower(final String handle,
-                                   final String followerHandle
+    public void deleteFollower(
+            final Accessor accessor,
+            final String handle,
+            final String followerHandle
     ) {
-        // TODO: Refactor permission checking part using annotations.
-        final Member loginMember = jwtProvider.getLoginMember();
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         if (!loginMember.getHandle().equals(handle)) {
             throw new GeneralException(_UNAUTHORIZED);
         }
@@ -97,10 +98,12 @@ public class FollowService {
     }
 
     @Transactional(readOnly = true)
-    public MemberElements getFollowings(final String handle,
-                                        final Pageable pageable
+    public MemberElements getFollowings(
+            final Accessor accessor,
+            final String handle,
+            final Pageable pageable
     ) {
-        final Member loginMember = jwtProvider.getLoginMember();
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Member member = memberRepository.findByHandle(handle, loginMember);
         final Page<MemberElement> followingPage = customMemberRepository.findFollowingsAndIsFollow(
                 member,
@@ -112,10 +115,12 @@ public class FollowService {
     }
 
     @Transactional(readOnly = true)
-    public MemberElements getFollowers(final String handle,
-                                       final Pageable pageable
+    public MemberElements getFollowers(
+            final Accessor accessor,
+            final String handle,
+            final Pageable pageable
     ) {
-        final Member loginMember = jwtProvider.getLoginMember();
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Member member = memberRepository.findByHandle(handle, loginMember);
         final Page<MemberElement> followerPage = customMemberRepository.findFollowersAndIsFollow(
                 member,
