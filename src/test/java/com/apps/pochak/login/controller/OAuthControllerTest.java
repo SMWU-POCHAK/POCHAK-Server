@@ -14,10 +14,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-
-import java.io.FileInputStream;
 
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
@@ -62,20 +59,27 @@ public class OAuthControllerTest extends ControllerTest {
 
     @Test
     @DisplayName("회원가입을 한다.")
-    void Signup() throws Exception {
+    void signUpTest() throws Exception {
         when(oAuthService.signup(any()))
-                .thenReturn(new OAuthMemberResponse(MEMBER1, false, ACCESS_TOKEN));
+                .thenReturn(
+                        new OAuthMemberResponse(
+                                MEMBER1,
+                                false,
+                                ACCESS_TOKEN
+                        )
+                );
 
         this.mockMvc.perform(
                         multipart("/api/v2/signup")
-                                .file(getSampleMultipartFile())
+                                .file("profileImage", getSampleMultipartFile().getBytes())
                                 .queryParam("name", MEMBER1.getName())
                                 .queryParam("email", MEMBER1.getEmail())
                                 .queryParam("handle", MEMBER1.getHandle())
                                 .queryParam("message", MEMBER1.getMessage())
                                 .queryParam("socialId", MEMBER1.getSocialId())
-                                .queryParam("socialType", MEMBER1.getSocialType().toString())
+                                .queryParam("socialType", MEMBER1.getSocialType().getCode())
                                 .queryParam("socialRefreshToken", MEMBER1.getSocialRefreshToken())
+                                .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
                         document("signup",

@@ -15,12 +15,11 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
-import org.springframework.http.HttpMethod;
-import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
-import java.io.FileInputStream;
 import java.util.List;
 
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
@@ -212,13 +211,22 @@ class MemberControllerTest extends ControllerTest {
                                 .build()
                 );
 
+        MockMultipartHttpServletRequestBuilder builder =
+                RestDocumentationRequestBuilders.
+                        multipart("/api/v2/members/{handle}", MEMBER1.getHandle());
+
+        builder.with(
+                new RequestPostProcessor() {
+                    @Override
+                    public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
+                        request.setMethod("PUT");
+                        return request;
+                    }
+                });
+
         this.mockMvc.perform(
-                        MockMvcRequestBuilders.multipart(
-                                        HttpMethod.PUT,
-                                        "/api/v2/members/{handle}",
-                                        MEMBER1.getHandle()
-                                )
-                                .file(getSampleMultipartFile())
+                        builder
+                                .file("profileImage", getSampleMultipartFile().getBytes())
                                 .queryParam("name", MEMBER1.getName())
                                 .queryParam("message", MEMBER1.getMessage())
                                 .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
@@ -232,7 +240,7 @@ class MemberControllerTest extends ControllerTest {
                                         headerWithName("Authorization").description("Basic auth credentials")
                                 ),
                                 requestParts(
-                                        partWithName("profileImage").description("회원 프로필 사진 파일")
+                                        partWithName("profileImage").description("회원 프로필 이미지")
                                 ),
                                 queryParameters(
                                         parameterWithName("name").description("회원 이름"),

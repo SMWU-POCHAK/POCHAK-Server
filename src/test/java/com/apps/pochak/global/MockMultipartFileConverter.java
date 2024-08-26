@@ -13,7 +13,7 @@ public class MockMultipartFileConverter {
         final FileInputStream fileInputStream
                 = new FileInputStream("src/test/resources/static/" + fileName + "." + fileType);
 
-        return  new MockMultipartFile(
+        return new MockMultipartFile(
                 "postImage",
                 fileName + "." + fileType,
                 "multipart/form-data",

@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import static lombok.AccessLevel.PRIVATE;
 @Getter
 @RequiredArgsConstructor
 @AllArgsConstructor
@@ -19,7 +18,7 @@ public class ProfileUpdateResponse {
     @Builder
     public ProfileUpdateResponse(
             final Member member
-    ){
+    ) {
         this.name = member.getName();
         this.handle = member.getHandle();
         this.message = member.getMessage();
