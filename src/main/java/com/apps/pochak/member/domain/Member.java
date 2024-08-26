@@ -3,6 +3,7 @@ package com.apps.pochak.member.domain;
 import com.apps.pochak.global.BaseEntity;
 import com.apps.pochak.member.dto.request.ProfileUpdateRequest;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @DynamicInsert
+@AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 @SQLDelete(sql = "UPDATE member SET status = 'DELETED' WHERE id = ?")
 @SQLRestriction("status = 'ACTIVE'")
