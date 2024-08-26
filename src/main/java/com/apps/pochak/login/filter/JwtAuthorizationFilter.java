@@ -67,7 +67,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 Arrays.stream(new String[]{claims.get(AUTHORITIES_KEY).toString()})
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
-        return new UsernamePasswordAuthenticationToken(claims.getSubject(), accessToken, authorities);
+
+        return new UsernamePasswordAuthenticationToken(
+                jwtProvider.getSubject(accessToken),
+                accessToken,
+                authorities
+        );
     }
 
     private void exceptionHandler(
