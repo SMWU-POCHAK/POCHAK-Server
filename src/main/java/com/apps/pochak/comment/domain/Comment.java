@@ -4,6 +4,7 @@ import com.apps.pochak.global.BaseEntity;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
@@ -57,11 +58,38 @@ public class Comment extends BaseEntity {
     }
 
     public Comment(
+            final Long id,
+            final String content,
+            final Member member,
+            final Post post
+    ) {
+        this.id = id;
+        this.content = content;
+        this.member = member;
+        this.post = post;
+    }
+
+    public Comment(
             final String content,
             final Member member,
             final Post post,
             final Comment parentComment
     ) {
+        this.content = content;
+        this.member = member;
+        this.post = post;
+        this.parentComment = parentComment;
+        parentComment.getChildCommentList().add(this);
+    }
+
+    public Comment(
+            final Long id,
+            final String content,
+            final Member member,
+            final Post post,
+            final Comment parentComment
+    ) {
+        this.id = id;
         this.content = content;
         this.member = member;
         this.post = post;
