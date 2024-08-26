@@ -2,11 +2,11 @@ package com.apps.pochak.global;
 
 
 import com.apps.pochak.login.provider.JwtProvider;
+import com.apps.pochak.login.util.LoginArgumentResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -16,7 +16,6 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 
-@Configuration
 @ExtendWith(RestDocumentationExtension.class)
 public abstract class ControllerTest {
 
@@ -25,6 +24,9 @@ public abstract class ControllerTest {
 
     @MockBean
     protected JwtProvider jwtProvider;
+
+    @MockBean
+    protected LoginArgumentResolver loginArgumentResolver;
 
     @BeforeEach
     void setUp(
