@@ -3,6 +3,7 @@ package com.apps.pochak.block.domain;
 import com.apps.pochak.global.BaseEntity;
 import com.apps.pochak.member.domain.Member;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @DynamicInsert
+@AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 @SQLRestriction("status = 'ACTIVE'")
 public class Block extends BaseEntity {
