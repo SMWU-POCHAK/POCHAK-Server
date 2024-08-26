@@ -29,10 +29,23 @@ public class FollowAlarm extends Alarm {
     private String senderProfileImage;
 
     public FollowAlarm(
+            final Long id,
+            final Follow follow,
+            final Member receiver
+    ) {
+        super(id, receiver, FOLLOW);
+        initializeFields(follow);
+    }
+
+    public FollowAlarm(
             final Follow follow,
             final Member receiver
     ) {
         super(receiver, FOLLOW);
+        initializeFields(follow);
+    }
+
+    private void initializeFields(final Follow follow) {
         this.follow = follow;
 
         Member sender = follow.getSender();

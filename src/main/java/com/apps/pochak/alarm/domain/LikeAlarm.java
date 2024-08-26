@@ -32,11 +32,25 @@ public class LikeAlarm extends Alarm {
     private String likedPostImage;
 
     public LikeAlarm(
+            final Long id,
+            final LikeEntity like,
+            final Member receiver,
+            final AlarmType alarmType
+    ) {
+        super(id, receiver, alarmType);
+        initializeFields(like);
+    }
+
+    public LikeAlarm(
             final LikeEntity like,
             final Member receiver,
             final AlarmType alarmType
     ) {
         super(receiver, alarmType);
+        initializeFields(like);
+    }
+
+    private void initializeFields(LikeEntity like) {
         this.like = like;
 
         Member likeMember = like.getLikeMember();
