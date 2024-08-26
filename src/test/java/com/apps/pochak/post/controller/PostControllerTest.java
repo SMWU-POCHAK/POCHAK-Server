@@ -24,8 +24,8 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 
-import static com.apps.pochak.common.ApiDocumentUtils.getDocumentRequest;
-import static com.apps.pochak.common.ApiDocumentUtils.getDocumentResponse;
+import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
+import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
