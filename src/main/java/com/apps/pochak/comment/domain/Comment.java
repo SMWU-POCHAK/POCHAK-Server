@@ -63,10 +63,8 @@ public class Comment extends BaseEntity {
             final Member member,
             final Post post
     ) {
+        this(content, member, post);
         this.id = id;
-        this.content = content;
-        this.member = member;
-        this.post = post;
     }
 
     public Comment(
@@ -75,9 +73,7 @@ public class Comment extends BaseEntity {
             final Post post,
             final Comment parentComment
     ) {
-        this.content = content;
-        this.member = member;
-        this.post = post;
+        this(content, member, post);
         this.parentComment = parentComment;
         parentComment.getChildCommentList().add(this);
     }
@@ -89,12 +85,8 @@ public class Comment extends BaseEntity {
             final Post post,
             final Comment parentComment
     ) {
+        this(content, member, post, parentComment);
         this.id = id;
-        this.content = content;
-        this.member = member;
-        this.post = post;
-        this.parentComment = parentComment;
-        parentComment.getChildCommentList().add(this);
     }
 
     public Boolean isChildComment() {
