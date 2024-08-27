@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.apps.pochak.fcm.util.MessageUtil.makeMessage;
-import static com.apps.pochak.fcm.util.MessageUtil.makeTagApprovalMessages;
+import static com.apps.pochak.fcm.util.MessageUtil.makeMessages;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.FAIL_MESSAGING;
 
 @Service
@@ -47,11 +47,11 @@ public class FCMService {
         }
     }
 
-    public void sendTagApprovalPushNotification(
+    public void sendPushNotification(
             final List<Alarm> alarmList
     ) {
         try {
-            MulticastMessage multicastMessage = makeTagApprovalMessages(alarmList);
+            MulticastMessage multicastMessage = makeMessages(alarmList);
             firebaseMessaging.sendEachForMulticast(multicastMessage);
         } catch (FirebaseMessagingException e) {
             throw new FCMMessagingException(FAIL_MESSAGING);
