@@ -13,7 +13,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.util.Objects;
 
-import static jakarta.persistence.EnumType.*;
+import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -48,6 +48,8 @@ public class Member extends BaseEntity {
     private SocialType socialType;
 
     private String socialRefreshToken;
+
+    private String fcmToken;
 
     @Builder(builderMethodName = "signupMember", builderClassName = "signupMember")
     public Member(
@@ -112,5 +114,9 @@ public class Member extends BaseEntity {
 
     public void updateHandle(final String handle) {
         this.handle = handle;
+    }
+
+    public void updateFcmToken(final String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 }

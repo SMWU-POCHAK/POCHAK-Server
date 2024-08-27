@@ -56,6 +56,8 @@ dependencies {
 	implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.30.1'
 
 	implementation group: 'org.json', name: 'json', version: '20090211'
+
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
 }
 
 ext {
