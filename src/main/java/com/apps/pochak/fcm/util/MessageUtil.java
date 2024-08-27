@@ -21,7 +21,7 @@ public class MessageUtil {
         );
     }
 
-    public static MulticastMessage makeTagApprovalMessages(
+    public static MulticastMessage makeMessages(
             final List<Alarm> alarmList
     ) {
         Alarm alarm = alarmList.get(0);
