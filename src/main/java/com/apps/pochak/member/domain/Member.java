@@ -119,4 +119,8 @@ public class Member extends BaseEntity {
     public void updateFcmToken(final String fcmToken) {
         this.fcmToken = fcmToken;
     }
+
+    public boolean hasFcmToken() {
+        return this.fcmToken != null;
+    }
 }
