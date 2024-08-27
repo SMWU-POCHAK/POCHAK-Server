@@ -42,4 +42,10 @@ public abstract class Alarm extends BaseEntity {
         this.receiver = receiver;
         this.alarmType = alarmType;
     }
+
+    public abstract String getPushNotificationTitle();
+
+    public abstract String getPushNotificationBody();
+
+    public abstract String getPushNotificationImage();
 }
