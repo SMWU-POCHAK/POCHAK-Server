@@ -70,4 +70,19 @@ public class CommentAlarm extends Alarm {
         this.writerName = writer.getName();
         this.writerProfileImage = writer.getProfileImage();
     }
+
+    @Override
+    public String getPushNotificationTitle() {
+        return String.format(this.getAlarmType().getTitle(), this.writerName);
+    }
+
+    @Override
+    public String getPushNotificationBody() {
+        return String.format(this.getAlarmType().getBody(), this.content);
+    }
+
+    @Override
+    public String getPushNotificationImage() {
+        return String.format(this.getAlarmType().getImage(), this.writerProfileImage);
+    }
 }

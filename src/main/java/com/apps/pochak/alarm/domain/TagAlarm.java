@@ -66,4 +66,19 @@ public class TagAlarm extends Alarm {
         this.postId = post.getId();
         this.postImage = post.getPostImage();
     }
+
+    @Override
+    public String getPushNotificationTitle() {
+        return this.getAlarmType().getTitle();
+    }
+
+    @Override
+    public String getPushNotificationBody() {
+        return String.format(this.getAlarmType().getBody(), this.taggerName);
+    }
+
+    @Override
+    public String getPushNotificationImage() {
+        return String.format(this.getAlarmType().getImage(), this.postImage);
+    }
 }
