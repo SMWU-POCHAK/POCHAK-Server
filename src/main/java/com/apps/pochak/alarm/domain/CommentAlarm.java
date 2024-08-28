@@ -34,15 +34,31 @@ public class CommentAlarm extends Alarm {
     private String writerProfileImage;
 
     public CommentAlarm(
+            final Long id,
+            final Comment comment,
+            final Member receiver,
+            final AlarmType alarmType
+    ) {
+        super(id, receiver, alarmType);
+        initializeFields(comment);
+    }
+
+    public CommentAlarm(
             final Comment comment,
             final Member receiver,
             final AlarmType alarmType
     ) {
         super(receiver, alarmType);
+        initializeFields(comment);
+    }
+
+    private void initializeFields(final Comment comment) {
         this.comment = comment;
         this.content = comment.getContent();
-        if (comment.isChildComment())
+
+        if (comment.isChildComment()) {
             this.parentCommentId = comment.getParentComment().getId();
+        }
 
         Post post = comment.getPost();
         this.postId = post.getId();

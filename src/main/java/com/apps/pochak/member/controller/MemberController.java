@@ -49,21 +49,6 @@ public class MemberController {
             );
     }
 
-    @PutMapping("/{handle}")
-    @MemberOnly
-    public ApiResponse<ProfileUpdateResponse> updateProfileDetail(
-            @Auth final Accessor accessor,
-            @PathVariable("handle") final String handle,
-            @ModelAttribute final ProfileUpdateRequest profileUpdateRequest) {
-        return ApiResponse.onSuccess(
-                memberService.updateProfileDetail(
-                        accessor,
-                        handle,
-                        profileUpdateRequest
-                ));
-    }
-
-
     @GetMapping("/{handle}/upload")
     @MemberOnly
     public ApiResponse<PostElements> getUploadPosts(
@@ -80,6 +65,19 @@ public class MemberController {
         );
     }
 
+    @PutMapping("/{handle}")
+    @MemberOnly
+    public ApiResponse<ProfileUpdateResponse> updateProfile(
+            @Auth final Accessor accessor,
+            @PathVariable("handle") final String handle,
+            @ModelAttribute final ProfileUpdateRequest profileUpdateRequest) {
+        return ApiResponse.onSuccess(
+                memberService.updateProfile(
+                        accessor,
+                        handle,
+                        profileUpdateRequest
+                ));
+    }
 
     @GetMapping("/search")
     @MemberOnly

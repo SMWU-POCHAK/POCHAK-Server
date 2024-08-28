@@ -1,4 +1,4 @@
-package com.apps.pochak.common;
+package com.apps.pochak.global;
 
 import org.springframework.restdocs.operation.preprocess.OperationRequestPreprocessor;
 import org.springframework.restdocs.operation.preprocess.OperationResponsePreprocessor;

@@ -1,74 +1,88 @@
 package com.apps.pochak.member.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.apps.pochak.auth.domain.Accessor;
+import com.apps.pochak.global.ControllerTest;
+import com.apps.pochak.member.domain.Member;
+import com.apps.pochak.member.dto.response.MemberElements;
+import com.apps.pochak.member.dto.response.ProfileResponse;
+import com.apps.pochak.member.dto.response.ProfileUpdateResponse;
+import com.apps.pochak.member.service.MemberService;
+import com.apps.pochak.post.dto.PostElements;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.filter.CharacterEncodingFilter;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
-import static com.apps.pochak.common.ApiDocumentUtils.getDocumentRequest;
-import static com.apps.pochak.common.ApiDocumentUtils.getDocumentResponse;
+import java.util.List;
+
+import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
+import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
+import static com.apps.pochak.global.MockMultipartFileConverter.getSampleMultipartFile;
+import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
+import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
+import static com.apps.pochak.member.fixture.MemberFixture.MEMBER2;
+import static com.apps.pochak.post.fixture.PostFixture.PUBLIC_POST;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 @AutoConfigureRestDocs
-@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
-class MemberControllerTest {
-    @Value("${test.authorization.master1}")
-    String authorization1;
+@WebMvcTest(MemberController.class)
+@MockBean(JpaMetamodelMappingContext.class)
+class MemberControllerTest extends ControllerTest {
 
-    @Value("${test.authorization.master2}")
-    String authorization2;
+    private static final List<Member> MEMBER_LIST = List.of(
+            MEMBER1,
+            MEMBER2
+    );
 
-    @Autowired
-    MockMvc mockMvc;
-
-    @Autowired
-    WebApplicationContext wac;
-
-    ObjectMapper objectMapper = new ObjectMapper();
+    @MockBean
+    MemberService memberService;
 
     @BeforeEach
-    public void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .addFilter(new CharacterEncodingFilter("UTF-8", true))
-                .apply(documentationConfiguration(restDocumentation))
-                .build();
+    void setUp() {
+        given(jwtProvider.validateAccessToken(any())).willReturn(true);
+        given(jwtProvider.getSubject(any())).willReturn(MEMBER1.getId().toString());
+        given(loginArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                .willReturn(Accessor.member(MEMBER1.getId()));
     }
 
     @Test
-    @DisplayName("get profile API Document")
+    @DisplayName("프로필 탭을 조회한다.")
     void getProfileTest() throws Exception {
 
-        String handle = "master2";
+        when(memberService.getProfileDetail(any(), any(), any()))
+                .thenReturn(
+                        ProfileResponse.of()
+                                .member(MEMBER1)
+                                .postPage(toPage(List.of(PUBLIC_POST)))
+                                .followerCount(1)
+                                .followingCount(1)
+                                .isFollow(null)
+                                .build()
+                );
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .get("/api/v2/members/{handle}", handle)
-                                .header("Authorization", authorization1)
+                                .get("/api/v2/members/{handle}", MEMBER1.getHandle())
+                                .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
@@ -96,7 +110,9 @@ class MemberControllerTest {
                                         fieldWithPath("result.totalPostNum").type(NUMBER).description("총 태그된 게시물 개수"),
                                         fieldWithPath("result.followerCount").type(NUMBER).description("팔로워 수"),
                                         fieldWithPath("result.followingCount").type(NUMBER).description("팔로잉 수"),
-                                        fieldWithPath("result.isFollow").type(BOOLEAN).description("현재 로그인한 멤버가 조회한 멤버를 팔로우하고 있는지의 여부 : 만약 본인이라면 null이 전달됩니다."),
+                                        fieldWithPath("result.isFollow").type(BOOLEAN)
+                                                .description("현재 로그인한 멤버가 조회한 멤버를 팔로우하고 있는지의 여부 : 만약 본인이라면 null이 전달됩니다.")
+                                                .optional(),
                                         fieldWithPath("result.pageInfo").type(OBJECT).description("게시물 페이징 정보"),
                                         fieldWithPath("result.pageInfo.lastPage").type(BOOLEAN)
                                                 .description(
@@ -125,15 +141,18 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("get uploaded Post API Document")
+    @DisplayName("프로필 탭에서 업로드한 게시물 목록을 조회한다.")
     void getUploadTest() throws Exception {
 
-        String handle = "_5jizzi";
+        when(memberService.getUploadPosts(any(), any(), any()))
+                .thenReturn(
+                        PostElements.from(toPage(List.of(PUBLIC_POST)))
+                );
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
-                                .get("/api/v2/members/{handle}/upload", handle)
-                                .header("Authorization", authorization1)
+                                .get("/api/v2/members/{handle}/upload", MEMBER1.getHandle())
+                                .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
@@ -182,16 +201,79 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("search Member API Document")
+    @DisplayName("회원 정보를 수정한다.")
+    void updateProfileTest() throws Exception {
+        when(memberService.updateProfile(any(), any(), any()))
+                .thenReturn(
+                        ProfileUpdateResponse
+                                .builder()
+                                .member(MEMBER1)
+                                .build()
+                );
+
+        MockMultipartHttpServletRequestBuilder builder =
+                RestDocumentationRequestBuilders.
+                        multipart("/api/v2/members/{handle}", MEMBER1.getHandle());
+
+        builder.with(
+                new RequestPostProcessor() {
+                    @Override
+                    public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
+                        request.setMethod("PUT");
+                        return request;
+                    }
+                });
+
+        this.mockMvc.perform(
+                        builder
+                                .file("profileImage", getSampleMultipartFile().getBytes())
+                                .queryParam("name", MEMBER1.getName())
+                                .queryParam("message", MEMBER1.getMessage())
+                                .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
+                                .contentType(APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andDo(
+                        document("update-profile",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(
+                                        headerWithName("Authorization").description("Basic auth credentials")
+                                ),
+                                requestParts(
+                                        partWithName("profileImage").description("회원 프로필 이미지")
+                                ),
+                                queryParameters(
+                                        parameterWithName("name").description("회원 이름"),
+                                        parameterWithName("message").description("프로필 한 줄 소개")
+                                ),
+                                responseFields(
+                                        fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),
+                                        fieldWithPath("code").type(STRING).description("결과 코드"),
+                                        fieldWithPath("message").type(STRING).description("결과 메세지"),
+                                        fieldWithPath("result").type(OBJECT).description("결과 데이터"),
+                                        fieldWithPath("result.name").type(STRING).description("회원 이름"),
+                                        fieldWithPath("result.handle").type(STRING).description("회원 아이디 (handle)"),
+                                        fieldWithPath("result.message").type(STRING).description("메세지"),
+                                        fieldWithPath("result.profileImage").type(STRING).description("프로필 사진")
+                                )
+                        )
+                );
+    }
+
+    @Test
+    @DisplayName("아이디 혹은 이름을 통해 회원을 검색한다.")
     void searchMemberTest() throws Exception {
 
-        String keyword = "_5jizzi";
+        when(memberService.search(any(), any(), any()))
+                .thenReturn(
+                        MemberElements.from(toPage(MEMBER_LIST))
+                );
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .get("/api/v2/members/search")
-                                .queryParam("keyword", keyword)
-                                .header("Authorization", authorization1)
+                                .queryParam("keyword", "me")
+                                .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
@@ -243,15 +325,15 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("check duplicate handle API Document")
+    @DisplayName("중복되는 아이디(handle)가 있는지 확인한다.")
     void checkDuplicateHandleTest() throws Exception {
 
-        String handle = "_5jizzi";
+        doNothing().when(memberService).checkDuplicate(any());
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .get("/api/v2/members/duplicate")
-                                .queryParam("handle", handle)
+                                .queryParam("handle", MEMBER1.getHandle())
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(

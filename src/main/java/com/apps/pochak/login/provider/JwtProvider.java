@@ -78,12 +78,9 @@ public class JwtProvider {
         }
     }
 
-    public Claims getTokenClaims(String token) {
+    public Claims getTokenClaims(final String token) {
         try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
+            return parseToken(token)
                     .getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();

@@ -54,7 +54,7 @@ public class MemberService {
                 .build();
     }
 
-    public ProfileUpdateResponse updateProfileDetail(
+    public ProfileUpdateResponse updateProfile(
             final Accessor accessor,
             final String handle,
             final ProfileUpdateRequest profileUpdateRequest
@@ -64,19 +64,17 @@ public class MemberService {
         if (!loginMember.equals(updateMember)) {
             throw new GeneralException(UNAUTHORIZED_MEMBER_REQUEST);
         }
+
         String profileImageUrl = updateMember.getProfileImage();
         if (profileUpdateRequest.getProfileImage() != null) {
             awsS3Service.deleteFileFromS3(updateMember.getProfileImage());
             profileImageUrl = awsS3Service.upload(profileUpdateRequest.getProfileImage(), MEMBER);
         }
 
-        updateMember.updateMember(profileUpdateRequest, profileImageUrl);
+        updateMember.update(profileUpdateRequest, profileImageUrl);
 
         return ProfileUpdateResponse.builder()
-                .name(updateMember.getName())
-                .handle(updateMember.getHandle())
-                .message(updateMember.getMessage())
-                .profileImage(updateMember.getProfileImage())
+                .member(updateMember)
                 .build();
     }
 

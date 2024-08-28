@@ -3,6 +3,7 @@ package com.apps.pochak.member.domain;
 import com.apps.pochak.global.BaseEntity;
 import com.apps.pochak.member.dto.request.ProfileUpdateRequest;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @DynamicInsert
+@AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 @SQLDelete(sql = "UPDATE member SET status = 'DELETED' WHERE id = ?")
 @SQLRestriction("status = 'ACTIVE'")
@@ -70,13 +72,19 @@ public class Member extends BaseEntity {
         this.socialRefreshToken = socialRefreshToken;
     }
 
-    public void updateMember(ProfileUpdateRequest profileUpdateRequest, String profileImageUrl){
+    public void update(
+            final ProfileUpdateRequest profileUpdateRequest,
+            final String profileImageUrl
+    ){
         this.name = getOrDefault(profileUpdateRequest.getName(), this.name);
         this.message = getOrDefault(profileUpdateRequest.getMessage(), this.message);
         this.profileImage = getOrDefault(profileImageUrl, this.profileImage);
     }
 
-    private <T> T getOrDefault(T property, T alternative){
+    private <T> T getOrDefault(
+            final T property,
+            final T alternative
+    ){
         if (property != null)
             return property;
         return alternative;

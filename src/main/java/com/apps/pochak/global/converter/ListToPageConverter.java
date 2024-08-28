@@ -6,6 +6,8 @@ import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
+import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
+
 public class ListToPageConverter {
     public static <T> Page<T> toPage(List<T> list, PageRequest pageRequest) {
         int start = (int) pageRequest.getOffset();
@@ -16,5 +18,10 @@ public class ListToPageConverter {
                 pageRequest,
                 list.size()
         );
+    }
+
+    public static <T> Page<T> toPage(List<T> list) {
+        PageRequest pageRequest = PageRequest.of(0, DEFAULT_PAGING_SIZE);
+        return toPage(list, pageRequest);
     }
 }

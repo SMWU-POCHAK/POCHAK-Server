@@ -4,10 +4,7 @@ import com.apps.pochak.global.BaseEntity;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -19,6 +16,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @DynamicInsert
+@AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 @SQLDelete(sql = "UPDATE tag SET status = 'DELETED' WHERE id = ?")
 @SQLRestriction("status = 'ACTIVE'")

@@ -1,34 +1,33 @@
 package com.apps.pochak.login.controller;
 
-import jakarta.transaction.Transactional;
+import com.apps.pochak.auth.domain.Accessor;
+import com.apps.pochak.global.ControllerTest;
+import com.apps.pochak.login.dto.response.AccessTokenResponse;
+import com.apps.pochak.login.dto.response.OAuthMemberResponse;
+import com.apps.pochak.login.service.AppleOAuthService;
+import com.apps.pochak.login.service.GoogleOAuthService;
+import com.apps.pochak.login.service.OAuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.filter.CharacterEncodingFilter;
 
-import java.io.FileInputStream;
-
-import static com.apps.pochak.common.ApiDocumentUtils.getDocumentRequest;
-import static com.apps.pochak.common.ApiDocumentUtils.getDocumentResponse;
+import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
+import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
+import static com.apps.pochak.global.MockMultipartFileConverter.getSampleMultipartFile;
+import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -36,62 +35,51 @@ import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 @AutoConfigureRestDocs
-@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
-public class LoginControllerTest {
+@WebMvcTest(OAuthController.class)
+@MockBean(JpaMetamodelMappingContext.class)
+public class OAuthControllerTest extends ControllerTest {
 
-    @Value("${test.authorization.master1}")
-    String authorization1;
+    @MockBean
+    OAuthService oAuthService;
 
-    @Value("${test.authorization.master2}")
-    String authorization2;
+    @MockBean
+    AppleOAuthService appleOAuthService;
 
-    @Value("${test.authorization.master1.refresh}")
-    String refreshToken;
-
-    @Autowired
-    MockMvc mockMvc;
-
-    @Autowired
-    WebApplicationContext wac;
-
+    @MockBean
+    GoogleOAuthService googleOAuthService;
 
     @BeforeEach
-    public void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .addFilter(new CharacterEncodingFilter("UTF-8", true))
-                .apply(documentationConfiguration(restDocumentation))
-                .build();
+    void setUp() {
+        given(jwtProvider.validateAccessToken(any())).willReturn(true);
+        given(jwtProvider.getSubject(any())).willReturn(MEMBER1.getId().toString());
+        given(loginArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                .willReturn(Accessor.member(MEMBER1.getId()));
     }
 
     @Test
-    @Transactional
-    @DisplayName("Signup API Document")
-    void Signup() throws Exception {
-        final String fileName = "APPS_LOGO";
-        final String fileType = "PNG";
-
-        final FileInputStream fileInputStream
-                = new FileInputStream("src/test/resources/static/" + fileName + "." + fileType);
-        final MockMultipartFile profileImage = new MockMultipartFile(
-                "profileImage",
-                fileName + "." + fileType,
-                "multipart/form-data",
-                fileInputStream
-        );
+    @DisplayName("회원가입을 한다.")
+    void signUpTest() throws Exception {
+        when(oAuthService.signup(any()))
+                .thenReturn(
+                        new OAuthMemberResponse(
+                                MEMBER1,
+                                false,
+                                ACCESS_TOKEN
+                        )
+                );
 
         this.mockMvc.perform(
                         multipart("/api/v2/signup")
-                                .file(profileImage)
-                                .queryParam("name", "user1")
-                                .queryParam("email", "user1@email.com")
-                                .queryParam("handle", "user1")
-                                .queryParam("message", "hi")
-                                .queryParam("socialId", "1111111")
-                                .queryParam("socialType", "apple")
-                                .queryParam("socialRefreshToken", "1111111")
+                                .file("profileImage", getSampleMultipartFile().getBytes())
+                                .queryParam("name", MEMBER1.getName())
+                                .queryParam("email", MEMBER1.getEmail())
+                                .queryParam("handle", MEMBER1.getHandle())
+                                .queryParam("message", MEMBER1.getMessage())
+                                .queryParam("socialId", MEMBER1.getSocialId())
+                                .queryParam("socialType", MEMBER1.getSocialType().getCode())
+                                .queryParam("socialRefreshToken", MEMBER1.getSocialRefreshToken())
+                                .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
                         document("signup",
@@ -129,14 +117,21 @@ public class LoginControllerTest {
     }
 
     @Test
-    @Transactional
-    @DisplayName("Refresh API Document")
+    @DisplayName("리프레시 토큰으로 액세스 토큰을 재발급한다.")
     void refresh() throws Exception {
+
+        when(oAuthService.reissueAccessToken())
+                .thenReturn(
+                        AccessTokenResponse.builder()
+                                .accessToken(ACCESS_TOKEN)
+                                .build()
+                );
+
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .post("/api/v2/refresh")
-                                .header("Authorization", authorization1)
-                                .header("RefreshToken", refreshToken)
+                                .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
+                                .header(REFRESH_TOKEN_HEADER, REFRESH_TOKEN)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
@@ -161,13 +156,15 @@ public class LoginControllerTest {
     }
 
     @Test
-    @Transactional
-    @DisplayName("Logout API Document")
+    @DisplayName("로그아웃을 한다.")
     void logout() throws Exception {
+
+        doNothing().when(oAuthService).logout(any());
+
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .get("/api/v2/logout")
-                                .header("Authorization", authorization1)
+                                .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
@@ -188,13 +185,15 @@ public class LoginControllerTest {
     }
 
     @Test
-    @Transactional
-    @DisplayName("Signout API Document")
+    @DisplayName("회원 탈퇴를 한다.")
     void signout() throws Exception {
+
+        doNothing().when(oAuthService).signout(any());
+
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .delete("/api/v2/signout")
-                                .header("Authorization", authorization1)
+                                .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
