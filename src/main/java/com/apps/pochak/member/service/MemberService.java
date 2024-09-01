@@ -16,8 +16,11 @@ import com.apps.pochak.post.dto.PostElements;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.UNAUTHORIZED_MEMBER_REQUEST;
 import static com.apps.pochak.global.s3.DirName.MEMBER;
@@ -30,6 +33,7 @@ public class MemberService {
     private final FollowRepository followRepository;
     private final PostRepository postRepository;
     private final S3Service awsS3Service;
+    private final ProfileImageDeletionQueue profileImageDeletionQueue;
 
     @Transactional(readOnly = true)
     public ProfileResponse getProfileDetail(
@@ -54,6 +58,7 @@ public class MemberService {
                 .build();
     }
 
+    @Transactional
     public ProfileUpdateResponse updateProfile(
             final Accessor accessor,
             final String handle,
@@ -65,14 +70,21 @@ public class MemberService {
             throw new GeneralException(UNAUTHORIZED_MEMBER_REQUEST);
         }
 
+        String newProfileImageUrl = null;
+        String oldProfileImageUrl = null;
         String profileImageUrl = updateMember.getProfileImage();
         if (profileUpdateRequest.getProfileImage() != null) {
-            awsS3Service.deleteFileFromS3(updateMember.getProfileImage());
-            profileImageUrl = awsS3Service.upload(profileUpdateRequest.getProfileImage(), MEMBER);
+            oldProfileImageUrl = updateMember.getProfileImage();
+            newProfileImageUrl = awsS3Service.upload(profileUpdateRequest.getProfileImage(), MEMBER);
+            profileImageUrl = newProfileImageUrl;
         }
-
         updateMember.update(profileUpdateRequest, profileImageUrl);
 
+        if (oldProfileImageUrl != null) {
+            profileImageDeletionQueue.add(oldProfileImageUrl);
+        }
+
+        // 응답 생성 및 반환
         return ProfileUpdateResponse.builder()
                 .member(updateMember)
                 .build();
