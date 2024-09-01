@@ -19,7 +19,7 @@ import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCE
 public class FCMController {
     private final FCMService fcmService;
 
-    @PostMapping("/api/v1/fcm")
+    @PostMapping("/api/v1/fcm/register")
     @MemberOnly
     public ApiResponse<Void> saveFCMToken(
             @Auth Accessor accessor,
@@ -28,4 +28,7 @@ public class FCMController {
         fcmService.saveToken(accessor, fcmToken);
         return ApiResponse.of(SUCCESS_SAVE_TOKEN);
     }
+
+    // Post: /api/v1/fcm
+    // TODO: Frontend에서 푸시 알림 요청을 받기
 }
