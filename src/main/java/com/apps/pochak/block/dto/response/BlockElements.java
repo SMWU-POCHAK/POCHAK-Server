@@ -1,7 +1,7 @@
 package com.apps.pochak.block.dto.response;
 
 import com.apps.pochak.block.domain.Block;
-import com.apps.pochak.global.PageInfo;
+import com.apps.pochak.global.util.PageInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

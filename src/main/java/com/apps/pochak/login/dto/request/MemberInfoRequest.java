@@ -1,6 +1,6 @@
 package com.apps.pochak.login.dto.request;
 
-import com.apps.pochak.global.s3.ValidFile;
+import com.apps.pochak.global.annotation.ValidFile;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
