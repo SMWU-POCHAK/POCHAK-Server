@@ -2,6 +2,7 @@ package com.apps.pochak.member.service.scheduler;
 
 import com.amazonaws.AmazonServiceException;
 import com.apps.pochak.global.s3.S3Service;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.util.List;
 
 @Component
+@EnableScheduling
 public class ProfileImageDeletionBatch {
 
     private final S3Service awsS3Service;
