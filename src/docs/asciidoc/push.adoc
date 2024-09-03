@@ -1,0 +1,32 @@
+= Profile API
+pochak server team~~
+:doctype: book
+:icons: font
+:source-highlighter: highlishtjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== `POST` Save FCM Token API
+
+FCM 토큰 저장 API
+
+=== Request
+include::{snippets}/save-fcm-token/http-request.adoc[]
+
+==== request headers
+include::{snippets}/save-fcm-token/request-headers.adoc[]
+
+==== request body
+include::{snippets}/save-fcm-token/request-body.adoc[]
+include::{snippets}/save-fcm-token/request-fields.adoc[]
+
+
+=== Response
+==== response body
+include::{snippets}/save-fcm-token/response-body.adoc[]
+include::{snippets}/save-fcm-token/response-fields.adoc[]

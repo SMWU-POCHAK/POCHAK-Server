@@ -47,6 +47,7 @@ pochak server team~~
 
 === Alarm 알람
 * link:alarm.html[Alarm API]
+* link:push.html[Push Notification API]
 
 === Report 신고
 * link:report.html[Report API]
