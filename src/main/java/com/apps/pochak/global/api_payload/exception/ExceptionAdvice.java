@@ -1,11 +1,16 @@
 package com.apps.pochak.global.api_payload.exception;
 
+import com.apps.pochak.discord.client.DiscordClient;
+import com.apps.pochak.discord.dto.DiscordMessage;
+import com.apps.pochak.discord.service.DiscordService;
 import com.apps.pochak.global.api_payload.ApiResponse;
 import com.apps.pochak.global.api_payload.code.ErrorReasonDTO;
 import com.apps.pochak.global.api_payload.code.status.ErrorStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +30,10 @@ import static com.apps.pochak.global.api_payload.code.status.ErrorStatus._INTERN
 
 @Slf4j
 @RestControllerAdvice(annotations = {RestController.class})
+@RequiredArgsConstructor
 public class ExceptionAdvice extends ResponseEntityExceptionHandler {
+
+    private final DiscordService discordService;
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
@@ -65,6 +73,7 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
         ApiResponse<Object> body = ApiResponse.onFailure(errorCommonStatus.getCode(), errorCommonStatus.getMessage(), errorPoint);
 
 //        e.printStackTrace();
+        discordService.sendDiscordMessage(e, request);
         return super.handleExceptionInternal(
                 e,
                 body,
