@@ -10,17 +10,15 @@ import com.apps.pochak.member.dto.request.ProfileUpdateRequest;
 import com.apps.pochak.member.dto.response.MemberElements;
 import com.apps.pochak.member.dto.response.ProfileResponse;
 import com.apps.pochak.member.dto.response.ProfileUpdateResponse;
+import com.apps.pochak.member.service.scheduler.ProfileImageDeletionQueue;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.post.dto.PostElements;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.UNAUTHORIZED_MEMBER_REQUEST;
 import static com.apps.pochak.global.s3.DirName.MEMBER;
@@ -58,7 +56,6 @@ public class MemberService {
                 .build();
     }
 
-    @Transactional
     public ProfileUpdateResponse updateProfile(
             final Accessor accessor,
             final String handle,
@@ -77,14 +74,10 @@ public class MemberService {
             oldProfileImageUrl = updateMember.getProfileImage();
             newProfileImageUrl = awsS3Service.upload(profileUpdateRequest.getProfileImage(), MEMBER);
             profileImageUrl = newProfileImageUrl;
+            profileImageDeletionQueue.add(oldProfileImageUrl);
         }
         updateMember.update(profileUpdateRequest, profileImageUrl);
 
-        if (oldProfileImageUrl != null) {
-            profileImageDeletionQueue.add(oldProfileImageUrl);
-        }
-
-        // 응답 생성 및 반환
         return ProfileUpdateResponse.builder()
                 .member(updateMember)
                 .build();

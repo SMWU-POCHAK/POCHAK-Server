@@ -2,8 +2,8 @@ package com.apps.pochak.member;
 
 import com.apps.pochak.member.fixture.MemberFixture;
 import com.apps.pochak.global.s3.S3Service;
-import com.apps.pochak.member.service.ProfileImageCleanupBatch;
-import com.apps.pochak.member.service.ProfileImageDeletionQueue;
+import com.apps.pochak.member.service.scheduler.ProfileImageDeletionBatch;
+import com.apps.pochak.member.service.scheduler.ProfileImageDeletionQueue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +24,7 @@ public class ProfileImageCleanupBatchTest {
     private ProfileImageDeletionQueue profileImageDeletionQueue;
 
     @InjectMocks
-    private ProfileImageCleanupBatch profileImageCleanupBatch;
+    private ProfileImageDeletionBatch profileImageDeletionBatch;
 
     @BeforeEach
     public void setUp() {
@@ -37,7 +37,7 @@ public class ProfileImageCleanupBatchTest {
         String oldImageUrl = MemberFixture.MEMBER1.getProfileImage();
         when(profileImageDeletionQueue.getImagesToDelete()).thenReturn(List.of(oldImageUrl));
 
-        profileImageCleanupBatch.cleanUpOldProfileImages();
+        profileImageDeletionBatch.cleanUpOldProfileImages();
 
         verify(awsS3Service, times(1)).deleteFileFromS3(oldImageUrl);
         verify(profileImageDeletionQueue, times(1)).clearProcessedImages(List.of(oldImageUrl));
@@ -52,7 +52,7 @@ public class ProfileImageCleanupBatchTest {
 
         when(profileImageDeletionQueue.getImagesToDelete()).thenReturn(List.of(oldImageUrl1, oldImageUrl2, oldImageUrl3));
 
-        profileImageCleanupBatch.cleanUpOldProfileImages();
+        profileImageDeletionBatch.cleanUpOldProfileImages();
 
         verify(awsS3Service, times(1)).deleteFileFromS3(oldImageUrl1);
         verify(awsS3Service, times(1)).deleteFileFromS3(oldImageUrl2);
