@@ -1,74 +1,69 @@
 package com.apps.pochak.report.controller;
 
+import com.apps.pochak.auth.domain.Accessor;
+import com.apps.pochak.global.ControllerTest;
 import com.apps.pochak.report.domain.ReportType;
 import com.apps.pochak.report.dto.request.ReportUploadRequest;
+import com.apps.pochak.report.service.ReportService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.filter.CharacterEncodingFilter;
 
-import static com.apps.pochak.common.ApiDocumentUtils.getDocumentRequest;
-import static com.apps.pochak.common.ApiDocumentUtils.getDocumentResponse;
+import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
+import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
+import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
+import static com.apps.pochak.post.fixture.PostFixture.PUBLIC_POST;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 @AutoConfigureRestDocs
-@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
-class ReportControllerTest {
+@WebMvcTest(ReportController.class)
+@MockBean(JpaMetamodelMappingContext.class)
+class ReportControllerTest extends ControllerTest {
 
-    @Value("${test.authorization.master1}")
-    String authorization;
-
-    @Autowired
-    MockMvc mockMvc;
+    @MockBean
+    ReportService reportService;
 
     @Autowired
-    WebApplicationContext wac;
-
-    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper;
 
     @BeforeEach
-    public void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .addFilter(new CharacterEncodingFilter("UTF-8", true))
-                .apply(documentationConfiguration(restDocumentation))
-                .build();
+    void setUp() {
+        given(jwtProvider.validateAccessToken(any())).willReturn(true);
+        given(jwtProvider.getSubject(any())).willReturn(MEMBER1.getId().toString());
+        given(loginArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                .willReturn(Accessor.member(MEMBER1.getId()));
     }
 
     @Test
-    @Transactional
-    @DisplayName("Report Upload API Document")
+    @DisplayName("게시물을 신고한다.")
     void uploadReportTest() throws Exception {
+        final ReportUploadRequest uploadRequest = new ReportUploadRequest(
+                PUBLIC_POST.getId(),
+                ReportType.NOT_INTERESTED
+        );
 
-        final ReportUploadRequest uploadRequest = new ReportUploadRequest(453L, ReportType.NOT_INTERESTED);
+        doNothing().when(reportService).saveReport(any(), any());
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
                                 .post("/api/v1/reports")
-                                .header("Authorization", authorization)
+                                .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
                                 .content(objectMapper.writeValueAsString(uploadRequest))
                                 .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())

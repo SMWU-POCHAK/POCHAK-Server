@@ -1,9 +1,9 @@
 package com.apps.pochak.member.service;
 
+import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.global.s3.S3Service;
-import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.member.dto.request.ProfileUpdateRequest;
@@ -29,15 +29,15 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
     private final PostRepository postRepository;
-    private final JwtProvider jwtProvider;
     private final S3Service awsS3Service;
 
     @Transactional(readOnly = true)
     public ProfileResponse getProfileDetail(
+            final Accessor accessor,
             final String handle,
             final Pageable pageable
     ) {
-        final Member loginMember = jwtProvider.getLoginMember();
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Member member = memberRepository.findByHandle(handle, loginMember);
         final long followerCount = followRepository.countActiveFollowByReceiver(member);
         final long followingCount = followRepository.countActiveFollowBySender(member);
@@ -54,37 +54,37 @@ public class MemberService {
                 .build();
     }
 
-    public ProfileUpdateResponse updateProfileDetail(
+    public ProfileUpdateResponse updateProfile(
+            final Accessor accessor,
             final String handle,
             final ProfileUpdateRequest profileUpdateRequest
     ) {
-        final Member loginMember = jwtProvider.getLoginMember();
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Member updateMember = memberRepository.findByHandleWithoutLogin(handle);
         if (!loginMember.equals(updateMember)) {
             throw new GeneralException(UNAUTHORIZED_MEMBER_REQUEST);
         }
+
         String profileImageUrl = updateMember.getProfileImage();
         if (profileUpdateRequest.getProfileImage() != null) {
             awsS3Service.deleteFileFromS3(updateMember.getProfileImage());
             profileImageUrl = awsS3Service.upload(profileUpdateRequest.getProfileImage(), MEMBER);
         }
 
-        updateMember.updateMember(profileUpdateRequest, profileImageUrl);
+        updateMember.update(profileUpdateRequest, profileImageUrl);
 
         return ProfileUpdateResponse.builder()
-                .name(updateMember.getName())
-                .handle(updateMember.getHandle())
-                .message(updateMember.getMessage())
-                .profileImage(updateMember.getProfileImage())
+                .member(updateMember)
                 .build();
     }
 
     @Transactional(readOnly = true)
     public PostElements getTaggedPosts(
+            final Accessor accessor,
             final String handle,
             final Pageable pageable
     ) {
-        final Member loginMember = jwtProvider.getLoginMember();
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Member member = memberRepository.findByHandle(handle, loginMember);
         final Page<Post> taggedPost = postRepository.findTaggedPost(member, loginMember, pageable);
         return PostElements.from(taggedPost);
@@ -92,10 +92,11 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public PostElements getUploadPosts(
+            final Accessor accessor,
             final String handle,
             final Pageable pageable
     ) {
-        final Member loginMember = jwtProvider.getLoginMember();
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Member owner = memberRepository.findByHandle(handle, loginMember);
         final Page<Post> taggedPost = postRepository.findUploadPost(owner, loginMember, pageable);
         return PostElements.from(taggedPost);
@@ -103,10 +104,11 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public MemberElements search(
+            final Accessor accessor,
             final String keyword,
             final Pageable pageable
     ) {
-        Member loginMember = jwtProvider.getLoginMember();
+        Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         Page<Member> memberPage = memberRepository.searchByKeyword(keyword, loginMember, pageable);
         return MemberElements.from(memberPage);
     }

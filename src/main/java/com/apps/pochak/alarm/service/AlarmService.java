@@ -3,9 +3,8 @@ package com.apps.pochak.alarm.service;
 import com.apps.pochak.alarm.domain.Alarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.alarm.dto.response.AlarmElements;
+import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.global.api_payload.code.BaseCode;
-import com.apps.pochak.login.provider.JwtProvider;
-import com.apps.pochak.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,18 +18,21 @@ import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCE
 @RequiredArgsConstructor
 public class AlarmService {
     private final AlarmRepository alarmRepository;
-    private final JwtProvider jwtProvider;
 
     @Transactional(readOnly = true)
-    public AlarmElements getAllAlarms(Pageable pageable) {
-        final Member loginMember = jwtProvider.getLoginMember();
-        final Page<Alarm> alarmPage = alarmRepository.getAllAlarm(loginMember.getId(), pageable);
+    public AlarmElements getAllAlarms(
+            final Accessor accessor,
+            final Pageable pageable
+    ) {
+        final Page<Alarm> alarmPage = alarmRepository.getAllAlarm(accessor.getMemberId(), pageable);
         return new AlarmElements(alarmPage);
     }
 
-    public BaseCode checkAlarm(Long alarmId) {
-        final Member loginMember = jwtProvider.getLoginMember();
-        final Alarm alarm = alarmRepository.findAlarmById(alarmId, loginMember);
+    public BaseCode checkAlarm(
+            final Accessor accessor,
+            final Long alarmId
+    ) {
+        final Alarm alarm = alarmRepository.findAlarmById(alarmId, accessor.getMemberId());
         alarm.setIsChecked(true);
         return SUCCESS_CHECK_ALARM;
     }

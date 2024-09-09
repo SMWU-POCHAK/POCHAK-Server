@@ -33,11 +33,28 @@ public class TagAlarm extends Alarm {
     private String postImage;
 
     public TagAlarm(
+            final Long id,
+            final Tag tag,
+            final Member tagger,
+            final Member receiver
+    ) {
+        super(id, receiver, TAG_APPROVAL);
+        initializeFields(tag, tagger);
+    }
+
+    public TagAlarm(
             final Tag tag,
             final Member tagger,
             final Member receiver
     ) {
         super(receiver, TAG_APPROVAL);
+        initializeFields(tag, tagger);
+    }
+
+    private void initializeFields(
+            final Tag tag,
+            final Member tagger
+    ) {
         this.tag = tag;
 
         this.taggerId = tagger.getId();

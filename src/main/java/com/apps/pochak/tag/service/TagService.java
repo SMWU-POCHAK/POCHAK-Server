@@ -1,10 +1,10 @@
 package com.apps.pochak.tag.service;
 
-import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.alarm.service.TagAlarmService;
+import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.global.api_payload.code.BaseCode;
-import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
+import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.tag.domain.Tag;
@@ -22,13 +22,17 @@ import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.*;
 @RequiredArgsConstructor
 public class TagService {
     private final TagRepository tagRepository;
-    private final AlarmRepository alarmRepository;
     private final PostRepository postRepository;
-    private final TagAlarmService tagAlarmService;
-    private final JwtProvider jwtProvider;
+    private final MemberRepository memberRepository;
 
-    public BaseCode approveOrRejectTagRequest(final Long tagId, final Boolean isAccept) {
-        final Member loginMember = jwtProvider.getLoginMember();
+    private final TagAlarmService tagAlarmService;
+
+    public BaseCode approveOrRejectTagRequest(
+            final Accessor accessor,
+            final Long tagId,
+            final Boolean isAccept
+    ) {
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Tag tag = tagRepository.findTagByIdAndMember(tagId, loginMember);
         if (isAccept) {
             return acceptPost(tag);

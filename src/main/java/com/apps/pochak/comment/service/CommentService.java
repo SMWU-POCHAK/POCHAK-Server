@@ -1,10 +1,7 @@
 package com.apps.pochak.comment.service;
 
-import com.apps.pochak.alarm.domain.Alarm;
-import com.apps.pochak.alarm.domain.AlarmType;
-import com.apps.pochak.alarm.domain.CommentAlarm;
-import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.alarm.service.CommentAlarmService;
+import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.comment.domain.Comment;
 import com.apps.pochak.comment.domain.repository.CommentRepository;
 import com.apps.pochak.comment.dto.request.CommentUploadRequest;
@@ -13,6 +10,7 @@ import com.apps.pochak.comment.dto.response.ParentCommentElement;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
+import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.tag.domain.Tag;
@@ -23,7 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
@@ -36,15 +33,17 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final TagRepository tagRepository;
     private final PostRepository postRepository;
+    private final MemberRepository memberRepository;
+
     private final CommentAlarmService commentAlarmService;
-    private final JwtProvider jwtProvider;
 
     @Transactional(readOnly = true)
     public CommentElements getComments(
+            final Accessor accessor,
             final Long postId,
             final Pageable pageable
     ) {
-        final Member loginMember = jwtProvider.getLoginMember();
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Post post = postRepository.findPublicPostById(postId, loginMember);
         final Page<Comment> commentList = commentRepository.findParentCommentByPost(post, loginMember, pageable);
         return new CommentElements(loginMember, commentList);
@@ -52,21 +51,23 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public ParentCommentElement getChildCommentsByParentCommentId(
+            final Accessor accessor,
             final Long postId,
             final Long parentCommentId,
             final Pageable pageable
     ) {
-        final Member loginMember = jwtProvider.getLoginMember();
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Comment comment = commentRepository.findParentCommentById(parentCommentId, loginMember)
                 .orElseThrow(() -> new GeneralException(INVALID_POST_ID));
         return new ParentCommentElement(comment, toPageRequest(pageable));
     }
 
     public void saveComment(
+            final Accessor accessor,
             final Long postId,
             final CommentUploadRequest request
     ) {
-        final Member loginMember = jwtProvider.getLoginMember();
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Post post = postRepository.findPublicPostById(postId, loginMember);
 
         if (request.checkChildComment()) {
@@ -120,17 +121,21 @@ public class CommentService {
     }
 
     public void deleteComment(
+            final Accessor accessor,
             final Long postId,
             final Long commentId
     ) {
         Comment comment = commentRepository.findCommentById(commentId);
-        checkAuthorized(comment);
+        checkAuthorized(accessor, comment);
         commentRepository.deleteCommentById(commentId);
         commentAlarmService.deleteAlarmByComment(comment);
     }
 
-    private void checkAuthorized(final Comment comment) {
-        Member member = jwtProvider.getLoginMember();
+    private void checkAuthorized(
+            final Accessor accessor,
+            final Comment comment
+    ) {
+        Member member = memberRepository.findMemberById(accessor.getMemberId());
         if (comment.isOwner(member)) return;
 
         Post post = comment.getPost();

@@ -17,6 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,9 +35,6 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    @Value("${cloud.aws.cloudfront.domain}")
-    private String domain;
-
     public String upload(MultipartFile multipartFile, DirName dirName) {
         if (multipartFile.isEmpty())
             throw new GeneralException(NULL_FILE);
@@ -49,8 +49,7 @@ public class S3Service {
 
     private String upload(File uploadFile, DirName dirName) {
         String fileName = dirName.getDirName() + "/" + UUID.randomUUID() + uploadFile.getName();
-        putS3(uploadFile, fileName);
-        String uploadImageUrl = domain+"/"+fileName;
+        String uploadImageUrl = putS3(uploadFile, fileName);
         deleteFile(uploadFile);
         return uploadImageUrl;
     }
@@ -85,18 +84,15 @@ public class S3Service {
 
     public void deleteFileFromS3(String fileUrl) {
         try {
-            String[] splitStrs = {".net/", ".com/"};
-            String fileName = null;
-
-            for (String splitStr : splitStrs) {
-                if (fileUrl.contains(splitStr)) {
-                    fileName = fileUrl.substring(fileUrl.lastIndexOf(splitStr) + splitStr.length());
-                    break;
-                }
-            }
+            String splitStr = ".com/";
+            String encodedFileName = fileUrl.substring(fileUrl.indexOf(splitStr) + splitStr.length());
+            String fileName = URLDecoder.decode(encodedFileName, StandardCharsets.UTF_8.name());
             amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
+
         } catch (AmazonServiceException e) {
             throw new ImageException(DELETE_FILE_ERROR);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
         }
     }
 }

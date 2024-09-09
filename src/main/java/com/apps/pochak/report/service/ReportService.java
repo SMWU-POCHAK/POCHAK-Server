@@ -1,7 +1,9 @@
 package com.apps.pochak.report.service;
 
+import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
+import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.report.domain.Report;
@@ -18,9 +20,13 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final PostRepository postRepository;
     private final JwtProvider jwtProvider;
+    private final MemberRepository memberRepository;
 
-    public void saveReport(final ReportUploadRequest request) {
-        final Member reporter = jwtProvider.getLoginMember();
+    public void saveReport(
+            final Accessor accessor,
+            final ReportUploadRequest request
+    ) {
+        final Member reporter = memberRepository.findMemberById(accessor.getMemberId());
         final Post reportedPost = postRepository.findPostById(request.getPostId(), reporter);
 
         Report report = request.toEntity(reporter, reportedPost);

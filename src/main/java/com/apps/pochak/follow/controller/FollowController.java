@@ -1,5 +1,8 @@
 package com.apps.pochak.follow.controller;
 
+import com.apps.pochak.auth.Auth;
+import com.apps.pochak.auth.MemberOnly;
+import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.follow.service.FollowService;
 import com.apps.pochak.global.api_payload.ApiResponse;
 import com.apps.pochak.member.dto.response.MemberElements;
@@ -18,35 +21,59 @@ public class FollowController {
     private final FollowService followService;
 
     @GetMapping("/{handle}/following")
+    @MemberOnly
     public ApiResponse<MemberElements> getFollowings(
+            @Auth final Accessor accessor,
             @PathVariable("handle") final String handle,
             @PageableDefault(DEFAULT_PAGING_SIZE) final Pageable pageable
     ) {
-        return ApiResponse.onSuccess(followService.getFollowings(handle, pageable));
+        return ApiResponse.onSuccess(
+                followService.getFollowings(
+                        accessor,
+                        handle,
+                        pageable
+                )
+        );
     }
 
     @GetMapping("/{handle}/follower")
+    @MemberOnly
     public ApiResponse<MemberElements> getFollowers(
+            @Auth final Accessor accessor,
             @PathVariable("handle") final String handle,
             @PageableDefault(DEFAULT_PAGING_SIZE) final Pageable pageable
     ) {
-        return ApiResponse.onSuccess(followService.getFollowers(handle, pageable));
+        return ApiResponse.onSuccess(
+                followService.getFollowers(
+                        accessor,
+                        handle,
+                        pageable
+                )
+        );
     }
 
 
     @PostMapping("/{handle}/follow")
+    @MemberOnly
     public ApiResponse<Void> followMember(
+            @Auth final Accessor accessor,
             @PathVariable("handle") final String handle
     ) {
-        return ApiResponse.of(followService.follow(handle));
+        return ApiResponse.of(followService.follow(accessor, handle));
     }
 
     @DeleteMapping("/{handle}/follower")
+    @MemberOnly
     public ApiResponse<Void> deleteFollower(
+            @Auth final Accessor accessor,
             @PathVariable("handle") final String handle,
             @RequestParam("followerHandle") final String followerHandle
     ) {
-        followService.deleteFollower(handle, followerHandle);
+        followService.deleteFollower(
+                accessor,
+                handle,
+                followerHandle
+        );
         return ApiResponse.of(SUCCESS_DELETE_FOLLOWER);
     }
 }

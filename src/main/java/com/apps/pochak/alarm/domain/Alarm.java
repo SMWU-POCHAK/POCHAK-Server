@@ -37,7 +37,17 @@ public abstract class Alarm extends BaseEntity {
     private AlarmType alarmType;
 
     protected Alarm(
-            final Member receiver, final AlarmType alarmType
+            final Long id,
+            final Member receiver,
+            final AlarmType alarmType
+    ) {
+        this(receiver, alarmType);
+        this.id = id;
+    }
+
+    protected Alarm(
+            final Member receiver,
+            final AlarmType alarmType
     ) {
         this.receiver = receiver;
         this.alarmType = alarmType;

@@ -4,6 +4,7 @@ import com.apps.pochak.global.BaseEntity;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @DynamicInsert
+@AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 @SQLDelete(sql = "UPDATE like_entity SET status = 'DELETED' WHERE id = ?")
 public class LikeEntity extends BaseEntity {
