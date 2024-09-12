@@ -21,12 +21,9 @@ AuthKey_D5ZQTHUQ4K.p8
 firebase-adminsdk.json
 
 # ignore properties file
-application-LAMBDA.properties
-application-API-KEY.properties
-application-ES.properties
-application-OAUTH.properties
-application-JWT.properties
-application-TEST.properties
+application-COMMON.properties
+application-DEV.properties
+application-PROD.properties
 
 # deploy
 .tar
