@@ -54,4 +54,9 @@ public class FollowAlarm extends Alarm {
         this.senderName = sender.getName();
         this.senderProfileImage = sender.getProfileImage();
     }
+
+    public void updateWriterInfo(final Member member){
+        this.senderName = member.getName();
+        this.senderProfileImage = member.getProfileImage();
+    }
 }

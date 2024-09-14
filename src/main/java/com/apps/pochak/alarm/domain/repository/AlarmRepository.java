@@ -1,6 +1,10 @@
 package com.apps.pochak.alarm.domain.repository;
 
 import com.apps.pochak.alarm.domain.Alarm;
+import com.apps.pochak.alarm.domain.CommentAlarm;
+import com.apps.pochak.alarm.domain.FollowAlarm;
+import com.apps.pochak.alarm.domain.TagAlarm;
+import com.apps.pochak.alarm.domain.LikeAlarm;
 import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.like.domain.LikeEntity;
@@ -14,6 +18,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -134,4 +139,21 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
             """,
             nativeQuery = true)
     void deleteByPost(@Param("postId") final Long postId);
+
+    @Query("SELECT a FROM Alarm a WHERE a.lastModifiedDate >= :recentTime")
+    List<Alarm> findRecentAlarms(@Param("recentTime") LocalDateTime recentTime);
+
+
+    @Query("SELECT a FROM CommentAlarm a WHERE a.writerId = :writerId")
+    List<CommentAlarm> findCommentAlarmsByWriterId(@Param("writerId") Long writerId);
+
+    @Query("SELECT a FROM TagAlarm a WHERE a.taggerId = :taggerId")
+    List<TagAlarm> findTagAlarmsByTaggerId(@Param("taggerId") Long taggerId);
+
+    @Query("SELECT a FROM LikeAlarm a WHERE a.likeMemberId = :likeMemberId")
+    List<LikeAlarm> findLikeAlarmsByLikeMemberId(@Param("likeMemberId") Long likeMemberId);
+
+    @Query("SELECT a FROM FollowAlarm a WHERE a.senderId = :senderId")
+    List<FollowAlarm> findFollowAlarmsBySenderId(@Param("senderId") Long senderId);
+
 }

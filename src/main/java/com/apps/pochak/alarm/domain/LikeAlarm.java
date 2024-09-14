@@ -63,4 +63,10 @@ public class LikeAlarm extends Alarm {
         this.likedPostId = likedPost.getId();
         this.likedPostImage = likedPost.getPostImage();
     }
+
+    public void updateWriterInfo(final Member member){
+        this.likeMemberName = member.getName();
+        this.likeMemberProfileImage = member.getProfileImage();
+    }
 }
+

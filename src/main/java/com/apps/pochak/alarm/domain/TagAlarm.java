@@ -66,4 +66,9 @@ public class TagAlarm extends Alarm {
         this.postId = post.getId();
         this.postImage = post.getPostImage();
     }
+
+    public void updateWriterInfo(final Member member){
+        this.taggerName = member.getName();
+        this.taggerProfileImage = member.getProfileImage();
+    }
 }

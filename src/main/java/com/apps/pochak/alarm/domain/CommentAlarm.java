@@ -70,4 +70,9 @@ public class CommentAlarm extends Alarm {
         this.writerName = writer.getName();
         this.writerProfileImage = writer.getProfileImage();
     }
+
+    public void updateWriterInfo(final Member member){
+        this.writerName = member.getName();
+        this.writerProfileImage = member.getProfileImage();
+    }
 }
