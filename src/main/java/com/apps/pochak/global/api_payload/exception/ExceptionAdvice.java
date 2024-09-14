@@ -44,6 +44,7 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
         ErrorStatus errorStatus = ErrorStatus.valueOf("_BAD_REQUEST");
         ApiResponse<Map<String, String>> body = ApiResponse.onFailure(errorStatus.getCode(), errorStatus.getMessage(), errors);
 
+        //e.printStackTrace();
         return super.handleExceptionInternal(
                 e,
                 body,
@@ -60,7 +61,7 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
         String errorPoint = e.getMessage();
         ApiResponse<Object> body = ApiResponse.onFailure(errorCommonStatus.getCode(), errorCommonStatus.getMessage(), errorPoint);
 
-//        e.printStackTrace();
+        //e.printStackTrace();
         return super.handleExceptionInternal(
                 e,
                 body,

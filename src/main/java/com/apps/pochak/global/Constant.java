@@ -9,4 +9,6 @@ public class Constant {
     public static final String HEADER_APPLE_AUTHORIZATION_CODE = "AuthorizationCode";
 
     public static final int DEFAULT_PAGING_SIZE = 30;
+    public static final String ERROR_CODE_NO_SUCH_KEY = "NoSuchKey";
+
 }

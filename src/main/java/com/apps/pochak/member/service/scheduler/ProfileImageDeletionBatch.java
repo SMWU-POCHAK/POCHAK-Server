@@ -24,22 +24,6 @@ public class ProfileImageDeletionBatch {
     @Scheduled(fixedRate = 300000)
     public void cleanUpOldProfileImages() {
         List<String> imagesToDelete = profileImageDeletionQueue.getImagesToDelete();
-
-        for (String imageUrl : imagesToDelete) {
-            try {
-                awsS3Service.deleteFileFromS3(imageUrl);
-            } catch (AmazonServiceException e) {
-                if ("NoSuchKey".equals(e.getErrorCode())) {
-                    //log 남기기
-                }
-                else{
-                    profileImageDeletionQueue.add(imageUrl);
-                }
-            }  catch (Exception e) {
-                profileImageDeletionQueue.add(imageUrl);
-            }
-        }
-
-        profileImageDeletionQueue.clearProcessedImages(imagesToDelete);
+        profileImageDeletionQueue.deleteImagesFromS3(imagesToDelete);
     }
 }
