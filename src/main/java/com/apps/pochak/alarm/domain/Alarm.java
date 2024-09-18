@@ -52,6 +52,5 @@ public abstract class Alarm extends BaseEntity {
         this.receiver = receiver;
         this.alarmType = alarmType;
     }
-    public abstract void updateWriterInfo(final Member writer);
-
+    public abstract void updateMemberInfo(Member member);
 }
