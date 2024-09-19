@@ -10,6 +10,7 @@ import com.apps.pochak.member.dto.request.ProfileUpdateRequest;
 import com.apps.pochak.member.dto.response.MemberElements;
 import com.apps.pochak.member.dto.response.ProfileResponse;
 import com.apps.pochak.member.dto.response.ProfileUpdateResponse;
+import com.apps.pochak.member.service.scheduler.MemberUpdatedQueue;
 import com.apps.pochak.member.service.scheduler.ProfileImageDeletionQueue;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
@@ -32,6 +33,7 @@ public class MemberService {
     private final PostRepository postRepository;
     private final S3Service awsS3Service;
     private final ProfileImageDeletionQueue profileImageDeletionQueue;
+    private final MemberUpdatedQueue memberUpdatedQueue;
 
     @Transactional(readOnly = true)
     public ProfileResponse getProfileDetail(
@@ -75,6 +77,7 @@ public class MemberService {
             newProfileImageUrl = awsS3Service.upload(profileUpdateRequest.getProfileImage(), MEMBER);
             profileImageUrl = newProfileImageUrl;
             profileImageDeletionQueue.add(oldProfileImageUrl);
+            memberUpdatedQueue.add(updateMember);
         }
         updateMember.update(profileUpdateRequest, profileImageUrl);
 

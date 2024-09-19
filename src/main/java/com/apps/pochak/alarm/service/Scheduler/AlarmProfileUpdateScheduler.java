@@ -32,7 +32,7 @@ public class AlarmProfileUpdateScheduler {
         }
     }
 
-    private void updateAlarmsForMember(Member member) {
+    public void updateAlarmsForMember(Member member) {
         List<CommentAlarm> commentAlarms = alarmRepository.findCommentAlarmsByWriterId(member.getId());
         List<TagAlarm> tagAlarms = alarmRepository.findTagAlarmsByTaggerId(member.getId());
         List<LikeAlarm> likeAlarms = alarmRepository.findLikeAlarmsByLikeMemberId(member.getId());
