@@ -47,13 +47,13 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
 
-	implementation 'com.h2database:h2'
-	runtimeOnly 'com.h2database:h2'
+    implementation 'com.h2database:h2'
+    runtimeOnly 'com.h2database:h2'
 
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test") {
-        exclude group: "com.vaadin.external.google", module: "android-json"
+    testImplementation("org.springframework.boot:spring-boot-starter-test"){
+      exclude group: "com.vaadin.external.google", module:"android-json"
     }
 
     testImplementation 'org.springframework.security:spring-security-test'
