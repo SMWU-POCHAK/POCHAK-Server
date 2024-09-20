@@ -1,7 +1,5 @@
 package com.apps.pochak.global.api_payload.exception;
 
-import com.apps.pochak.discord.client.DiscordClient;
-import com.apps.pochak.discord.dto.DiscordMessage;
 import com.apps.pochak.discord.service.DiscordService;
 import com.apps.pochak.global.api_payload.ApiResponse;
 import com.apps.pochak.global.api_payload.code.ErrorReasonDTO;
@@ -10,7 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
