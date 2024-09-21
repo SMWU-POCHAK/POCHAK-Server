@@ -1,4 +1,4 @@
-package com.apps.pochak.global;
+package com.apps.pochak.global.util;
 
 import lombok.Data;
 import org.springframework.data.domain.Page;

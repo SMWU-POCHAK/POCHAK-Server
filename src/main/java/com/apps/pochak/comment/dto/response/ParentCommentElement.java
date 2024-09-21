@@ -2,7 +2,7 @@ package com.apps.pochak.comment.dto.response;
 
 import com.apps.pochak.comment.domain.Comment;
 import com.apps.pochak.global.Constant;
-import com.apps.pochak.global.PageInfo;
+import com.apps.pochak.global.util.PageInfo;
 import com.apps.pochak.member.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Data;

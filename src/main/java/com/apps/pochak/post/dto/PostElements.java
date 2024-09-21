@@ -1,6 +1,6 @@
 package com.apps.pochak.post.dto;
 
-import com.apps.pochak.global.PageInfo;
+import com.apps.pochak.global.util.PageInfo;
 import com.apps.pochak.post.domain.Post;
 import lombok.AllArgsConstructor;
 import lombok.Data;
