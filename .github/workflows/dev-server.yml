@@ -52,7 +52,7 @@ jobs:
       - name: Execute remote ssh & Deploy Dev server
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.DEV_SSH_HOST }}
+          host: ${{ secrets.SSH_DEV_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
