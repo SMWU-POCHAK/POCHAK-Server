@@ -30,31 +30,46 @@
 
 ## STACK
 
-> CI/CD
+- DB `MySQL`
+- Host
+  - GCP `Computing Engine` `Cloud SQL` `Cloud DNS` 
+  - AWS `S3`
+  - `Ubuntu 20.04.6 LTS` `nginx/1.18.0 (Ubuntu)`
+  - `Docker version 27.1.2`
+- CI/CD `GitHub Actions` `Jenkins Version 2.473`
+- Framework `Spring Boot 3.2.1 (Java 17)`
+- Authentication `JWT`
+- API Document `Spring REST Docs`
 
-- GitHub Actions
-- AWS CodeDeploy, EC2, S3
+<!-- 아키텍처 사진 넣기 -->
 
-> INFRA
+<!-- 
 
-- GCP Computing Engine, Cloud SQL, Cloud DNS
-- Nginx
-- Spring Boot 3.2.1 (Java 17)
-- Spring Data JPA
-- MySQL
+## ERD
+
+> ERD 사진 넣기
+
+-->
+
+## Team Rule
+
+[![GitHub](https://img.shields.io/badge/github%20convention-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://smwu-pochak.github.io/posts/server-team-rule/)
+
+
 
 ## Contributors
 
-> 최신순 `(2차 → 1차)` 으로 나열되어 있습니다.
 
 <table>
   <tr>
     <td align="center" valign="top" width="33%"><a href="https://github.com/5jisoo"><img src="https://avatars.githubusercontent.com/u/96935231?v=4" ></a></td>
     <td align="center" valign="top" width="33%"><a href="https://github.com/dudrhy12"><img src="https://avatars.githubusercontent.com/u/90203803?v=4" ></a></td>
+    <td align="center" valign="top" width="33%"><a href="https://github.com/yeahjinjeong"><img src="https://avatars.githubusercontent.com/u/88896562?v=4" ></a></td>
   </tr>
   <tr>
     <td align="center" valign="top"><a href = "https://github.com/5jisoo">오지수 Lucy Oh</a><br>Backend Developer</td>
     <td align="center" valign="top"><a href = "https://github.com/dudrhy12">조영서 Bella Cho</a><br>Backend Developer</td>
+    <td align="center" valign="top"><a href = "https://github.com/yeahjinjeong">정예진 Yejin Jeong</a><br>Backend Developer</td>
   </tr>
   <tr>
     <td valign="top"> <!-- 지수 -->
@@ -102,6 +117,10 @@
                       <li>프로필 정보 수정</li>
                   </ul>
             </li>
+        </ul>
+    </td> 
+    <td valign="top"> <!-- 예진 -->
+        <ul>
         </ul>
     </td>
 
