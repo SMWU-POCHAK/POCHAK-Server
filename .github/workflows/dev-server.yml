@@ -2,7 +2,7 @@ name: dev server
 
 on:
   push:
-    branches: [ feature/#55-github-actions ]
+    branches: [ develop ]
 
 jobs:
   build:
