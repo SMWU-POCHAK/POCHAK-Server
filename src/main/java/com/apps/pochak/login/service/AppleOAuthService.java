@@ -54,8 +54,6 @@ public class AppleOAuthService {
     private String TEAM_ID;
     @Value("${oauth2.apple.client-id}")
     private String CLIENT_ID;
-    @Value("${oauth2.apple.base-url}")
-    private String PUBLIC_KEY_URL;
     @Value("${oauth2.apple.key-id-path}")
     private String KEY_ID_PATH;
 
@@ -129,7 +127,6 @@ public class AppleOAuthService {
                 "authorization_code",
                 CLIENT_ID
         ).orElseThrow(() -> new AppleOAuthException(FAIL_GET_REFRESH_TOKEN));
-        ;
 
         return appleToken.getRefreshToken();
     }

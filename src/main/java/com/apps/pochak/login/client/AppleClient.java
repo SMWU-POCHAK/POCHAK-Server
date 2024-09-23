@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Optional;
 
-@FeignClient(name = "apple-public-key-client", url = "https://appleid.apple.com")
+@FeignClient(name = "apple-client", url = "https://appleid.apple.com")
 public interface AppleClient {
 
     @GetMapping(value = "/auth/keys", consumes = MediaType.APPLICATION_JSON_VALUE)
