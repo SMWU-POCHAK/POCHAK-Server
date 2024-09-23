@@ -94,9 +94,6 @@ public class AppleOAuthService {
                 .build();
     }
 
-    /**
-     * Get Public Key
-     */
     private Claims verifyIdToken(final Map<String, String> tokenHeaders, final String idToken) {
         try {
             ApplePublicKeyResponse publicKeyResponse = appleClient
@@ -116,10 +113,7 @@ public class AppleOAuthService {
         }
     }
 
-    /**
-     * Get Apple Refresh Token
-     * For Delete Account
-     */
+    // For Delete Account
     private String getAppleRefreshToken(final String authorizationCode) {
         AppleTokenResponse appleToken = appleClient.getRefreshToken(
                 makeClientSecret(),
@@ -170,9 +164,6 @@ public class AppleOAuthService {
         }
     }
 
-    /**
-     * Revoke Apple Login
-     */
     public void revoke(final String socialRefreshToken) {
         appleClient.revoke(makeClientSecret(), socialRefreshToken, CLIENT_ID);
     }
