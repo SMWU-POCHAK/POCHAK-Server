@@ -2,7 +2,7 @@
 name: Bug report
 about: Bug 해결을 도와주세요!
 title: "[BUG]"
-labels: "\U0001F41C bug"
+labels: ''
 assignees: ''
 
 ---

@@ -2,7 +2,7 @@
 name: Refactor request
 about: 기존 기능을 개선하거나 리팩토링합니다
 title: "[Refactor]"
-labels: "\U0001F4ABfeature"
+labels: "\U0001F527 refactor"
 assignees: ''
 
 ---
