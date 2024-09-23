@@ -1,4 +1,4 @@
-package com.apps.pochak.login.dto.apple.key;
+package com.apps.pochak.login.dto.apple;
 
 import com.apps.pochak.global.api_payload.exception.handler.AuthenticationException;
 import lombok.AccessLevel;

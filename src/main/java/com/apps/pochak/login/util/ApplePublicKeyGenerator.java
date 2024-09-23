@@ -1,8 +1,8 @@
 package com.apps.pochak.login.util;
 
 import com.apps.pochak.global.api_payload.exception.handler.AppleOAuthException;
-import com.apps.pochak.login.dto.apple.key.ApplePublicKey;
-import com.apps.pochak.login.dto.apple.key.ApplePublicKeyResponse;
+import com.apps.pochak.login.dto.apple.ApplePublicKey;
+import com.apps.pochak.login.dto.apple.ApplePublicKeyResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

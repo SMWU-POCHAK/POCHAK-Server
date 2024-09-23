@@ -2,7 +2,9 @@ package com.apps.pochak.login.service;
 
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.global.api_payload.exception.handler.AppleOAuthException;
-import com.apps.pochak.login.dto.apple.key.ApplePublicKeyResponse;
+import com.apps.pochak.login.client.AppleClient;
+import com.apps.pochak.login.dto.apple.ApplePublicKeyResponse;
+import com.apps.pochak.login.dto.apple.AppleTokenResponse;
 import com.apps.pochak.login.dto.response.OAuthMemberResponse;
 import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.login.util.ApplePublicKeyGenerator;
@@ -16,26 +18,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.PrivateKey;
@@ -45,7 +35,6 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 
@@ -54,9 +43,10 @@ import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 @RequiredArgsConstructor
 public class AppleOAuthService {
     private final JwtProvider jwtProvider;
-    private final ApplePublicKeyGenerator applePublicKeyGenerator;
     private final JwtValidator jwtValidator;
     private final MemberRepository memberRepository;
+    private final ApplePublicKeyGenerator applePublicKeyGenerator;
+    private final AppleClient appleClient;
 
     @Value("${oauth2.apple.key-id}")
     private String KEY_ID;
@@ -70,7 +60,7 @@ public class AppleOAuthService {
     private String KEY_ID_PATH;
 
     @Transactional
-    public OAuthMemberResponse login(String idToken, String authorizationCode) {
+    public OAuthMemberResponse login(final String idToken, final String authorizationCode) {
         Map<String, String> tokenHeaders = jwtValidator.parseHeaders(idToken);
         Claims claims = verifyIdToken(tokenHeaders, idToken);
 
@@ -109,26 +99,10 @@ public class AppleOAuthService {
     /**
      * Get Public Key
      */
-    private Claims verifyIdToken(Map<String, String> tokenHeaders, String idToken) {
+    private Claims verifyIdToken(final Map<String, String> tokenHeaders, final String idToken) {
         try {
-            WebClient webClient = WebClient
-                    .builder()
-                    .baseUrl(PUBLIC_KEY_URL)
-                    .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .build();
-
-            ApplePublicKeyResponse publicKeyResponse = webClient
-                    .get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("/auth/keys")
-                            .build())
-                    .retrieve()
-                    .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.error(new RuntimeException("Client Error")))
-                    .onStatus(HttpStatusCode::is5xxServerError, response -> Mono.error(new RuntimeException("Internal Server Error")))
-                    .bodyToMono(ApplePublicKeyResponse.class)
-                    .flux()
-                    .toStream()
-                    .findFirst()
+            ApplePublicKeyResponse publicKeyResponse = appleClient
+                    .getPublicKey()
                     .orElseThrow(() -> new AppleOAuthException(INVALID_PUBLIC_KEY));
 
             PublicKey publicKey = applePublicKeyGenerator.generatePublicKey(tokenHeaders, publicKeyResponse);
@@ -149,43 +123,25 @@ public class AppleOAuthService {
      * For Delete Account
      */
     private String getAppleRefreshToken(final String authorizationCode) {
-        String uriStr = PUBLIC_KEY_URL + "/auth/token";
+        AppleTokenResponse appleToken = appleClient.getRefreshToken(
+                makeClientSecret(),
+                authorizationCode,
+                "authorization_code",
+                CLIENT_ID
+        ).orElseThrow(() -> new AppleOAuthException(FAIL_GET_REFRESH_TOKEN));
+        ;
 
-        Map<String, String> params = new HashMap<>();
-        params.put("client_secret", makeClientSecret());
-        params.put("code", authorizationCode);
-        params.put("grant_type", "authorization_code");
-        params.put("client_id", CLIENT_ID);
-
-        String errMsg = "";
-        try {
-            HttpRequest getRequest = HttpRequest.newBuilder()
-                    .uri(new URI(uriStr))
-                    .POST(getParamsUrlEncoded(params))
-                    .headers(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                    .build();
-
-            HttpClient httpClient = HttpClient.newHttpClient();
-            HttpResponse<String> getResponse = httpClient.send(getRequest, HttpResponse.BodyHandlers.ofString());
-
-            JSONObject parseData = new JSONObject(getResponse.body());
-            errMsg = getResponse.body();
-            return parseData.get("refresh_token").toString();
-        } catch (Exception e) {
-            throw new RuntimeException(errMsg);
-        }
-    }
-
-    private HttpRequest.BodyPublisher getParamsUrlEncoded(Map<String, String> parameters) {
-        String urlEncoded = parameters.entrySet()
-                .stream()
-                .map(e -> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8))
-                .collect(Collectors.joining("&"));
-        return HttpRequest.BodyPublishers.ofString(urlEncoded);
+        return appleToken.getRefreshToken();
     }
 
     private String makeClientSecret() {
-        Date expirationDate = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
+        Date expirationDate = Date
+                .from(LocalDateTime
+                        .now()
+                        .plusDays(30)
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant()
+                );
 
         Map<String, Object> jwtHeader = new HashMap<>();
         jwtHeader.put("kid", KEY_ID);
@@ -220,25 +176,7 @@ public class AppleOAuthService {
     /**
      * Revoke Apple Login
      */
-    public String revoke(String socialRefreshToken) {
-        WebClient webClient = WebClient
-                .builder()
-                .baseUrl(PUBLIC_KEY_URL)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .build();
-
-        return webClient
-                .post()
-                .uri(uriBuilder -> {
-                    return uriBuilder
-                            .path("/auth/revoke")
-                            .queryParam("client_id", CLIENT_ID)
-                            .queryParam("client_secret", makeClientSecret())
-                            .queryParam("token", socialRefreshToken)
-                            .build();
-                })
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+    public void revoke(final String socialRefreshToken) {
+        appleClient.revoke(makeClientSecret(), socialRefreshToken, CLIENT_ID);
     }
 }
