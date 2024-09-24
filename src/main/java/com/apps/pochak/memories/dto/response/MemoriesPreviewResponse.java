@@ -38,19 +38,25 @@ public class MemoriesPreviewResponse {
             final Member member,
             final Follow follow,
             final Follow followed,
-            final Tag firstPochaked,
-            final Tag firstPochak,
-            final Tag firstPochackedWith,
-            final Tag latestPost) {
+            final Long countTag,
+            final Long countTaggedWith,
+            final Long countTagged,
+            final Tag firstTagged,
+            final Tag firstTag,
+            final Tag firstTaggedWith,
+            final Tag latestTag) {
         this.handle = member.getHandle();
         this.loginMemberProfileImage = loginMember.getProfileImage();
         this.memberProfileImage = member.getProfileImage();
         this.followDate = follow.getLastModifiedDate();
         this.followedDate = followed.getLastModifiedDate();
         this.followDay = (followDate.isAfter(followedDate) ? Period.between(LocalDate.now(), followDate.toLocalDate()).getDays() : Period.between(LocalDate.now(), followedDate.toLocalDate()).getDays());
-        this.firstPochaked = MemoriesElement.from(firstPochaked);
-        this.firstPochak = MemoriesElement.from(firstPochak);
-        this.firstPochackedWith = MemoriesElement.from(firstPochackedWith);
-        this.latestPost = MemoriesElement.from(latestPost);
+        this.pochakCount = countTag.intValue();
+        this.bondedCount = countTaggedWith.intValue();
+        this.pochakedCount = countTagged.intValue();
+        this.firstPochaked = MemoriesElement.from(firstTagged);
+        this.firstPochak = MemoriesElement.from(firstTag);
+        this.firstPochackedWith = MemoriesElement.from(firstTaggedWith);
+        this.latestPost = MemoriesElement.from(latestTag);
     }
 }

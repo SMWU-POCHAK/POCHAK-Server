@@ -3,6 +3,7 @@ package com.apps.pochak.tag.domain.repository;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
+import com.apps.pochak.post.domain.PostStatus;
 import com.apps.pochak.tag.domain.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -61,39 +62,45 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     select t from Tag t
     join fetch t.member m
     join fetch t.post p
-    where t.status = 'ACTIVE'
-    and p.status = 'ACTIVE'
-    and p.postStatus = 'PUBLIC'
-    and t.member = :member
+    where p.postStatus = 'PUBLIC'
+    and m = :member
     and p.owner = :owner
     order by p.allowedDate asc
     """)
-    Page<Tag> findFirstTag(@Param("owner")Member owner, @Param("member")Member member, PageRequest of);
+    Page<Tag> findTagByMember(@Param("owner")Member owner, @Param("member")Member member, PageRequest of);
 
     @Query("""
-    select distinct t1
+    select t1
     from Tag t1
     join fetch t1.post p
     join Tag t2 on t1.post = t2.post
-    where t1.status = 'ACTIVE'
-    and p.status = 'ACTIVE'
-    and p.postStatus = 'PUBLIC'
+    where p.postStatus = 'PUBLIC'
     and t1.member = :loginMember
     and t2.member = :member
-    order by p.allowedDate asc
     """)
-    Page<Tag> findFirstTaggedWith(@Param("loginMember")Member loginMember, @Param("member")Member member, PageRequest of);
+    Page<Tag> findTaggedWith(@Param("loginMember")Member loginMember, @Param("member")Member member, PageRequest of);
 
     @Query("""
     select t from Tag t
     join fetch t.member m
     join fetch t.post p
-    where t.status = 'ACTIVE'
-    and p.status = 'ACTIVE'
-    and p.postStatus = 'PUBLIC'
-    and ((t.member = :member and p.owner = :loginMember)
-    or (t.member = :loginMember and p.owner = :member))
+    where p.postStatus = 'PUBLIC'
+    and ((m = :member and p.owner = :loginMember)
+    or (m = :loginMember and p.owner = :member))
     order by p.allowedDate desc
     """)
     Page<Tag> findLatestTagged(@Param("loginMember")Member loginMember, @Param("member")Member member, PageRequest of);
+
+    Long countByPost_PostStatusAndPost_OwnerAndMember(PostStatus postStatus, Member owner, Member member);
+
+    @Query("""
+    select count(t) from Tag t
+    join t.member m
+    join t.post p
+    where p.postStatus = 'PUBLIC'
+    and ((m = :member and p.owner = :loginMember)
+    or (m = :loginMember and p.owner = :member))
+    order by p.allowedDate desc
+    """)
+    Long countByMember(@Param("loginMember") Member loginMember, @Param("member")Member member);
 }

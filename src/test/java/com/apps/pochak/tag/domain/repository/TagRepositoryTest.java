@@ -5,10 +5,10 @@ import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.SocialType;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
+import com.apps.pochak.post.domain.PostStatus;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.tag.domain.Tag;
 import jakarta.persistence.EntityManager;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,13 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
-import java.util.Optional;
 
+import static com.apps.pochak.member.fixture.MemberFixture.*;
+import static com.apps.pochak.post.fixture.PostFixture.PUBLIC_POST;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @TestPropertySource(locations = "classpath:application.properties")
@@ -38,50 +39,16 @@ class TagRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        Member owner = Member.signupMember()
-                .name("kimyeji")
-                .email("kimyeji@gmail.com")
-                .handle("kky.yjj2")
-                .message("김예지입니다 탕.")
-                .socialId("kimyeji")
-                .profileImage("")
-                .refreshToken("")
-                .socialType(SocialType.GOOGLE)
-                .socialRefreshToken("")
-                .build();
+        Member owner = MEMBER1;
         memberRepository.save(owner);
 
-        Member member = Member.signupMember()
-                .name("kangminji")
-                .email("kangminji@gmail.com")
-                .handle("mmn_mj")
-                .message("강민지 ㅎ2")
-                .socialId("kangminji")
-                .profileImage("")
-                .refreshToken("")
-                .socialType(SocialType.GOOGLE)
-                .socialRefreshToken("")
-                .build();
+        Member member = MEMBER2;
         memberRepository.save(member);
 
-        Member friend = Member.signupMember()
-                .name("leehyunjin")
-                .email("leehyunjin@gmail.com")
-                .handle("hyunjiny2")
-                .message("이현진")
-                .socialId("leehyunjin")
-                .profileImage("")
-                .refreshToken("")
-                .socialType(SocialType.GOOGLE)
-                .socialRefreshToken("")
-                .build();
+        Member friend = MEMBER3;
         memberRepository.save(friend);
 
-        Post post = Post.builder()
-                .caption("푸핫 바보같아~!")
-                .postImage("")
-                .owner(owner)
-                .build();
+        Post post = PUBLIC_POST;
         postRepository.save(post);
         post.makePublic();
         post.setStatus(BaseEntityStatus.ACTIVE);
@@ -108,6 +75,7 @@ class TagRepositoryTest {
                 .build();
         tagRepository.save(tags1);
         tags1.setStatus(BaseEntityStatus.ACTIVE);
+
         Tag tags2 = Tag.builder()
                 .member(member)
                 .post(post2)
@@ -117,13 +85,13 @@ class TagRepositoryTest {
     }
 
     @Test
-    @DisplayName("[추억 페이지] 친구를 태그한 첫 게시물")
+    @DisplayName("[추억 페이지] 친구를 태그한 첫 게시물을 조회한다.")
     void findFirstTaggedPost() {
         // given
-        Member owner = memberRepository.findByHandleWithoutLogin("kky.yjj2");
-        Member member = memberRepository.findByHandleWithoutLogin("mmn_mj");
+        Member owner = memberRepository.findByHandleWithoutLogin("member1");
+        Member member = memberRepository.findByHandleWithoutLogin("member2");
         // when
-        Page<Tag> tag = tagRepository.findFirstTag(owner, member, PageRequest.of(0, 1));
+        Page<Tag> tag = tagRepository.findTagByMember(owner, member, PageRequest.of(0, 1));
         // then
         assertThat(tag).isNotNull();
         assertThat(tag.hasContent()).isTrue();
@@ -133,13 +101,13 @@ class TagRepositoryTest {
     }
 
     @Test
-    @DisplayName("[추억 페이지] 함께 태그된 첫 게시물")
-    void findFirstTaggedWith() {
+    @DisplayName("[추억 페이지] 함께 태그된 첫 게시물을 조회한다.")
+    void findTaggedWith() {
         // given
-        Member loginMember = memberRepository.findByHandleWithoutLogin("kky.yjj2");
-        Member member = memberRepository.findByHandleWithoutLogin("mmn_mj");
+        Member loginMember = memberRepository.findByHandleWithoutLogin("member1");
+        Member member = memberRepository.findByHandleWithoutLogin("member2");
         // when
-        Page<Tag> tag = tagRepository.findFirstTaggedWith(loginMember, member, PageRequest.of(0, 1));
+        Page<Tag> tag = tagRepository.findTaggedWith(loginMember, member, PageRequest.of(0, 1, Sort.by(Sort.Direction.ASC, "post.allowedDate")));
         // then
         assertThat(tag).isNotNull();
         assertThat(tag.hasContent()).isTrue();
@@ -149,5 +117,50 @@ class TagRepositoryTest {
         boolean hasMember = tagsByPost.stream().anyMatch(t -> t.getMember().equals(member));
         assertThat(hasLoginMember).isTrue();
         assertThat(hasMember).isTrue();
+    }
+
+    @Test
+    @DisplayName("[추억 페이지] 가장 최근 게시물을 조회한다.")
+    void findLatestTag() {
+        // given
+        Member loginMember = memberRepository.findByHandleWithoutLogin("member1");
+        Member member = memberRepository.findByHandleWithoutLogin("member2");
+        // when
+        Page<Tag> taggedWithDesc = tagRepository.findTaggedWith(loginMember, member, PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "post.allowedDate")));
+        Page<Tag> tagOrTagged = tagRepository.findLatestTagged(loginMember, member, PageRequest.of(0, 1));
+
+        Tag latestTaggedWith = (taggedWithDesc.hasContent() ? taggedWithDesc.getContent().get(0) : null);
+        Tag latestTagOrTagged = (tagOrTagged.hasContent() ? tagOrTagged.getContent().get(0) : null);
+
+        Tag latestTag = null;
+        if (latestTaggedWith != null && latestTagOrTagged != null) {
+            latestTag = latestTaggedWith.getPost().getAllowedDate().isAfter(latestTagOrTagged.getPost().getAllowedDate()) ? latestTaggedWith : latestTagOrTagged;
+        } else if (latestTaggedWith == null && latestTagOrTagged != null) {
+            latestTag = latestTagOrTagged;
+        } else if (latestTaggedWith != null) {
+            latestTag = latestTaggedWith;
+        }
+        // then
+        assertThat(latestTag).isNotNull();
+    }
+
+    @Test
+    @DisplayName("[추억 페이지] 함께 태그된 게시물의 수를 조회한다.")
+    void countByMember() {
+        Member owner = memberRepository.findByHandleWithoutLogin("member1");
+        Member member = memberRepository.findByHandleWithoutLogin("member2");
+
+        Long count = tagRepository.countByMember(owner, member);
+        assertThat(count).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("[추억 페이지] 내가 태그한, 태그된 게시물의 수를 조회한다.")
+    void countByPostOwner() {
+        Member owner = memberRepository.findByHandleWithoutLogin("member1");
+        Member member = memberRepository.findByHandleWithoutLogin("member2");
+
+        Long count = tagRepository.countByPost_PostStatusAndPost_OwnerAndMember(PostStatus.PUBLIC, owner, member);
+        assertThat(count).isEqualTo(1);
     }
 }

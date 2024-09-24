@@ -15,7 +15,7 @@ import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCE
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v2/memories")
+@RequestMapping("api/v1/memories")
 public class MemoriesController {
 
     private final MemoriesService memoriesService;

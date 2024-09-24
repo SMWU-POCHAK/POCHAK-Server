@@ -12,10 +12,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemoriesElement {
+    private Long postId;
     private String postImage;
     private LocalDateTime postDate;
 
     public static MemoriesElement from(final Tag tag) {
-        return new MemoriesElement(tag.getPost().getPostImage(), tag.getPost().getAllowedDate());
+        return new MemoriesElement(tag.getPost().getId(), tag.getPost().getPostImage(), tag.getPost().getAllowedDate());
     }
 }
