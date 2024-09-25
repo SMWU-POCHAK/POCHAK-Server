@@ -7,6 +7,7 @@ import com.apps.pochak.post.domain.PostStatus;
 import com.apps.pochak.tag.domain.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -67,7 +68,7 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     and p.owner = :owner
     order by p.allowedDate asc
     """)
-    Page<Tag> findTagByMember(@Param("owner")Member owner, @Param("member")Member member, PageRequest of);
+    Page<Tag> findTagByMember(@Param("owner")Member owner, @Param("member")Member member, Pageable pageable);
 
     @Query("""
     select t1
@@ -78,7 +79,7 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     and t1.member = :loginMember
     and t2.member = :member
     """)
-    Page<Tag> findTaggedWith(@Param("loginMember")Member loginMember, @Param("member")Member member, PageRequest of);
+    Page<Tag> findTaggedWith(@Param("loginMember")Member loginMember, @Param("member")Member member, Pageable pageable);
 
     @Query("""
     select t from Tag t
@@ -89,7 +90,7 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     or (m = :loginMember and p.owner = :member))
     order by p.allowedDate desc
     """)
-    Page<Tag> findLatestTagged(@Param("loginMember")Member loginMember, @Param("member")Member member, PageRequest of);
+    Page<Tag> findLatestTagged(@Param("loginMember")Member loginMember, @Param("member")Member member, Pageable pageable);
 
     Long countByPost_PostStatusAndPost_OwnerAndMember(PostStatus postStatus, Member owner, Member member);
 
