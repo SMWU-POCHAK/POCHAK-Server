@@ -7,16 +7,15 @@ import com.apps.pochak.global.api_payload.ApiResponse;
 import com.apps.pochak.memories.dto.response.MemoriesPostResponse;
 import com.apps.pochak.memories.dto.response.MemoriesPreviewResponse;
 import com.apps.pochak.memories.service.MemoriesService;
-import com.apps.pochak.post.dto.PostElements;
-import com.apps.pochak.report.dto.request.ReportUploadRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
-import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_UPLOAD_REPORT;
 
 @RestController
 @RequiredArgsConstructor

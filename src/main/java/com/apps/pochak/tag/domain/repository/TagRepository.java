@@ -6,7 +6,6 @@ import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.PostStatus;
 import com.apps.pochak.tag.domain.Tag;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -68,7 +67,7 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     and p.owner = :owner
     order by p.allowedDate asc
     """)
-    Page<Tag> findTagByMember(@Param("owner")Member owner, @Param("member")Member member, Pageable pageable);
+    Page<Tag> findTagByOwnerAndMember(@Param("owner")Member owner, @Param("member")Member member, Pageable pageable);
 
     @Query("""
     select t1

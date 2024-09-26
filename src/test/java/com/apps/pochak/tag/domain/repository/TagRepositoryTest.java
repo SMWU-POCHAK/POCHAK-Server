@@ -2,7 +2,6 @@ package com.apps.pochak.tag.domain.repository;
 
 import com.apps.pochak.global.BaseEntityStatus;
 import com.apps.pochak.member.domain.Member;
-import com.apps.pochak.member.domain.SocialType;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.PostStatus;
@@ -91,7 +90,7 @@ class TagRepositoryTest {
         Member owner = memberRepository.findByHandleWithoutLogin("member1");
         Member member = memberRepository.findByHandleWithoutLogin("member2");
         // when
-        Page<Tag> tag = tagRepository.findTagByMember(owner, member, PageRequest.of(0, 1));
+        Page<Tag> tag = tagRepository.findTagByOwnerAndMember(owner, member, PageRequest.of(0, 1));
         // then
         assertThat(tag).isNotNull();
         assertThat(tag.hasContent()).isTrue();
@@ -160,7 +159,8 @@ class TagRepositoryTest {
         Member owner = memberRepository.findByHandleWithoutLogin("member1");
         Member member = memberRepository.findByHandleWithoutLogin("member2");
 
+        Page<Tag> tag = tagRepository.findTagByOwnerAndMember(owner, member, PageRequest.of(0, 1));
         Long count = tagRepository.countByPost_PostStatusAndPost_OwnerAndMember(PostStatus.PUBLIC, owner, member);
-        assertThat(count).isEqualTo(1);
+        assertThat(count).isEqualTo(tag.getTotalElements());
     }
 }

@@ -7,10 +7,8 @@ import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.memories.dto.response.MemoriesPostResponse;
 import com.apps.pochak.memories.dto.response.MemoriesPreviewResponse;
-import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.PostStatus;
 import com.apps.pochak.post.domain.repository.PostRepository;
-import com.apps.pochak.post.dto.PostElements;
 import com.apps.pochak.tag.domain.Tag;
 import com.apps.pochak.tag.domain.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,29 +33,22 @@ public class MemoriesService {
         final Member member = memberRepository.findByHandle(handle, loginMember);
         final Follow follow = followRepository.findBySenderAndReceiver(loginMember, member);
         final Follow followed = followRepository.findBySenderAndReceiver(member, loginMember);
-        final Long countTag = tagRepository.countByPost_PostStatusAndPost_OwnerAndMember(PostStatus.PUBLIC, loginMember, member);
-        final Long countTaggedWith = tagRepository.countByMember(loginMember, member);
-        final Long countTagged = tagRepository.countByPost_PostStatusAndPost_OwnerAndMember(PostStatus.PUBLIC, member, loginMember);
-        final Page<Tag> tagged = tagRepository.findTagByMember(member, loginMember, PageRequest.of(0, 1));
-        final Page<Tag> tag = tagRepository.findTagByMember(loginMember, member, PageRequest.of(0, 1));
-        final Page<Tag> taggedWithAsc = tagRepository.findTaggedWith(loginMember, member, PageRequest.of(0, 1, Sort.by(Sort.Direction.ASC, "post.allowedDate")));
+        final Page<Tag> tagged = tagRepository.findTagByOwnerAndMember(member, loginMember, PageRequest.of(0, 1));
+        final Page<Tag> tag = tagRepository.findTagByOwnerAndMember(loginMember, member, PageRequest.of(0, 1));
+        final Page<Tag> taggedWithAsc= tagRepository.findTaggedWith(loginMember, member, PageRequest.of(0, 1, Sort.by(Sort.Direction.ASC, "post.allowedDate")));
+        final Long countTagged = tagged.getTotalElements();
+        final Long countTag = tag.getTotalElements();
+        final Long countTaggedWith = taggedWithAsc.getTotalElements();
         final Page<Tag> taggedWithDesc = tagRepository.findTaggedWith(loginMember, member, PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "post.allowedDate")));
         final Page<Tag> tagOrTagged = tagRepository.findLatestTagged(loginMember, member, PageRequest.of(0, 1));
 
-        final Tag firstTagged = (tagged.hasContent() ? tagged.getContent().get(0) : null);
-        final Tag firstTag = (tag.hasContent() ? tag.getContent().get(0) : null);
-        final Tag firstTaggedWith = (taggedWithAsc.hasContent() ? taggedWithAsc.getContent().get(0) : null);
-        final Tag latestTaggedWith = (taggedWithDesc.hasContent() ? taggedWithDesc.getContent().get(0) : null);
-        final Tag latestTagOrTagged = (tagOrTagged.hasContent() ? tagOrTagged.getContent().get(0) : null);
+        final Tag firstTagged = pageToTag(tagged);
+        final Tag firstTag = pageToTag(tag);
+        final Tag firstTaggedWith = pageToTag(taggedWithAsc);
+        final Tag latestTaggedWith = pageToTag(taggedWithDesc);
+        final Tag latestTagOrTagged = pageToTag(tagOrTagged);
 
-        Tag latestTag = null;
-        if (latestTaggedWith != null && latestTagOrTagged != null) {
-            latestTag = latestTaggedWith.getPost().getAllowedDate().isAfter(latestTagOrTagged.getPost().getAllowedDate()) ? latestTaggedWith : latestTagOrTagged;
-        } else if (latestTaggedWith == null && latestTagOrTagged != null) {
-            latestTag = latestTagOrTagged;
-        } else if (latestTaggedWith != null) {
-            latestTag = latestTaggedWith;
-        }
+        final Tag latestTag = findLatestTag(latestTaggedWith, latestTagOrTagged);
 
         return MemoriesPreviewResponse.of()
                 .loginMember(loginMember)
@@ -74,11 +65,26 @@ public class MemoriesService {
                 .build();
     }
 
+    private Tag pageToTag(final Page<Tag> tagPage) {
+        if (tagPage.hasContent()) {
+            return tagPage.getContent().get(0);
+        } else return null;
+    }
+
+    private Tag findLatestTag(final Tag latestTaggedWith, final Tag latestTagOrTagged) {
+        if (latestTaggedWith != null && latestTagOrTagged != null) {
+            return latestTaggedWith.getPost().getAllowedDate().isAfter(latestTagOrTagged.getPost().getAllowedDate()) ?
+                    latestTaggedWith : latestTagOrTagged;
+        } else if (latestTaggedWith == null && latestTagOrTagged != null) {
+            return latestTagOrTagged;
+        } else return latestTaggedWith;
+    }
+
     public MemoriesPostResponse getPochak(Accessor accessor, String handle, Pageable pageable) {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Member member = memberRepository.findByHandle(handle, loginMember);
 
-        final Page<Tag> tag = tagRepository.findTagByMember(loginMember, member, pageable);
+        final Page<Tag> tag = tagRepository.findTagByOwnerAndMember(loginMember, member, pageable);
         return MemoriesPostResponse.from(tag);
     }
 
@@ -86,7 +92,7 @@ public class MemoriesService {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Member member = memberRepository.findByHandle(handle, loginMember);
 
-        final Page<Tag> tag = tagRepository.findTagByMember(member, loginMember, pageable);
+        final Page<Tag> tag = tagRepository.findTagByOwnerAndMember(member, loginMember, pageable);
         return MemoriesPostResponse.from(tag);
     }
 

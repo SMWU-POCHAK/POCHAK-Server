@@ -1,6 +1,5 @@
 package com.apps.pochak.memories.dto;
 
-import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.tag.domain.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Data;
