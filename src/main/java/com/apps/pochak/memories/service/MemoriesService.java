@@ -7,7 +7,6 @@ import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.memories.dto.response.MemoriesPostResponse;
 import com.apps.pochak.memories.dto.response.MemoriesPreviewResponse;
-import com.apps.pochak.post.domain.PostStatus;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.tag.domain.Tag;
 import com.apps.pochak.tag.domain.repository.TagRepository;
@@ -18,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.apps.pochak.global.util.PageUtil.getFirstContentFromPage;
 
 @Service
 @Transactional(readOnly = true)
@@ -42,11 +43,11 @@ public class MemoriesService {
         final Page<Tag> taggedWithDesc = tagRepository.findTaggedWith(loginMember, member, PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "post.allowedDate")));
         final Page<Tag> tagOrTagged = tagRepository.findLatestTagged(loginMember, member, PageRequest.of(0, 1));
 
-        final Tag firstTagged = pageToTag(tagged);
-        final Tag firstTag = pageToTag(tag);
-        final Tag firstTaggedWith = pageToTag(taggedWithAsc);
-        final Tag latestTaggedWith = pageToTag(taggedWithDesc);
-        final Tag latestTagOrTagged = pageToTag(tagOrTagged);
+        final Tag firstTagged = getFirstContentFromPage(tagged);
+        final Tag firstTag = getFirstContentFromPage(tag);
+        final Tag firstTaggedWith = getFirstContentFromPage(taggedWithAsc);
+        final Tag latestTaggedWith = getFirstContentFromPage(taggedWithDesc);
+        final Tag latestTagOrTagged = getFirstContentFromPage(tagOrTagged);
 
         final Tag latestTag = findLatestTag(latestTaggedWith, latestTagOrTagged);
 
@@ -63,12 +64,6 @@ public class MemoriesService {
                 .firstTaggedWith(firstTaggedWith)
                 .latestTag(latestTag)
                 .build();
-    }
-
-    private Tag pageToTag(final Page<Tag> tagPage) {
-        if (tagPage.hasContent()) {
-            return tagPage.getContent().get(0);
-        } else return null;
     }
 
     private Tag findLatestTag(final Tag latestTaggedWith, final Tag latestTagOrTagged) {

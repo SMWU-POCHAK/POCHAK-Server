@@ -2,6 +2,8 @@ package com.apps.pochak.follow.fixture;
 
 import com.apps.pochak.follow.domain.Follow;
 
+import java.time.LocalDateTime;
+
 import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
 import static com.apps.pochak.member.fixture.MemberFixture.MEMBER2;
 

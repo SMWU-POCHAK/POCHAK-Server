@@ -28,7 +28,7 @@ public class MemoriesPreviewResponse {
     private Long pochakedCount;
     private MemoriesElement firstPochaked;
     private MemoriesElement firstPochak;
-    private MemoriesElement firstPochackedWith;
+    private MemoriesElement firstPochakedWith;
     private MemoriesElement latestPost;
 
     @Builder(builderMethodName = "of")
@@ -43,24 +43,36 @@ public class MemoriesPreviewResponse {
             final Tag firstTagged,
             final Tag firstTag,
             final Tag firstTaggedWith,
-            final Tag latestTag) {
+            final Tag latestTag
+    ) {
         this.handle = member.getHandle();
         this.loginMemberProfileImage = loginMember.getProfileImage();
         this.memberProfileImage = member.getProfileImage();
-        this.followDate = follow.getLastModifiedDate();
-        this.followedDate = followed.getLastModifiedDate();
+        this.followDate = checkModifiedDate(follow);
+        this.followedDate = checkModifiedDate(followed);
         this.followDay = findFollowDay(followDate, followedDate);
         this.pochakCount = countTag;
         this.bondedCount = countTaggedWith;
         this.pochakedCount = countTagged;
         this.firstPochaked = MemoriesElement.from(firstTagged);
         this.firstPochak = MemoriesElement.from(firstTag);
-        this.firstPochackedWith = MemoriesElement.from(firstTaggedWith);
+        this.firstPochakedWith = MemoriesElement.from(firstTaggedWith);
         this.latestPost = MemoriesElement.from(latestTag);
     }
 
+    private LocalDateTime checkModifiedDate(Follow follow) {
+        if (follow.getCreatedDate() == null && follow.getLastModifiedDate() == null) {
+            return LocalDateTime.now();
+        } else if (follow.getLastModifiedDate() == null) {
+            return follow.getCreatedDate();
+        } else
+            return follow.getLastModifiedDate();
+    }
+
     private int findFollowDay(LocalDateTime followDate, LocalDateTime followedDate) {
-        if (followDate.isAfter(followedDate)) {
+        if (followDate == null && followedDate == null) {
+            return 0;
+        } else if (followDate.isAfter(followedDate)) {
             return Period.between(LocalDate.now(), followDate.toLocalDate()).getDays();
         } else
             return Period.between(LocalDate.now(), followedDate.toLocalDate()).getDays();

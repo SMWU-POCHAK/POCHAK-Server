@@ -35,7 +35,7 @@ public class MemoriesController {
 
     @GetMapping("{handle}/pochak")
     @MemberOnly
-    public ApiResponse<MemoriesPostResponse> getPochaks(
+    public ApiResponse<MemoriesPostResponse> getPochak(
             @Auth final Accessor accessor,
             @PathVariable("handle") final String handle,
             @PageableDefault(DEFAULT_PAGING_SIZE) final Pageable pageable

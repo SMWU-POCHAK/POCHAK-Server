@@ -21,7 +21,8 @@ import org.springframework.test.context.TestPropertySource;
 import java.util.List;
 
 import static com.apps.pochak.member.fixture.MemberFixture.*;
-import static com.apps.pochak.post.fixture.PostFixture.PUBLIC_POST;
+import static com.apps.pochak.post.fixture.PostFixture.*;
+import static com.apps.pochak.tag.fixture.TagFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
@@ -52,33 +53,20 @@ class TagRepositoryTest {
         post.makePublic();
         post.setStatus(BaseEntityStatus.ACTIVE);
 
-        Tag tag = Tag.builder()
-                .member(member)
-                .post(post)
-                .build();
+        Tag tag = APPROVED_TAG;
         tagRepository.save(tag);
         tag.setStatus(BaseEntityStatus.ACTIVE);
 
-        Post post2 = Post.builder()
-                .caption("너네 둘!")
-                .postImage("")
-                .owner(friend)
-                .build();
+        Post post2 = PUBLIC_POST_FOR_TAG;
         postRepository.save(post2);
         post2.makePublic();
         post2.setStatus(BaseEntityStatus.ACTIVE);
 
-        Tag tags1 = Tag.builder()
-                .member(owner)
-                .post(post2)
-                .build();
+        Tag tags1 = APPROVED_TAG1;
         tagRepository.save(tags1);
         tags1.setStatus(BaseEntityStatus.ACTIVE);
 
-        Tag tags2 = Tag.builder()
-                .member(member)
-                .post(post2)
-                .build();
+        Tag tags2 = APPROVED_TAG2;
         tagRepository.save(tags2);
         tags2.setStatus(BaseEntityStatus.ACTIVE);
     }

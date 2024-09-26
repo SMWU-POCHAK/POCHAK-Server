@@ -1,13 +1,12 @@
 package com.apps.pochak.post.fixture;
 
-import com.apps.pochak.member.fixture.MemberFixture;
 import com.apps.pochak.post.domain.Post;
-import com.apps.pochak.post.domain.PostStatus;
 
 import java.time.LocalDateTime;
 
 import static com.apps.pochak.member.fixture.MemberFixture.*;
-import static com.apps.pochak.post.domain.PostStatus.*;
+import static com.apps.pochak.post.domain.PostStatus.PRIVATE;
+import static com.apps.pochak.post.domain.PostStatus.PUBLIC;
 
 public class PostFixture {
 
@@ -30,4 +29,13 @@ public class PostFixture {
             POST_IMAGE,
             "아직 수락되지 않은 게시물의 캡션입니다."
     );
+
+    public static final Post PUBLIC_POST_FOR_TAG = new Post(
+            3L,
+            PUBLIC,
+            LocalDateTime.now(),
+            MEMBER3,
+            POST_IMAGE,
+            "공개 게시물2 캡션입니다."
+    ); // 다수의 태그 생성 목적
 }
