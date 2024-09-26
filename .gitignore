@@ -18,6 +18,7 @@ src/main/resources/static/docs/
 
 # ignore key file
 AuthKey_D5ZQTHUQ4K.p8
+AuthKey_ZJ4VQZNW7D.p8
 firebase-adminsdk.json
 
 # ignore properties file
@@ -30,10 +31,6 @@ application-PROD.properties
 application-API-KEY.tar
 application-OAUTH.tar
 application-JWT.tar
-
-AuthKey_D5ZQTHUQ4K.p8
-AuthKey_D5ZQTHUQ4K.tar
-
 
 ### STS ###
 .apt_generated
