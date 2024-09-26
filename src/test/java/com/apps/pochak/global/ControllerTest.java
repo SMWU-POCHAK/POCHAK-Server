@@ -1,6 +1,7 @@
 package com.apps.pochak.global;
 
 
+import com.apps.pochak.discord.service.DiscordService;
 import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.login.util.LoginArgumentResolver;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +32,9 @@ public abstract class ControllerTest {
 
     @MockBean
     protected LoginArgumentResolver loginArgumentResolver;
+
+    @MockBean
+    DiscordService discordService;
 
     @BeforeEach
     void setUp(
