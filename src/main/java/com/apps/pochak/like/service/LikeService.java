@@ -34,7 +34,7 @@ public class LikeService {
             final Long postId
     ) {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
-        final Post post = postRepository.findPostById(postId, loginMember);
+        final Post post = postRepository.findPostById(postId);
 
         final Optional<LikeEntity> optionalLike = likeRepository.findByLikeMemberAndLikedPost(loginMember, post);
         if (optionalLike.isPresent()) {
@@ -76,7 +76,7 @@ public class LikeService {
             final Long postId
     ) {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
-        final Post likedPost = postRepository.findPostById(postId, loginMember);
+        final Post likedPost = postRepository.findPostById(postId);
 
         final List<LikeElement> likeElements = likeRepository.findLikesAndIsFollow(
                 loginMember.getId(),
