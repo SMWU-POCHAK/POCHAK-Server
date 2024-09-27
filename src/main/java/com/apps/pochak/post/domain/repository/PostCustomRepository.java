@@ -49,16 +49,12 @@ public class PostCustomRepository {
         );
     }
 
-    private BooleanExpression checkOwnerOrTaggedMemberBlockLoginMember(
-            final Long loginMemberId
-    ) {
+    private BooleanExpression checkOwnerOrTaggedMemberBlockLoginMember(final Long loginMemberId) {
         return (block.blocker.eq(tag.member).or(block.blocker.eq(post.owner)))
                 .and(block.blockedMember.id.eq(loginMemberId));
     }
 
-    private BooleanExpression checkLoginMemberBlockOwnerOrTaggedMember(
-            final Long loginMemberId
-    ) {
+    private BooleanExpression checkLoginMemberBlockOwnerOrTaggedMember(final Long loginMemberId) {
         return (block.blocker.id.eq(loginMemberId))
                 .and(block.blockedMember.eq(tag.member).or(block.blockedMember.eq(post.owner)));
     }

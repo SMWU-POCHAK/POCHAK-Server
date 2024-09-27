@@ -23,15 +23,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Optional<Post> findById(final Long id);
 
-    default Post findPostById(
-            final Long postId
-    ) {
+    default Post findPostById(final Long postId) {
         return findById(postId).orElseThrow(() -> new GeneralException(INVALID_POST_ID));
     }
 
-    default Post findPublicPostById(
-            final Long postId
-    ) {
+    default Post findPublicPostById(final Long postId) {
         final Post post = findById(postId).orElseThrow(() -> new GeneralException(INVALID_POST_ID));
         if (post.isPrivate()) {
             throw new GeneralException(PRIVATE_POST);
