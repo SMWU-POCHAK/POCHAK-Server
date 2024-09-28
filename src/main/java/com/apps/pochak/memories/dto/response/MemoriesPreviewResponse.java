@@ -28,7 +28,7 @@ public class MemoriesPreviewResponse {
     private Long pochakedCount;
     private MemoriesElement firstPochaked;
     private MemoriesElement firstPochak;
-    private MemoriesElement firstPochakedWith;
+    private MemoriesElement firstBonded;
     private MemoriesElement latestPost;
 
     @Builder(builderMethodName = "of")
@@ -56,7 +56,7 @@ public class MemoriesPreviewResponse {
         this.pochakedCount = countTagged;
         this.firstPochaked = MemoriesElement.from(firstTagged);
         this.firstPochak = MemoriesElement.from(firstTag);
-        this.firstPochakedWith = MemoriesElement.from(firstTaggedWith);
+        this.firstBonded = MemoriesElement.from(firstTaggedWith);
         this.latestPost = MemoriesElement.from(latestTag);
     }
 
