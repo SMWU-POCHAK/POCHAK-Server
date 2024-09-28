@@ -6,7 +6,6 @@ import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
 import static com.apps.pochak.member.fixture.MemberFixture.MEMBER2;
 
 public class FollowFixture {
-
     public static final Follow SEND_FOLLOW = new Follow(
             1L,
             MEMBER1,
