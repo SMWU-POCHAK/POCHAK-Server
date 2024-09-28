@@ -25,6 +25,14 @@ jobs:
         run: echo "${{ secrets.DEV }}" > ./src/main/resources/application-DEV.properties
         shell: bash
 
+      - name: Set up Firebase Key file
+        run: echo "${{ secrets.FIREBASE_KEY }}" > ./src/main/resources/static/firebase-adminsdk.json
+        shell: bash
+
+      - name: Set up Apple Key file
+        run: echo "${{ secrets.APPLE_AUTH_KEY }}" > ./src/main/resources/static/AuthKey_ZJ4VQZNW7D.p8
+        shell: bash
+
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
         shell: bash
