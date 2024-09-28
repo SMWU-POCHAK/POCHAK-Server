@@ -36,20 +36,30 @@ public abstract class Alarm extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private AlarmType alarmType;
 
+    private Long senderId;
+    private String senderHandle;
+    private String senderName;
+    private String senderProfileImage;
+
     protected Alarm(
             final Long id,
             final Member receiver,
-            final AlarmType alarmType
+            final AlarmType alarmType,
+            final Member sender
     ) {
-        this(receiver, alarmType);
+        this(receiver, alarmType, sender);
         this.id = id;
     }
 
     protected Alarm(
             final Member receiver,
-            final AlarmType alarmType
+            final AlarmType alarmType,
+            final Member sender
     ) {
         this.receiver = receiver;
         this.alarmType = alarmType;
+        this.senderHandle = sender.getHandle();
+        this.senderName = sender.getName();
+        this.senderProfileImage = sender.getProfileImage();
     }
 }
