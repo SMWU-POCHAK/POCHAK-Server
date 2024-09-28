@@ -60,7 +60,7 @@ public class MemberFixture {
     public static final Member TAGGED_MEMBER2 = Member.signupMember()
             .name("태그된 사람 2번")
             .email("aaa@pochak.com")
-            .handle("tagged_member1")
+            .handle("tagged_member2")
             .message("한 줄 소개")
             .socialId("SOCIAL_ID")
             .profileImage(PROFILE_IMAGE)
