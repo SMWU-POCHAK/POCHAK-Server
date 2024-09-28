@@ -26,7 +26,7 @@ import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
 import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
 import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
 import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER2;
-import static com.apps.pochak.tag.fixture.TagFixture.*;
+import static com.apps.pochak.tag.fixture.TagFixture.STATIC_APPROVED_TAG;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
@@ -78,8 +78,8 @@ class MemoriesControllerTest extends ControllerTest {
                         .countTagged(30L)
                         .firstTagged(APPROVED_TAG)
                         .firstTag(APPROVED_TAG)
-                        .firstTaggedWith(TAG1_WITH_ONE_POST)
-                        .latestTag(TAG2_WITH_ONE_POST)
+                        .firstTaggedWith(APPROVED_TAG)
+                        .latestTag(APPROVED_TAG)
                         .build()
                 );
 
