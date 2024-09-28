@@ -33,17 +33,17 @@ public class PostCustomRepository {
     ) {
         return Optional.ofNullable(
                 query.selectFrom(post)
-                        .distinct()
                         .join(post.owner).fetchJoin()
                         .join(tag).on(tag.post.eq(post))
                         .leftJoin(block).on(
                                 checkOwnerOrTaggedMemberBlockLoginMember(loginMemberId)
                                         .or(checkLoginMemberBlockOwnerOrTaggedMember(loginMemberId))
                         )
+                        .groupBy(post)
+                        .having(block.id.count().eq(0L))
                         .where(
                                 post.id.eq(postId),
-                                post.status.eq(BaseEntityStatus.ACTIVE),
-                                block.isNull()
+                                post.status.eq(BaseEntityStatus.ACTIVE)
                         )
                         .fetchOne()
         );
