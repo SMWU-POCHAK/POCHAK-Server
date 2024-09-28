@@ -14,10 +14,10 @@ public class CommentAlarmElement extends AlarmElement {
     private Long postId;
     private String postImage;
 
-    private Long memberId;
-    private String memberHandle;
-    private String memberName;
-    private String memberProfileImage;
+    private Long senderId;
+    private String senderHandle;
+    private String senderName;
+    private String senderProfileImage;
 
     public CommentAlarmElement(CommentAlarm alarm) {
         super(alarm);
@@ -25,9 +25,9 @@ public class CommentAlarmElement extends AlarmElement {
         this.commentContent = alarm.getContent();
         this.postId = alarm.getPostId();
         this.postImage = alarm.getPostImage();
-        this.memberId = alarm.getWriterId();
-        this.memberHandle = alarm.getWriterHandle();
-        this.memberName = alarm.getWriterName();
-        this.memberProfileImage = alarm.getWriterProfileImage();
+        this.senderId = alarm.getSenderId();
+        this.senderHandle = alarm.getSenderHandle();
+        this.senderName = alarm.getSenderName();
+        this.senderProfileImage = alarm.getSenderProfileImage();
     }
 }
