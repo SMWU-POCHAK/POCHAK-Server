@@ -14,10 +14,10 @@ import lombok.Setter;
 public class TagApprovalAlarmElement extends AlarmElement {
     private Long tagId;
 
-    private Long senderId;
-    private String senderHandle;
-    private String senderName;
-    private String senderProfileImage;
+    private Long ownerId;
+    private String ownerHandle;
+    private String ownerName;
+    private String ownerProfileImage;
 
     private Long postId;
     private String postImage;
@@ -25,10 +25,10 @@ public class TagApprovalAlarmElement extends AlarmElement {
     public TagApprovalAlarmElement(final TagAlarm alarm) {
         super(alarm);
         this.tagId = alarm.getTag().getId();
-        this.senderId = alarm.getSenderId();
-        this.senderHandle = alarm.getSenderHandle();
-        this.senderName = alarm.getSenderName();
-        this.senderProfileImage = alarm.getSenderProfileImage();
+        this.ownerId = alarm.getSender().getId();
+        this.ownerHandle = alarm.getSender().getHandle();
+        this.ownerName = alarm.getSender().getName();
+        this.ownerProfileImage = alarm.getSender().getProfileImage();
         this.postId = alarm.getPostId();
         this.postImage = alarm.getPostImage();
     }

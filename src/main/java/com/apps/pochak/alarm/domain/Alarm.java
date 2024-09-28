@@ -36,10 +36,9 @@ public abstract class Alarm extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private AlarmType alarmType;
 
-    private Long senderId;
-    private String senderHandle;
-    private String senderName;
-    private String senderProfileImage;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "sender_id")
+    private Member sender;
 
     protected Alarm(
             final Long id,
@@ -58,8 +57,6 @@ public abstract class Alarm extends BaseEntity {
     ) {
         this.receiver = receiver;
         this.alarmType = alarmType;
-        this.senderHandle = sender.getHandle();
-        this.senderName = sender.getName();
-        this.senderProfileImage = sender.getProfileImage();
+        this.sender = sender;
     }
 }

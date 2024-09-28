@@ -15,9 +15,9 @@ public class FollowAlarmElement extends AlarmElement {
 
     public FollowAlarmElement(FollowAlarm alarm) {
         super(alarm);
-        this.memberId = alarm.getSenderId();
-        this.memberHandle = alarm.getSenderHandle();
-        this.memberName = alarm.getSenderName();
-        this.memberProfileImage = alarm.getSenderProfileImage();
+        this.memberId = alarm.getSender().getId();
+        this.memberHandle = alarm.getSender().getHandle();
+        this.memberName = alarm.getSender().getName();
+        this.memberProfileImage = alarm.getSender().getProfileImage();
     }
 }
