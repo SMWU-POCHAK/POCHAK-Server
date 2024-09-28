@@ -19,15 +19,15 @@ public class TagFixture {
             MEMBER1,
             false
     );
-    public static final Tag APPROVED_TAG1 = new Tag(
+    public static final Tag TAG1_WITH_ONE_POST = new Tag(
             3L,
-            PUBLIC_POST_FOR_TAG,
+            POST_WITH_MULTI_TAG,
             MEMBER1,
             true
     );
-    public static final Tag APPROVED_TAG2 = new Tag(
+    public static final Tag TAG2_WITH_ONE_POST = new Tag(
             4L,
-            PUBLIC_POST_FOR_TAG,
+            POST_WITH_MULTI_TAG,
             MEMBER2,
             true
     );

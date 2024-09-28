@@ -1,6 +1,4 @@
 package com.apps.pochak.tag.domain.repository;
-
-import com.apps.pochak.global.BaseEntityStatus;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
@@ -16,7 +14,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
 
@@ -26,7 +23,6 @@ import static com.apps.pochak.tag.fixture.TagFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@TestPropertySource(locations = "classpath:application.properties")
 class TagRepositoryTest {
     @Autowired
     private MemberRepository memberRepository;
@@ -39,6 +35,8 @@ class TagRepositoryTest {
 
     @BeforeEach
     void setUp() {
+        entityManager.clear();
+
         Member owner = MEMBER1;
         memberRepository.save(owner);
 
@@ -51,24 +49,19 @@ class TagRepositoryTest {
         Post post = PUBLIC_POST;
         postRepository.save(post);
         post.makePublic();
-        post.setStatus(BaseEntityStatus.ACTIVE);
 
         Tag tag = APPROVED_TAG;
         tagRepository.save(tag);
-        tag.setStatus(BaseEntityStatus.ACTIVE);
 
-        Post post2 = PUBLIC_POST_FOR_TAG;
+        Post post2 = POST_WITH_MULTI_TAG;
         postRepository.save(post2);
         post2.makePublic();
-        post2.setStatus(BaseEntityStatus.ACTIVE);
 
-        Tag tags1 = APPROVED_TAG1;
+        Tag tags1 = TAG1_WITH_ONE_POST;
         tagRepository.save(tags1);
-        tags1.setStatus(BaseEntityStatus.ACTIVE);
 
-        Tag tags2 = APPROVED_TAG2;
+        Tag tags2 = TAG2_WITH_ONE_POST;
         tagRepository.save(tags2);
-        tags2.setStatus(BaseEntityStatus.ACTIVE);
     }
 
     @Test

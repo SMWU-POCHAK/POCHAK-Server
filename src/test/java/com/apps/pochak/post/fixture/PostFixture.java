@@ -30,7 +30,7 @@ public class PostFixture {
             "아직 수락되지 않은 게시물의 캡션입니다."
     );
 
-    public static final Post PUBLIC_POST_FOR_TAG = new Post(
+    public static final Post POST_WITH_MULTI_TAG = new Post(
             3L,
             PUBLIC,
             LocalDateTime.now(),

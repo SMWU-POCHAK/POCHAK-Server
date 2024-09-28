@@ -67,8 +67,8 @@ class MemoriesControllerTest extends ControllerTest {
                         .countTagged(30L)
                         .firstTagged(APPROVED_TAG)
                         .firstTag(APPROVED_TAG)
-                        .firstTaggedWith(APPROVED_TAG1)
-                        .latestTag(APPROVED_TAG2)
+                        .firstTaggedWith(TAG1_WITH_ONE_POST)
+                        .latestTag(TAG2_WITH_ONE_POST)
                         .build()
                 );
 
