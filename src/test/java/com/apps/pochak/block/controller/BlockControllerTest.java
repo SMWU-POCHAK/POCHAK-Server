@@ -5,6 +5,7 @@ import com.apps.pochak.block.domain.Block;
 import com.apps.pochak.block.dto.response.BlockElements;
 import com.apps.pochak.block.service.BlockService;
 import com.apps.pochak.global.ControllerTest;
+import com.apps.pochak.member.domain.Member;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,12 +17,12 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
 import java.util.List;
 
-import static com.apps.pochak.block.fixture.BlockFixture.BLOCK;
+import static com.apps.pochak.block.fixture.BlockFixture.STATIC_BLOCK;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
 import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
-import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
-import static com.apps.pochak.member.fixture.MemberFixture.MEMBER2;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER2;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -41,8 +42,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @MockBean(JpaMetamodelMappingContext.class)
 class BlockControllerTest extends ControllerTest {
 
+    private static final Member MEMBER1 = STATIC_MEMBER1;
+    private static final Member MEMBER2 = STATIC_MEMBER2;
+
     private static final List<Block> BLOCK_LIST = List.of(
-            BLOCK
+            STATIC_BLOCK
     );
 
     @MockBean

@@ -1,10 +1,13 @@
 package com.apps.pochak.memories.controller;
 
 import com.apps.pochak.auth.domain.Accessor;
+import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.global.ControllerTest;
+import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.memories.dto.response.MemoriesPostResponse;
 import com.apps.pochak.memories.dto.response.MemoriesPreviewResponse;
 import com.apps.pochak.memories.service.MemoriesService;
+import com.apps.pochak.tag.domain.Tag;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,13 +19,13 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
 import java.util.List;
 
-import static com.apps.pochak.follow.fixture.FollowFixture.RECEIVE_FOLLOW;
-import static com.apps.pochak.follow.fixture.FollowFixture.SEND_FOLLOW;
+import static com.apps.pochak.follow.fixture.FollowFixture.STATIC_RECEIVE_FOLLOW;
+import static com.apps.pochak.follow.fixture.FollowFixture.STATIC_SEND_FOLLOW;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
 import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
-import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
-import static com.apps.pochak.member.fixture.MemberFixture.MEMBER2;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER2;
 import static com.apps.pochak.tag.fixture.TagFixture.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -41,6 +44,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(MemoriesController.class)
 @MockBean(JpaMetamodelMappingContext.class)
 class MemoriesControllerTest extends ControllerTest {
+    private static final Member MEMBER1 = STATIC_MEMBER1;
+    private static final Member MEMBER2 = STATIC_MEMBER2;
+    private static final Follow SEND_FOLLOW = STATIC_SEND_FOLLOW;
+    private static final Follow RECEIVE_FOLLOW = STATIC_RECEIVE_FOLLOW;
+    private static final Tag APPROVED_TAG = STATIC_APPROVED_TAG;
 
     @MockBean
     MemoriesService memoriesService;
