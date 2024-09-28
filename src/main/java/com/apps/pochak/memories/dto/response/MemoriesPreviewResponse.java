@@ -61,18 +61,14 @@ public class MemoriesPreviewResponse {
     }
 
     private LocalDateTime checkModifiedDate(Follow follow) {
-        if (follow.getCreatedDate() == null && follow.getLastModifiedDate() == null) {
-            return LocalDateTime.now();
-        } else if (follow.getLastModifiedDate() == null) {
-            return follow.getCreatedDate();
-        } else
+        if (follow.getLastModifiedDate() != null) {
             return follow.getLastModifiedDate();
+        } else
+            return LocalDateTime.MIN;
     }
 
     private int findFollowDay(LocalDateTime followDate, LocalDateTime followedDate) {
-        if (followDate == null && followedDate == null) {
-            return 0;
-        } else if (followDate.isAfter(followedDate)) {
+        if (followDate.isAfter(followedDate)) {
             return Period.between(LocalDate.now(), followDate.toLocalDate()).getDays();
         } else
             return Period.between(LocalDate.now(), followedDate.toLocalDate()).getDays();

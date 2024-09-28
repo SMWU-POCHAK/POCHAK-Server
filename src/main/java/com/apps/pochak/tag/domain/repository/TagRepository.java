@@ -63,6 +63,7 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     join fetch t.member m
     join fetch t.post p
     where p.postStatus = 'PUBLIC'
+    and p.status = 'ACTIVE'
     and m = :member
     and p.owner = :owner
     order by p.allowedDate asc
@@ -75,6 +76,7 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     join fetch t1.post p
     join Tag t2 on t1.post = t2.post
     where p.postStatus = 'PUBLIC'
+    and p.status = 'ACTIVE'
     and t1.member = :loginMember
     and t2.member = :member
     """)
@@ -85,6 +87,7 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     join fetch t.member m
     join fetch t.post p
     where p.postStatus = 'PUBLIC'
+    and p.status = 'ACTIVE'
     and ((m = :member and p.owner = :loginMember)
     or (m = :loginMember and p.owner = :member))
     order by p.allowedDate desc
@@ -98,6 +101,7 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     join t.member m
     join t.post p
     where p.postStatus = 'PUBLIC'
+    and p.status = 'ACTIVE'
     and ((m = :member and p.owner = :loginMember)
     or (m = :loginMember and p.owner = :member))
     order by p.allowedDate desc

@@ -1,4 +1,6 @@
 package com.apps.pochak.tag.domain.repository;
+
+import com.apps.pochak.global.config.JpaAuditingConfig;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
@@ -11,18 +13,22 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
+import static com.apps.pochak.global.util.PageUtil.getFirstContentFromPage;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
-import static com.apps.pochak.post.fixture.PostFixture.*;
+import static com.apps.pochak.post.fixture.PostFixture.POST_WITH_MULTI_TAG;
+import static com.apps.pochak.post.fixture.PostFixture.PUBLIC_POST;
 import static com.apps.pochak.tag.fixture.TagFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@Import(JpaAuditingConfig.class)
 class TagRepositoryTest {
     @Autowired
     private MemberRepository memberRepository;
@@ -35,8 +41,6 @@ class TagRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        entityManager.clear();
-
         Member owner = MEMBER1;
         memberRepository.save(owner);
 
@@ -75,7 +79,7 @@ class TagRepositoryTest {
         // then
         assertThat(tag).isNotNull();
         assertThat(tag.hasContent()).isTrue();
-        Tag firstTag = tag.getContent().get(0);
+        Tag firstTag = getFirstContentFromPage(tag);
         assertThat(firstTag.getPost().getOwner()).isEqualTo(owner);
         assertThat(firstTag.getMember()).isEqualTo(member);
     }
