@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 import static com.apps.pochak.block.domain.QBlock.block;
-import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.INVALID_POST_ID;
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.BLOCKED_POST;
 import static com.apps.pochak.post.domain.QPost.post;
 import static com.apps.pochak.tag.domain.QTag.tag;
 
@@ -24,7 +24,7 @@ public class PostCustomRepository {
             final Long postId,
             final Long loginMemberId
     ) {
-        return findByIdWithoutBlockPost(postId, loginMemberId).orElseThrow(() -> new GeneralException(INVALID_POST_ID));
+        return findByIdWithoutBlockPost(postId, loginMemberId).orElseThrow(() -> new GeneralException(BLOCKED_POST));
     }
 
     public Optional<Post> findByIdWithoutBlockPost(

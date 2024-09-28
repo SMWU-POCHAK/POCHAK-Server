@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-import java.security.NoSuchAlgorithmException;
-
 import static org.springframework.http.HttpStatus.*;
 
 @Getter
@@ -78,6 +76,7 @@ public enum ErrorStatus implements BaseErrorCode {
     EXCEED_TAG_LIMIT(BAD_REQUEST, "POST4004", "최대 멤버 태그 수를 초과하였습니다."),
     TAGGED_ONESELF(BAD_REQUEST, "POST4005", "자기 자신을 태그하였습니다."),
     INVALID_TAG_INFO(BAD_REQUEST, "POST4006", "태그된 멤버의 정보가 확인되지 않습니다."),
+    BLOCKED_POST(BAD_REQUEST, "POST4007", "확인할 수 없는 게시물입니다."),
 
     // Tag
     INVALID_TAG_ID(BAD_REQUEST, "TAG4001", "유효하지 않은 태그 아이디입니다."),
