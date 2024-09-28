@@ -51,6 +51,9 @@ class MemoriesControllerTest extends ControllerTest {
         given(jwtProvider.getSubject(any())).willReturn(MEMBER1.getId().toString());
         given(loginArgumentResolver.resolveArgument(any(), any(), any(), any()))
                 .willReturn(Accessor.member(MEMBER1.getId()));
+
+        SEND_FOLLOW.updateLastModifiedDate();
+        RECEIVE_FOLLOW.updateLastModifiedDate();
     }
 
     @Test

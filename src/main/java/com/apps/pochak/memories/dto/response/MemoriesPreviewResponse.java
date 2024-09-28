@@ -48,8 +48,8 @@ public class MemoriesPreviewResponse {
         this.handle = member.getHandle();
         this.loginMemberProfileImage = loginMember.getProfileImage();
         this.memberProfileImage = member.getProfileImage();
-        this.followDate = checkModifiedDate(follow);
-        this.followedDate = checkModifiedDate(followed);
+        this.followDate = follow.getLastModifiedDate();
+        this.followedDate = followed.getLastModifiedDate();
         this.followDay = findFollowDay(followDate, followedDate);
         this.pochakCount = countTag;
         this.bondedCount = countTaggedWith;
@@ -58,13 +58,6 @@ public class MemoriesPreviewResponse {
         this.firstPochak = MemoriesElement.from(firstTag);
         this.firstPochakedWith = MemoriesElement.from(firstTaggedWith);
         this.latestPost = MemoriesElement.from(latestTag);
-    }
-
-    private LocalDateTime checkModifiedDate(Follow follow) {
-        if (follow.getLastModifiedDate() != null) {
-            return follow.getLastModifiedDate();
-        } else
-            return LocalDateTime.MIN;
     }
 
     private int findFollowDay(LocalDateTime followDate, LocalDateTime followedDate) {
