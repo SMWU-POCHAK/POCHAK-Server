@@ -132,5 +132,4 @@ tasks.withType(JavaCompile) {
 
 sourceSets {
     main.java.srcDirs += "$projectDir/build/generated"
-    print "$projectDir"
 }
