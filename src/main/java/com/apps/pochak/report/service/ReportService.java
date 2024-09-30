@@ -27,7 +27,7 @@ public class ReportService {
             final ReportUploadRequest request
     ) {
         final Member reporter = memberRepository.findMemberById(accessor.getMemberId());
-        final Post reportedPost = postRepository.findPostById(request.getPostId(), reporter);
+        final Post reportedPost = postRepository.findPostById(request.getPostId());
 
         Report report = request.toEntity(reporter, reportedPost);
         reportRepository.save(report);

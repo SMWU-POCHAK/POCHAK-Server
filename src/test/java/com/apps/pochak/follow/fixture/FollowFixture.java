@@ -2,19 +2,19 @@ package com.apps.pochak.follow.fixture;
 
 import com.apps.pochak.follow.domain.Follow;
 
-import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
-import static com.apps.pochak.member.fixture.MemberFixture.MEMBER2;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER2;
 
 public class FollowFixture {
-    public static final Follow SEND_FOLLOW = new Follow(
+    public static final Follow STATIC_SEND_FOLLOW = new Follow(
             1L,
-            MEMBER1,
-            MEMBER2
+            STATIC_MEMBER1,
+            STATIC_MEMBER2
     );
 
-    public static final Follow RECEIVE_FOLLOW = new Follow(
+    public static final Follow STATIC_RECEIVE_FOLLOW = new Follow(
             2L,
-            MEMBER2,
-            MEMBER1
+            STATIC_MEMBER2,
+            STATIC_MEMBER1
     );
 }

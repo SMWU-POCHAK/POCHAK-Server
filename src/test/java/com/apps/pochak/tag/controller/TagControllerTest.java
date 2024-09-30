@@ -2,6 +2,8 @@ package com.apps.pochak.tag.controller;
 
 import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.global.ControllerTest;
+import com.apps.pochak.member.domain.Member;
+import com.apps.pochak.tag.domain.Tag;
 import com.apps.pochak.tag.service.TagService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,8 +17,8 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
 import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_ACCEPT;
-import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
-import static com.apps.pochak.tag.fixture.TagFixture.WAITING_TAG;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
+import static com.apps.pochak.tag.fixture.TagFixture.STATIC_WAITING_TAG;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
@@ -35,6 +37,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(TagController.class)
 @MockBean(JpaMetamodelMappingContext.class)
 class TagControllerTest extends ControllerTest {
+    private static final Member MEMBER = STATIC_MEMBER1;
+    private static final Tag WAITING_TAG = STATIC_WAITING_TAG;
 
     @MockBean
     TagService tagService;
@@ -42,9 +46,9 @@ class TagControllerTest extends ControllerTest {
     @BeforeEach
     void setUp() {
         given(jwtProvider.validateAccessToken(any())).willReturn(true);
-        given(jwtProvider.getSubject(any())).willReturn(MEMBER1.getId().toString());
+        given(jwtProvider.getSubject(any())).willReturn(MEMBER.getId().toString());
         given(loginArgumentResolver.resolveArgument(any(), any(), any(), any()))
-                .willReturn(Accessor.member(MEMBER1.getId()));
+                .willReturn(Accessor.member(MEMBER.getId()));
     }
 
     @Test

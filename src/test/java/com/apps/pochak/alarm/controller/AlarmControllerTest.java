@@ -1,6 +1,7 @@
 package com.apps.pochak.alarm.controller;
 
 import com.apps.pochak.alarm.domain.Alarm;
+import com.apps.pochak.alarm.domain.TagAlarm;
 import com.apps.pochak.alarm.dto.response.AlarmElements;
 import com.apps.pochak.alarm.service.AlarmService;
 import com.apps.pochak.auth.domain.Accessor;
@@ -24,8 +25,8 @@ import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
 import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_CHECK_ALARM;
 import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
-import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
-import static com.apps.pochak.tag.fixture.TagFixture.WAITING_TAG;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
+import static com.apps.pochak.tag.fixture.TagFixture.STATIC_WAITING_TAG;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
@@ -45,13 +46,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @MockBean(JpaMetamodelMappingContext.class)
 class AlarmControllerTest extends ControllerTest {
 
-    private static final Member MEMBER = MEMBER1;
+    private static final Member MEMBER = STATIC_MEMBER1;
+    private static final TagAlarm TAG_ALARM = STATIC_TAG_ALARM;
 
     private static final List<Alarm> ALARM_LIST = List.of(
-            COMMENT_REPLY_ALARM,
-            FOLLOW_ALARM,
-            TAGGED_LIKE_ALARM,
-            TAG_ALARM
+            STATIC_COMMENT_REPLY_ALARM,
+            STATIC_FOLLOW_ALARM,
+            STATIC_TAGGED_LIKE_ALARM,
+            STATIC_TAG_ALARM
     );
 
     @MockBean
@@ -184,7 +186,7 @@ class AlarmControllerTest extends ControllerTest {
 
         when(postService.getPreviewPost(any(), any()))
                 .thenReturn(
-                        new PostPreviewResponse(TAG_ALARM.getTag().getPost(), List.of(WAITING_TAG))
+                        new PostPreviewResponse(TAG_ALARM.getTag().getPost(), List.of(STATIC_WAITING_TAG))
                 );
 
         this.mockMvc.perform(

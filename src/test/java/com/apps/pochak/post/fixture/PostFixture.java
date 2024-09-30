@@ -12,30 +12,33 @@ public class PostFixture {
 
     private static final String POST_IMAGE = "https://avatars.githubusercontent.com/u/163827369?s=200&v=4";
 
-    public static final Post PUBLIC_POST = new Post(
+    public static final Post STATIC_PUBLIC_POST = new Post(
             1L,
             PUBLIC,
             LocalDateTime.now(),
-            MEMBER1,
+            STATIC_MEMBER1,
             POST_IMAGE,
             "공개 게시물 캡션입니다."
     );
 
-    public static final Post PRIVATE_POST = new Post(
+    public static final Post STATIC_PRIVATE_POST = new Post(
             2L,
             PRIVATE,
             LocalDateTime.now(),
-            MEMBER2,
+            STATIC_MEMBER2,
             POST_IMAGE,
             "아직 수락되지 않은 게시물의 캡션입니다."
     );
 
-    public static final Post POST_WITH_MULTI_TAG = new Post(
-            3L,
-            PUBLIC,
-            LocalDateTime.now(),
-            MEMBER3,
-            POST_IMAGE,
-            "공개 게시물2 캡션입니다."
-    ); // 다수의 태그 생성 목적
+    public static final Post PUBLIC_POST = Post.builder()
+            .owner(OWNER)
+            .postImage(POST_IMAGE)
+            .caption("하나의 태그를 가진 게시물입니다.")
+            .build();
+
+    public static final Post POST_WITH_MULTI_TAG = Post.builder()
+            .owner(OWNER)
+            .postImage(POST_IMAGE)
+            .caption("다중 태그를 가진 게시물입니다.")
+            .build();
 }

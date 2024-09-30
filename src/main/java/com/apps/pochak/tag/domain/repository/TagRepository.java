@@ -97,14 +97,11 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     Long countByPost_PostStatusAndPost_OwnerAndMember(PostStatus postStatus, Member owner, Member member);
 
     @Query("""
-    select count(t) from Tag t
-    join t.member m
-    join t.post p
-    where p.postStatus = 'PUBLIC'
-    and p.status = 'ACTIVE'
-    and ((m = :member and p.owner = :loginMember)
-    or (m = :loginMember and p.owner = :member))
-    order by p.allowedDate desc
+    select count(t1) from Tag t1
+    join Tag t2 on t1.post = t2.post
+    where t1.post.postStatus = 'PUBLIC'
+    and t1.post.status = 'ACTIVE'
+    and (t1.member = :loginMember and t2.member = :member)
     """)
     Long countByMember(@Param("loginMember") Member loginMember, @Param("member")Member member);
 }

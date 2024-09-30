@@ -7,6 +7,7 @@ import com.apps.pochak.login.dto.response.OAuthMemberResponse;
 import com.apps.pochak.login.service.AppleOAuthService;
 import com.apps.pochak.login.service.GoogleOAuthService;
 import com.apps.pochak.login.service.OAuthService;
+import com.apps.pochak.member.domain.Member;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,7 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
 import static com.apps.pochak.global.MockMultipartFileConverter.getSampleMultipartFile;
-import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -39,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(OAuthController.class)
 @MockBean(JpaMetamodelMappingContext.class)
 public class OAuthControllerTest extends ControllerTest {
+    private static final Member MEMBER1 = STATIC_MEMBER1;
 
     @MockBean
     OAuthService oAuthService;

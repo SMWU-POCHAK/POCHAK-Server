@@ -2,14 +2,13 @@ package com.apps.pochak.block.fixture;
 
 import com.apps.pochak.block.domain.Block;
 
-import static com.apps.pochak.member.fixture.MemberFixture.BLOCKED_MEMBER;
-import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
 
 public class BlockFixture {
 
-    public static final Block BLOCK = new Block(
+    public static final Block STATIC_BLOCK = new Block(
             1L,
-            MEMBER1,
-            BLOCKED_MEMBER
+            STATIC_MEMBER1,
+            STATIC_MEMBER1
     );
 }
