@@ -1,6 +1,6 @@
 package com.apps.pochak.member.dto.response;
 
-import com.apps.pochak.global.PageInfo;
+import com.apps.pochak.global.util.PageInfo;
 import com.apps.pochak.member.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.MappedSuperclass;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
@@ -41,5 +42,9 @@ public abstract class BaseEntity {
         } else {
             this.status = ACTIVE;
         }
+    }
+
+    public void updateLastModifiedDate() {
+        this.lastModifiedDate = LocalDateTime.now();
     }
 }

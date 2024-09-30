@@ -62,6 +62,7 @@ public enum ErrorStatus implements BaseErrorCode {
     JSON_PROCESSING_EXCEPTION(INTERNAL_SERVER_ERROR, "APPLE4004", "idToken 파싱에 실패하였습니다."),
     NO_SUCH_ALGORITHM(INTERNAL_SERVER_ERROR, "APPLE5001", "Null algorithm name"),
     INVALID_KEY_SPEC(INTERNAL_SERVER_ERROR, "APPLE5002", "Could not generate public key."),
+    FAIL_GET_REFRESH_TOKEN(INTERNAL_SERVER_ERROR, "APPLE5003", "애플로그인 리프레시 토큰 값 조회에 실패하였습니다."),
 
 
     // Member

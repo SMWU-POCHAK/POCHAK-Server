@@ -1,6 +1,6 @@
 package com.apps.pochak.post.dto.request;
 
-import com.apps.pochak.global.s3.ValidFile;
+import com.apps.pochak.global.annotation.ValidFile;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
 import jakarta.validation.Valid;

@@ -5,7 +5,7 @@ import com.apps.pochak.alarm.dto.response.alarm_element.CommentAlarmElement;
 import com.apps.pochak.alarm.dto.response.alarm_element.FollowAlarmElement;
 import com.apps.pochak.alarm.dto.response.alarm_element.LikeAlarmElement;
 import com.apps.pochak.alarm.dto.response.alarm_element.TagApprovalAlarmElement;
-import com.apps.pochak.global.PageInfo;
+import com.apps.pochak.global.util.PageInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

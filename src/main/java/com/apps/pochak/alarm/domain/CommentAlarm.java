@@ -28,18 +28,13 @@ public class CommentAlarm extends Alarm {
     private Long postId;
     private String postImage;
 
-    private Long writerId;
-    private String writerHandle;
-    private String writerName;
-    private String writerProfileImage;
-
     public CommentAlarm(
             final Long id,
             final Comment comment,
             final Member receiver,
             final AlarmType alarmType
     ) {
-        super(id, receiver, alarmType);
+        super(id, receiver, alarmType, comment.getMember());
         initializeFields(comment);
     }
 
@@ -48,7 +43,7 @@ public class CommentAlarm extends Alarm {
             final Member receiver,
             final AlarmType alarmType
     ) {
-        super(receiver, alarmType);
+        super(receiver, alarmType, comment.getMember());
         initializeFields(comment);
     }
 
@@ -64,10 +59,5 @@ public class CommentAlarm extends Alarm {
         this.postId = post.getId();
         this.postImage = post.getPostImage();
 
-        Member writer = comment.getMember();
-        this.writerId = writer.getId();
-        this.writerHandle = writer.getHandle();
-        this.writerName = writer.getName();
-        this.writerProfileImage = writer.getProfileImage();
     }
 }
