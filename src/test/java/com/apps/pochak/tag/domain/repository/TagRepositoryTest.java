@@ -41,39 +41,27 @@ class TagRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        Member owner = MEMBER1;
-        memberRepository.save(owner);
+        memberRepository.save(OWNER);
+        memberRepository.save(TAGGED_MEMBER1);
+        memberRepository.save(TAGGED_MEMBER2);
 
-        Member member = MEMBER2;
-        memberRepository.save(member);
+        PUBLIC_POST.makePublic();
+        postRepository.save(PUBLIC_POST);;
+        tagRepository.save(APPROVAL_TAG);
 
-        Member friend = MEMBER3;
-        memberRepository.save(friend);
+        POST_WITH_MULTI_TAG.makePublic();
+        postRepository.save(POST_WITH_MULTI_TAG);
 
-        Post post = PUBLIC_POST;
-        postRepository.save(post);
-        post.makePublic();
-
-        Tag tag = APPROVED_TAG;
-        tagRepository.save(tag);
-
-        Post post2 = POST_WITH_MULTI_TAG;
-        postRepository.save(post2);
-        post2.makePublic();
-
-        Tag tags1 = TAG1_WITH_ONE_POST;
-        tagRepository.save(tags1);
-
-        Tag tags2 = TAG2_WITH_ONE_POST;
-        tagRepository.save(tags2);
+        tagRepository.save(TAG1_WITH_ONE_POST);
+        tagRepository.save(TAG2_WITH_ONE_POST);
     }
 
     @Test
     @DisplayName("[추억 페이지] 친구를 태그한 첫 게시물을 조회한다.")
     void findFirstTaggedPost() {
         // given
-        Member owner = memberRepository.findByHandleWithoutLogin("member1");
-        Member member = memberRepository.findByHandleWithoutLogin("member2");
+        Member owner = memberRepository.findByHandleWithoutLogin("owner");
+        Member member = memberRepository.findByHandleWithoutLogin("tagged_member1");
         // when
         Page<Tag> tag = tagRepository.findTagByOwnerAndMember(owner, member, PageRequest.of(0, 1));
         // then
@@ -88,8 +76,8 @@ class TagRepositoryTest {
     @DisplayName("[추억 페이지] 함께 태그된 첫 게시물을 조회한다.")
     void findTaggedWith() {
         // given
-        Member loginMember = memberRepository.findByHandleWithoutLogin("member1");
-        Member member = memberRepository.findByHandleWithoutLogin("member2");
+        Member loginMember = memberRepository.findByHandleWithoutLogin("tagged_member1");
+        Member member = memberRepository.findByHandleWithoutLogin("tagged_member2");
         // when
         Page<Tag> tag = tagRepository.findTaggedWith(loginMember, member, PageRequest.of(0, 1, Sort.by(Sort.Direction.ASC, "post.allowedDate")));
         // then
@@ -107,8 +95,8 @@ class TagRepositoryTest {
     @DisplayName("[추억 페이지] 가장 최근 게시물을 조회한다.")
     void findLatestTag() {
         // given
-        Member loginMember = memberRepository.findByHandleWithoutLogin("member1");
-        Member member = memberRepository.findByHandleWithoutLogin("member2");
+        Member loginMember = memberRepository.findByHandleWithoutLogin("tagged_member1");
+        Member member = memberRepository.findByHandleWithoutLogin("tagged_member2");
         // when
         Page<Tag> taggedWithDesc = tagRepository.findTaggedWith(loginMember, member, PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "post.allowedDate")));
         Page<Tag> tagOrTagged = tagRepository.findLatestTagged(loginMember, member, PageRequest.of(0, 1));
@@ -131,18 +119,19 @@ class TagRepositoryTest {
     @Test
     @DisplayName("[추억 페이지] 함께 태그된 게시물의 수를 조회한다.")
     void countByMember() {
-        Member owner = memberRepository.findByHandleWithoutLogin("member1");
-        Member member = memberRepository.findByHandleWithoutLogin("member2");
+        Member loginMember = memberRepository.findByHandleWithoutLogin("tagged_member1");
+        Member member = memberRepository.findByHandleWithoutLogin("tagged_member2");
 
-        Long count = tagRepository.countByMember(owner, member);
-        assertThat(count).isEqualTo(1);
+        Page<Tag> taggedWith = tagRepository.findTaggedWith(loginMember, member, PageRequest.of(0, 1, Sort.by(Sort.Direction.ASC, "post.allowedDate")));
+        Long count = tagRepository.countByMember(loginMember, member);
+        assertThat(count).isEqualTo(taggedWith.getTotalElements());
     }
 
     @Test
     @DisplayName("[추억 페이지] 내가 태그한, 태그된 게시물의 수를 조회한다.")
     void countByPostOwner() {
-        Member owner = memberRepository.findByHandleWithoutLogin("member1");
-        Member member = memberRepository.findByHandleWithoutLogin("member2");
+        Member owner = memberRepository.findByHandleWithoutLogin("owner");
+        Member member = memberRepository.findByHandleWithoutLogin("tagged_member1");
 
         Page<Tag> tag = tagRepository.findTagByOwnerAndMember(owner, member, PageRequest.of(0, 1));
         Long count = tagRepository.countByPost_PostStatusAndPost_OwnerAndMember(PostStatus.PUBLIC, owner, member);

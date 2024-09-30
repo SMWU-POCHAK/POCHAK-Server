@@ -21,32 +21,14 @@ import static com.apps.pochak.global.converter.LongListToStringConverter.convert
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    @Query("""
-            select p from Post p
-            join fetch p.owner
-            where p.id = :postId and p.status = 'ACTIVE'
-                and p.owner not in (select b.blockedMember from Block b where b.blocker = :loginMember)
-                and :loginMember not in (select b.blockedMember from Block b where b.blocker = p.owner)
-                and not exists (select t.member from Tag t where t.post = p intersect select b.blockedMember from Block b where b.blocker = :loginMember)
-                and :loginMember not in (select b.blockedMember from Block b where b.blocker in (select t.member from Tag t where t.post = p))
-            """)
-    Optional<Post> findById(
-            @Param("postId") final Long postId,
-            @Param("loginMember") final Member loginMember
-    );
+    Optional<Post> findById(final Long id);
 
-    default Post findPostById(
-            final Long postId,
-            final Member loginMember
-    ) {
-        return findById(postId, loginMember).orElseThrow(() -> new GeneralException(INVALID_POST_ID));
+    default Post findPostById(final Long postId) {
+        return findById(postId).orElseThrow(() -> new GeneralException(INVALID_POST_ID));
     }
 
-    default Post findPublicPostById(
-            final Long postId,
-            final Member loginMember
-    ) {
-        final Post post = findById(postId, loginMember).orElseThrow(() -> new GeneralException(INVALID_POST_ID));
+    default Post findPublicPostById(final Long postId) {
+        final Post post = findById(postId).orElseThrow(() -> new GeneralException(INVALID_POST_ID));
         if (post.isPrivate()) {
             throw new GeneralException(PRIVATE_POST);
         }

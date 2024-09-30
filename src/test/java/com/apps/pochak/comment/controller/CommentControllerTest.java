@@ -7,6 +7,7 @@ import com.apps.pochak.comment.dto.response.CommentElements;
 import com.apps.pochak.comment.dto.response.ParentCommentElement;
 import com.apps.pochak.comment.service.CommentService;
 import com.apps.pochak.global.ControllerTest;
+import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,12 +22,12 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
 import java.util.List;
 
-import static com.apps.pochak.comment.fixture.CommentFixture.PARENT_COMMENT;
+import static com.apps.pochak.comment.fixture.CommentFixture.STATIC_PARENT_COMMENT;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
 import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
-import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
-import static com.apps.pochak.post.fixture.PostFixture.PUBLIC_POST;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
+import static com.apps.pochak.post.fixture.PostFixture.STATIC_PUBLIC_POST;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -45,10 +46,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @MockBean(JpaMetamodelMappingContext.class)
 class CommentControllerTest extends ControllerTest {
 
-    private static final Post POST = PUBLIC_POST;
+    private static final Member MEMBER1 = STATIC_MEMBER1;
+    private static final Post POST = STATIC_PUBLIC_POST;
+    private static final Comment PARENT_COMMENT = STATIC_PARENT_COMMENT;
 
     private static final List<Comment> PARENT_COMMENT_LIST = List.of(
-            PARENT_COMMENT
+            STATIC_PARENT_COMMENT
     );
 
     @MockBean

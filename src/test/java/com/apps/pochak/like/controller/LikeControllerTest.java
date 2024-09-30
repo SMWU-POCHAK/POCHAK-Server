@@ -2,10 +2,11 @@ package com.apps.pochak.like.controller;
 
 import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.global.ControllerTest;
-import com.apps.pochak.like.domain.LikeEntity;
 import com.apps.pochak.like.dto.response.LikeElement;
 import com.apps.pochak.like.dto.response.LikeElements;
 import com.apps.pochak.like.service.LikeService;
+import com.apps.pochak.member.domain.Member;
+import com.apps.pochak.post.domain.Post;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,11 +22,9 @@ import java.util.List;
 
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
-import static com.apps.pochak.like.fixture.LikeFixture.LIKE1;
-import static com.apps.pochak.like.fixture.LikeFixture.LIKE2;
-import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
-import static com.apps.pochak.member.fixture.MemberFixture.MEMBER2;
-import static com.apps.pochak.post.fixture.PostFixture.PUBLIC_POST;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER2;
+import static com.apps.pochak.post.fixture.PostFixture.STATIC_PUBLIC_POST;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -45,11 +44,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(LikeController.class)
 @MockBean(JpaMetamodelMappingContext.class)
 public class LikeControllerTest extends ControllerTest {
-
-    private static final List<LikeEntity> LIKE_LIST = List.of(
-            LIKE1,
-            LIKE2
-    );
+    private static final Member MEMBER1 = STATIC_MEMBER1;
+    private static final Member MEMBER2 = STATIC_MEMBER2;
+    private static final Post PUBLIC_POST = STATIC_PUBLIC_POST;
 
     @MockBean
     LikeService likeService;

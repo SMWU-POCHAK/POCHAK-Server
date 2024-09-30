@@ -7,6 +7,7 @@ import com.apps.pochak.member.dto.response.MemberElements;
 import com.apps.pochak.member.dto.response.ProfileResponse;
 import com.apps.pochak.member.dto.response.ProfileUpdateResponse;
 import com.apps.pochak.member.service.MemberService;
+import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.dto.PostElements;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,9 +27,9 @@ import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
 import static com.apps.pochak.global.MockMultipartFileConverter.getSampleMultipartFile;
 import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
-import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
-import static com.apps.pochak.member.fixture.MemberFixture.MEMBER2;
-import static com.apps.pochak.post.fixture.PostFixture.PUBLIC_POST;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER2;
+import static com.apps.pochak.post.fixture.PostFixture.STATIC_PUBLIC_POST;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -47,6 +48,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(MemberController.class)
 @MockBean(JpaMetamodelMappingContext.class)
 class MemberControllerTest extends ControllerTest {
+    private static final Member MEMBER1 = STATIC_MEMBER1;
+    private static final Member MEMBER2 = STATIC_MEMBER2;
+    private static final Post PUBLIC_POST = STATIC_PUBLIC_POST;
 
     private static final List<Member> MEMBER_LIST = List.of(
             MEMBER1,

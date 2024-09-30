@@ -44,7 +44,7 @@ public class CommentService {
             final Pageable pageable
     ) {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
-        final Post post = postRepository.findPublicPostById(postId, loginMember);
+        final Post post = postRepository.findPublicPostById(postId);
         final Page<Comment> commentList = commentRepository.findParentCommentByPost(post, loginMember, pageable);
         return new CommentElements(loginMember, commentList);
     }
@@ -68,7 +68,7 @@ public class CommentService {
             final CommentUploadRequest request
     ) {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
-        final Post post = postRepository.findPublicPostById(postId, loginMember);
+        final Post post = postRepository.findPublicPostById(postId);
 
         if (request.checkChildComment()) {
             saveChildComment(
