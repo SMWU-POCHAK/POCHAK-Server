@@ -25,10 +25,10 @@ public class TagApprovalAlarmElement extends AlarmElement {
     public TagApprovalAlarmElement(final TagAlarm alarm) {
         super(alarm);
         this.tagId = alarm.getTag().getId();
-        this.ownerId = alarm.getTaggerId();
-        this.ownerHandle = alarm.getTaggerHandle();
-        this.ownerName = alarm.getTaggerName();
-        this.ownerProfileImage = alarm.getTaggerProfileImage();
+        this.ownerId = alarm.getSender().getId();
+        this.ownerHandle = alarm.getSender().getHandle();
+        this.ownerName = alarm.getSender().getName();
+        this.ownerProfileImage = alarm.getSender().getProfileImage();
         this.postId = alarm.getPostId();
         this.postImage = alarm.getPostImage();
     }

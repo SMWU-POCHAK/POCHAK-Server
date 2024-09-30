@@ -25,9 +25,9 @@ public class CommentAlarmElement extends AlarmElement {
         this.commentContent = alarm.getContent();
         this.postId = alarm.getPostId();
         this.postImage = alarm.getPostImage();
-        this.memberId = alarm.getWriterId();
-        this.memberHandle = alarm.getWriterHandle();
-        this.memberName = alarm.getWriterName();
-        this.memberProfileImage = alarm.getWriterProfileImage();
+        this.memberId = alarm.getSender().getId();
+        this.memberHandle = alarm.getSender().getHandle();
+        this.memberName = alarm.getSender().getName();
+        this.memberProfileImage = alarm.getSender().getProfileImage();
     }
 }
