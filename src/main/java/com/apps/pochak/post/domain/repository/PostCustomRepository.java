@@ -27,7 +27,7 @@ public class PostCustomRepository {
         return findByIdWithoutBlockPost(postId, loginMemberId).orElseThrow(() -> new GeneralException(BLOCKED_POST));
     }
 
-    public Optional<Post> findByIdWithoutBlockPost(
+    private Optional<Post> findByIdWithoutBlockPost(
             final Long postId,
             final Long loginMemberId
     ) {
