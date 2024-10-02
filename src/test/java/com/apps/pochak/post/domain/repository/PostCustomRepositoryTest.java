@@ -64,7 +64,7 @@ class PostCustomRepositoryTest {
                 .build();
     }
 
-    @DisplayName("차단된 게시물을 제외한 게시물이 조회된다.")
+    @DisplayName("[findPostByIdWithoutBlockPost] 차단된 게시물을 제외한 게시물이 조회된다.")
     @Test
     void findById() throws Exception {
         //given
@@ -79,7 +79,7 @@ class PostCustomRepositoryTest {
         assertEquals(savedPost.getId(), findPost.getId());
     }
 
-    @DisplayName("유효한 id가 없는 경우 조회되지 않는다.")
+    @DisplayName("[findPostByIdWithoutBlockPost] 유효한 id가 없는 경우 조회되지 않는다.")
     @Test
     void findById_WhenIdIsInvalid() throws Exception {
         //given
@@ -97,7 +97,7 @@ class PostCustomRepositoryTest {
         assertEquals(BLOCKED_POST, exception.getCode());
     }
 
-    @DisplayName("게시물을 업로드한 사람이 현재 로그인한 사람을 차단하였다면 조회되지 않는다.")
+    @DisplayName("[findPostByIdWithoutBlockPost] 게시물을 업로드한 사람이 현재 로그인한 사람을 차단하였다면 조회되지 않는다.")
     @Test
     void findById_WhenOwnerBlockLoginMember() throws Exception {
         //given
@@ -121,7 +121,7 @@ class PostCustomRepositoryTest {
         assertEquals(BLOCKED_POST, exception.getCode());
     }
 
-    @DisplayName("게시물에 태그된 사람 중 한명이라도 현재 로그인한 사람을 차단하였다면 조회되지 않는다.")
+    @DisplayName("[findPostByIdWithoutBlockPost] 게시물에 태그된 사람 중 한명이라도 현재 로그인한 사람을 차단하였다면 조회되지 않는다.")
     @Test
     void findById_WhenTaggedMemberBlockLoginMember() throws Exception {
         //given
@@ -145,7 +145,7 @@ class PostCustomRepositoryTest {
         assertEquals(BLOCKED_POST, exception.getCode());
     }
 
-    @DisplayName("현재 로그인한 사람이 게시물을 업로드한 사람을 차단하였다면 조회되지 않는다.")
+    @DisplayName("[findPostByIdWithoutBlockPost] 현재 로그인한 사람이 게시물을 업로드한 사람을 차단하였다면 조회되지 않는다.")
     @Test
     void findById_WhenLoginMemberBlockOwner() throws Exception {
         //given
@@ -169,9 +169,9 @@ class PostCustomRepositoryTest {
         assertEquals(BLOCKED_POST, exception.getCode());
     }
 
-    @DisplayName("현재 로그인한 사람이 게시물에 태그된 사람 중 한명이라도 차단하였다면 조회되지 않는다.")
+    @DisplayName("[findPostByIdWithoutBlockPost] 현재 로그인한 사람이 게시물에 태그된 사람 중 한명이라도 차단하였다면 조회되지 않는다.")
     @Test
-    void findPostByIdWithoutBlockPostWhenLoginMemberBlockTaggedMember() throws Exception {
+    void findPostById_WhenLoginMemberBlockTaggedMember() throws Exception {
         //given
         SavedPostData savedPostData = savePost();
         Member loginMember = savedPostData.getLoginMember();
