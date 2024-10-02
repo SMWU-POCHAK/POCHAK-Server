@@ -192,6 +192,56 @@ class PostCustomRepositoryTest {
         //then
         assertEquals(BLOCKED_POST, exception.getCode());
     }
+
+    @DisplayName("[홈탭 조회] 차단된 게시물을 제외한 홈 탭 게시물이 조회된다.")
+    @Test
+    void findPostOfFollowing() throws Exception{
+        //given
+
+        //when
+
+        //then
+    }
+
+    @DisplayName("[홈탭 조회] 게시물을 업로드한 사람이 현재 로그인한 사람을 차단하였다면 해당 게시물은 제외되어 조회된다.")
+    @Test
+    void findPostOfFollowing_WhenOwnerBlockLoginMember() throws Exception{
+        //given
+
+        //when
+
+        //then
+    }
+
+    @DisplayName("[홈탭 조회] 게시물에 태그된 사람 중 한명이라도 현재 로그인한 사람을 차단하였다면 해당 게시물은 제외되어 조회된다.")
+    @Test
+    void findPostOfFollowing_WhenTaggedMemberBlockLoginMember() throws Exception{
+        //given
+
+        //when
+
+        //then
+    }
+
+    @DisplayName("[홈탭 조회] 현재 로그인한 사람이 게시물을 업로드한 사람을 차단하였다면 해당 게시물은 제외되어 조회된다.")
+    @Test
+    void findPostOfFollowing_WhenLoginMemberBlockOwner() throws Exception{
+        //given
+
+        //when
+
+        //then
+    }
+
+    @DisplayName("[홈탭 조회] 현재 로그인한 사람이 게시물에 태그된 사람 중 한명이라도 차단하였다면 해당 게시물은 제외되어 조회된다.")
+    @Test
+    void findPostOfFollowing_WhenLoginMemberBlockTaggedMember() throws Exception{
+        //given
+
+        //when
+
+        //then
+    }
 }
 
 @Data
