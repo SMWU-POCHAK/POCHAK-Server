@@ -1,6 +1,5 @@
 package com.apps.pochak.post.domain.repository;
 
-import com.apps.pochak.global.BaseEntityStatus;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.post.domain.Post;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 import static com.apps.pochak.block.domain.QBlock.block;
+import static com.apps.pochak.global.BaseEntityStatus.ACTIVE;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.BLOCKED_POST;
 import static com.apps.pochak.post.domain.PostStatus.PUBLIC;
 import static com.apps.pochak.post.domain.QPost.post;
@@ -40,9 +40,9 @@ public class PostCustomRepository {
                                 checkOwnerOrTaggedMemberBlockLoginMember(loginMemberId)
                                         .or(checkLoginMemberBlockOwnerOrTaggedMember(loginMemberId))
                         )
+                        .where(post.status.eq(ACTIVE).and(post.postStatus.eq(PUBLIC)))
                         .groupBy(post)
                         .having(block.id.count().eq(0L))
-                        .where(post.status.eq(BaseEntityStatus.ACTIVE).and(post.postStatus.eq(PUBLIC)))
                         .fetchOne()
         );
     }
