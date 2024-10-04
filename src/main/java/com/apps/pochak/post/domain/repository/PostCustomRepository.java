@@ -18,6 +18,7 @@ import static com.apps.pochak.block.domain.QBlock.block;
 import static com.apps.pochak.follow.domain.QFollow.follow;
 import static com.apps.pochak.global.BaseEntityStatus.ACTIVE;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.BLOCKED_POST;
+import static com.apps.pochak.post.domain.PostStatus.PUBLIC;
 import static com.apps.pochak.post.domain.QPost.post;
 import static com.apps.pochak.tag.domain.QTag.tag;
 
@@ -78,6 +79,7 @@ public class PostCustomRepository {
                         tag.post.eq(post)
                                 .and(tag.status.eq(ACTIVE))
                                 .and(post.status.eq(ACTIVE))
+                                .and(post.postStatus.eq(PUBLIC))
                 )
                 .leftJoin(follow).on(checkFollowOwnerOrTaggedMember(memberId))
                 .leftJoin(block).on(checkBlockStatus(memberId))
