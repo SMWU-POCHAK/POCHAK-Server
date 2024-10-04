@@ -2,6 +2,8 @@ package com.apps.pochak.post.domain.repository;
 
 import com.apps.pochak.block.domain.Block;
 import com.apps.pochak.block.domain.repository.BlockRepository;
+import com.apps.pochak.follow.domain.Follow;
+import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.TestQuerydslConfig;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.member.domain.Member;
@@ -17,7 +19,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
+import static com.apps.pochak.global.BaseEntityStatus.ACTIVE;
+import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.BLOCKED_POST;
 import static com.apps.pochak.post.fixture.PostFixture.POST_WITH_MULTI_TAG;
 import static com.apps.pochak.tag.fixture.TagFixture.TAG1_WITH_ONE_POST;
@@ -51,6 +57,9 @@ class PostCustomRepositoryTest {
 
     @Autowired
     BlockRepository blockRepository;
+
+    @Autowired
+    FollowRepository followRepository;
 
     private SavedPostData savePost() {
         return SavedPostData.of()
@@ -193,9 +202,60 @@ class PostCustomRepositoryTest {
         assertEquals(BLOCKED_POST, exception.getCode());
     }
 
-    @DisplayName("[홈탭 조회] 차단된 게시물을 제외한 홈 탭 게시물이 조회된다.")
+    @DisplayName("[홈탭 조회] 홈 탭이 조회된다.")
     @Test
-    void findPostOfFollowing() throws Exception{
+    void findPostOfFollowing() throws Exception {
+        //given
+        SavedPostData savedPostData = savePost();
+        Post savedPost = savedPostData.getSavedPost();
+        savedPost.makePublic();
+        Member loginMember = savedPostData.getLoginMember();
+
+        //when
+        Page<Post> postPage = postCustomRepository.findPostOfFollowing(
+                loginMember.getId(),
+                PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
+
+        //then
+        assertEquals(0, postPage.getTotalElements());
+        assertEquals(0, postPage.getTotalPages());
+    }
+
+    @DisplayName("[홈탭 조회] 게시물을 업로더를 팔로우하면 게시물이 조회된다.")
+    @Test
+    void findPostOfFollowing_WhenFollowOwner() throws Exception {
+        //given
+        SavedPostData savedPostData = savePost();
+        Post savedPost = savedPostData.getSavedPost();
+        savedPost.makePublic();
+        savedPost.setStatus(ACTIVE);
+        savedPostData.getTag1().setStatus(ACTIVE);
+        savedPostData.getTag2().setStatus(ACTIVE);
+        Member loginMember = savedPostData.getLoginMember();
+
+        //when
+        Follow followOwner = Follow.of()
+                .sender(loginMember)
+                .receiver(savedPost.getOwner())
+                .build();
+        followOwner.setStatus(ACTIVE);
+        followRepository.save(followOwner);
+
+        Page<Post> postPage = postCustomRepository.findPostOfFollowing(
+                loginMember.getId(),
+                PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
+
+        //then
+        assertEquals(1, postPage.getTotalElements());
+        assertEquals(1, postPage.getTotalPages());
+        assertEquals(savedPost.getId(), postPage.getContent().get(0).getId());
+    }
+
+    @DisplayName("[홈탭 조회] 업로더가 현재 유저를 차단하였다면 해당 게시물은 제외되어 조회된다.")
+    @Test
+    void findPostOfFollowing_WhenFollowTaggedAndBlockedByOwner() throws Exception {
         //given
 
         //when
@@ -203,9 +263,9 @@ class PostCustomRepositoryTest {
         //then
     }
 
-    @DisplayName("[홈탭 조회] 게시물을 업로드한 사람이 현재 로그인한 사람을 차단하였다면 해당 게시물은 제외되어 조회된다.")
+    @DisplayName("[홈탭 조회] 태그된 사람 중 한명이라도 현재 유저를 차단하였다면 해당 게시물은 제외되어 조회된다.")
     @Test
-    void findPostOfFollowing_WhenOwnerBlockLoginMember() throws Exception{
+    void findPostOfFollowing_WhenFollowOwnerAndBlockedByTagged() throws Exception {
         //given
 
         //when
@@ -213,9 +273,9 @@ class PostCustomRepositoryTest {
         //then
     }
 
-    @DisplayName("[홈탭 조회] 게시물에 태그된 사람 중 한명이라도 현재 로그인한 사람을 차단하였다면 해당 게시물은 제외되어 조회된다.")
+    @DisplayName("[홈탭 조회] 태그된 사람을 팔로우하더라도 업로더를 차단하였다면 해당 게시물은 제외되어 조회된다.")
     @Test
-    void findPostOfFollowing_WhenTaggedMemberBlockLoginMember() throws Exception{
+    void findPostOfFollowing_WhenFollowTaggedAndBlockOwner() throws Exception {
         //given
 
         //when
@@ -223,9 +283,9 @@ class PostCustomRepositoryTest {
         //then
     }
 
-    @DisplayName("[홈탭 조회] 현재 로그인한 사람이 게시물을 업로드한 사람을 차단하였다면 해당 게시물은 제외되어 조회된다.")
+    @DisplayName("[홈탭 조회] 업로더를 팔로우하더라도 태그된 사람을 차단하였다면 해당 게시물은 제외되어 조회된다.")
     @Test
-    void findPostOfFollowing_WhenLoginMemberBlockOwner() throws Exception{
+    void findPostOfFollowing_WhenFollowOwnerAndBlockTagged() throws Exception {
         //given
 
         //when
@@ -233,9 +293,9 @@ class PostCustomRepositoryTest {
         //then
     }
 
-    @DisplayName("[홈탭 조회] 현재 로그인한 사람이 게시물에 태그된 사람 중 한명이라도 차단하였다면 해당 게시물은 제외되어 조회된다.")
+    @DisplayName("[홈탭 조회] 태그된 사람을 팔로우하더라도 또 다른 태그된 사람을 차단하였다면 해당 게시물은 제외되어 조회된다.")
     @Test
-    void findPostOfFollowing_WhenLoginMemberBlockTaggedMember() throws Exception{
+    void findPostOfFollowing_WhenFollowTaggedAndBlockTagged() throws Exception {
         //given
 
         //when
