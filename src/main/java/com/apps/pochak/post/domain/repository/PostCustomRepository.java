@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import static com.apps.pochak.block.domain.QBlock.block;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.BLOCKED_POST;
+import static com.apps.pochak.post.domain.PostStatus.PUBLIC;
 import static com.apps.pochak.post.domain.QPost.post;
 import static com.apps.pochak.tag.domain.QTag.tag;
 
@@ -41,7 +42,7 @@ public class PostCustomRepository {
                         )
                         .groupBy(post)
                         .having(block.id.count().eq(0L))
-                        .where(post.status.eq(BaseEntityStatus.ACTIVE))
+                        .where(post.status.eq(BaseEntityStatus.ACTIVE).and(post.postStatus.eq(PUBLIC)))
                         .fetchOne()
         );
     }
