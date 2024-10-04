@@ -11,6 +11,7 @@ import com.apps.pochak.member.dto.response.MemberElements;
 import com.apps.pochak.member.dto.response.ProfileResponse;
 import com.apps.pochak.member.dto.response.ProfileUpdateResponse;
 import com.apps.pochak.post.domain.Post;
+import com.apps.pochak.post.domain.repository.PostCustomRepository;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.post.dto.PostElements;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
     private final PostRepository postRepository;
+    private final PostCustomRepository postCustomRepository;
     private final S3Service awsS3Service;
 
     @Transactional(readOnly = true)
@@ -98,7 +100,7 @@ public class MemberService {
     ) {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Member owner = memberRepository.findByHandle(handle, loginMember);
-        final Page<Post> taggedPost = postRepository.findUploadPost(owner, loginMember, pageable);
+        final Page<Post> taggedPost = postCustomRepository.findUploadPostPage(owner.getId(), loginMember.getId(), pageable);
         return PostElements.from(taggedPost);
     }
 

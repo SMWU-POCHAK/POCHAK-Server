@@ -2,6 +2,7 @@ package com.apps.pochak.post.domain.repository;
 
 import com.apps.pochak.block.domain.Block;
 import com.apps.pochak.block.domain.repository.BlockRepository;
+import com.apps.pochak.global.BaseEntityStatus;
 import com.apps.pochak.global.TestQuerydslConfig;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.member.domain.Member;
@@ -10,6 +11,7 @@ import com.apps.pochak.member.fixture.MemberFixture;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.tag.domain.Tag;
 import com.apps.pochak.tag.domain.repository.TagRepository;
+import jakarta.persistence.EntityManager;
 import lombok.Builder;
 import lombok.Data;
 import org.junit.jupiter.api.DisplayName;
@@ -17,13 +19,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.BLOCKED_POST;
 import static com.apps.pochak.post.fixture.PostFixture.POST_WITH_MULTI_TAG;
 import static com.apps.pochak.tag.fixture.TagFixture.TAG1_WITH_ONE_POST;
 import static com.apps.pochak.tag.fixture.TagFixture.TAG2_WITH_ONE_POST;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @Import(TestQuerydslConfig.class)
@@ -36,6 +43,9 @@ class PostCustomRepositoryTest {
     private static final Member TAGGED_MEMBER1 = MemberFixture.TAGGED_MEMBER1;
     private static final Member TAGGED_MEMBER2 = MemberFixture.TAGGED_MEMBER2;
     private static final Member LOGIN_MEMBER = MemberFixture.LOGIN_MEMBER;
+
+    @Autowired
+    private EntityManager em;
 
     @Autowired
     PostCustomRepository postCustomRepository;
@@ -191,6 +201,49 @@ class PostCustomRepositoryTest {
 
         //then
         assertEquals(BLOCKED_POST, exception.getCode());
+    }
+
+    @Test
+    @DisplayName("현재 로그인한 사람이 특정 포차커가 업로드한 게시물을 조회한다.")
+    void findUploadPost() {
+        //given
+        SavedPostData savedPostData = savePost();
+        Member owner = savedPostData.getOwner();
+        Member loginMember = savedPostData.getLoginMember();
+        savedPostData.getSavedPost().makePublic();
+        savedPostData.getSavedPost().setStatus(BaseEntityStatus.ACTIVE);
+        //when
+        List<Post> posts = postCustomRepository.findUploadPost(owner.getId(), loginMember.getId());
+        //then
+        assertThat(posts.size()).isEqualTo(1L);
+        assertThat(posts.get(0)).isEqualTo(savedPostData.getSavedPost());
+    }
+
+    @Test
+    @DisplayName("현재 로그인한 사람이 특정 포차커가 업로드한 게시물을 페이지별로 조회한다.")
+    void findUploadPostPage() {
+        //given
+        SavedPostData savedPostData = savePost();
+        Member owner = savedPostData.getOwner();
+        Member loginMember = savedPostData.getLoginMember();
+        Member blockedMember = savedPostData.getTaggedMember1();
+        savedPostData.getSavedPost().makePublic();
+        savedPostData.getSavedPost().setStatus(BaseEntityStatus.ACTIVE);
+
+        blockRepository.save(new Block(
+                owner,
+                blockedMember
+        ));
+
+        //when
+        Page<Post> posts = postCustomRepository.findUploadPostPage(owner.getId(), loginMember.getId(), PageRequest.of(0, 1));
+
+        //then
+        System.out.println(Arrays.toString(posts.getContent().toArray()));
+        assertThat(posts.getTotalElements()).isEqualTo(1L);
+        assertThat(posts.getContent().get(0)).isEqualTo(savedPostData.getSavedPost());
+
+        assertFalse(postCustomRepository.findUploadPostPage(owner.getId(), blockedMember.getId(), PageRequest.of(0, 1)).hasContent());
     }
 }
 
