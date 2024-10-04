@@ -58,6 +58,7 @@ public class PostCustomRepository {
             final Pageable pageable
     ) {
         List<Post> postList = findPostOfFollowing(memberId)
+                .orderBy(post.allowedDate.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -77,16 +78,18 @@ public class PostCustomRepository {
                 .selectFrom(post)
                 .join(tag).on(
                         tag.post.eq(post)
-                                .and(tag.status.eq(ACTIVE))
                                 .and(post.status.eq(ACTIVE))
                                 .and(post.postStatus.eq(PUBLIC))
                 )
                 .leftJoin(follow).on(checkFollowOwnerOrTaggedMember(memberId))
                 .leftJoin(block).on(checkBlockStatus(memberId))
+                .where(
+                        follow.id.isNotNull()
+                                .or(post.owner.id.eq(memberId))
+                                .or(tag.member.id.eq(memberId))
+                )
                 .groupBy(post)
-                .having((follow.id.count().gt(0L).or(post.owner.id.eq(memberId).or(tag.member.id.eq(memberId))))
-                        .and(block.id.count().eq(0L)))
-                .orderBy(post.allowedDate.desc());
+                .having(block.id.count().eq(0L));
     }
 
     private BooleanExpression checkFollowOwnerOrTaggedMember(final Long memberId) {
