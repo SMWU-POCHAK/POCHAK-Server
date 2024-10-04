@@ -213,7 +213,7 @@ class PostCustomRepositoryTest {
         savedPostData.getSavedPost().makePublic();
         savedPostData.getSavedPost().setStatus(BaseEntityStatus.ACTIVE);
         //when
-        List<Post> posts = postCustomRepository.findUploadPost(owner.getId(), loginMember.getId());
+        List<Post> posts = postCustomRepository.findUploadPost(owner.getId(), loginMember.getId()).fetch();
         //then
         assertThat(posts.size()).isEqualTo(1L);
         assertThat(posts.get(0)).isEqualTo(savedPostData.getSavedPost());
