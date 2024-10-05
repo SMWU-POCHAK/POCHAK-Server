@@ -13,15 +13,14 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.DUPLICATE_HANDLE;
-import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.INVALID_MEMBER_HANDLE;
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
     default Member findMemberById(
             final Long id
     ) {
-        return findById(id).orElseThrow(() -> new GeneralException(INVALID_MEMBER_HANDLE));
+        return findById(id).orElseThrow(() -> new GeneralException(INVALID_MEMBER_ID));
     }
 
     Optional<Member> findMemberByHandle(final String handle);

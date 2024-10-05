@@ -16,7 +16,7 @@ import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
-import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -46,9 +46,9 @@ class FCMControllerTest extends ControllerTest {
     @BeforeEach
     void setUp() {
         given(jwtProvider.validateAccessToken(any())).willReturn(true);
-        given(jwtProvider.getSubject(any())).willReturn(MEMBER1.getId().toString());
+        given(jwtProvider.getSubject(any())).willReturn(STATIC_MEMBER1.getId().toString());
         given(loginArgumentResolver.resolveArgument(any(), any(), any(), any()))
-                .willReturn(Accessor.member(MEMBER1.getId()));
+                .willReturn(Accessor.member(STATIC_MEMBER1.getId()));
     }
 
     @Test

@@ -3,7 +3,6 @@ package com.apps.pochak.fcm.service;
 import com.apps.pochak.alarm.domain.Alarm;
 import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.fcm.dto.FCMToken;
-import com.apps.pochak.global.api_payload.exception.handler.FCMMessagingException;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -18,7 +17,6 @@ import java.util.List;
 
 import static com.apps.pochak.fcm.util.MessageUtil.makeMessage;
 import static com.apps.pochak.fcm.util.MessageUtil.makeMessages;
-import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.FAIL_MESSAGING;
 
 @Service
 @RequiredArgsConstructor
@@ -35,26 +33,23 @@ public class FCMService {
         member.updateFcmToken(fcmToken.getToken());
     }
 
-    public void sendPushNotification(
-            final Alarm alarm
-    ) {
+    public void sendPushNotification(final Alarm alarm) {
         if (!alarm.getReceiver().hasFcmToken()) return;
         try {
             Message message = makeMessage(alarm);
             firebaseMessaging.send(message);
         } catch (FirebaseMessagingException e) {
-            throw new FCMMessagingException(FAIL_MESSAGING);
+            // TODO: 푸시 알림 전송 실패가 Exception까지 터뜨릴 문제인가?
+//            throw new FCMMessagingException(FAIL_MESSAGING);
         }
     }
 
-    public void sendPushNotification(
-            final List<Alarm> alarmList
-    ) {
+    public void sendPushNotification(final List<Alarm> alarmList) {
         try {
             MulticastMessage multicastMessage = makeMessages(alarmList);
             firebaseMessaging.sendEachForMulticast(multicastMessage);
         } catch (FirebaseMessagingException e) {
-            throw new FCMMessagingException(FAIL_MESSAGING);
+//            throw new FCMMessagingException(FAIL_MESSAGING);
         }
     }
 }
