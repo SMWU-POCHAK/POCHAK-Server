@@ -23,11 +23,6 @@ public class LikeAlarm extends Alarm {
     @JoinColumn(name = "like_id")
     private LikeEntity like;
 
-    private Long likeMemberId;
-    private String likeMemberHandle;
-    private String likeMemberName;
-    private String likeMemberProfileImage;
-
     private Long likedPostId;
     private String likedPostImage;
 
@@ -37,7 +32,7 @@ public class LikeAlarm extends Alarm {
             final Member receiver,
             final AlarmType alarmType
     ) {
-        super(id, receiver, alarmType);
+        super(id, receiver, alarmType, like.getLikeMember());
         initializeFields(like);
     }
 
@@ -46,18 +41,12 @@ public class LikeAlarm extends Alarm {
             final Member receiver,
             final AlarmType alarmType
     ) {
-        super(receiver, alarmType);
+        super(receiver, alarmType, like.getLikeMember());
         initializeFields(like);
     }
 
     private void initializeFields(LikeEntity like) {
         this.like = like;
-
-        Member likeMember = like.getLikeMember();
-        this.likeMemberId = likeMember.getId();
-        this.likeMemberHandle = likeMember.getHandle();
-        this.likeMemberName = likeMember.getName();
-        this.likeMemberProfileImage = likeMember.getProfileImage();
 
         Post likedPost = like.getLikedPost();
         this.likedPostId = likedPost.getId();

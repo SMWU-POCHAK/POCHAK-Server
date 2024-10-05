@@ -36,21 +36,28 @@ public abstract class Alarm extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private AlarmType alarmType;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "sender_id")
+    private Member sender;
+
     protected Alarm(
             final Long id,
             final Member receiver,
-            final AlarmType alarmType
+            final AlarmType alarmType,
+            final Member sender
     ) {
-        this(receiver, alarmType);
+        this(receiver, alarmType, sender);
         this.id = id;
     }
 
     protected Alarm(
             final Member receiver,
-            final AlarmType alarmType
+            final AlarmType alarmType,
+            final Member sender
     ) {
         this.receiver = receiver;
         this.alarmType = alarmType;
+        this.sender = sender;
     }
 
     public abstract String getPushNotificationTitle();

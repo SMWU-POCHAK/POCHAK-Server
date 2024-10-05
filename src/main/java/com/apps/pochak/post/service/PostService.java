@@ -14,6 +14,7 @@ import com.apps.pochak.like.domain.repository.LikeRepository;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
+import com.apps.pochak.post.domain.repository.PostCustomRepository;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.post.dto.PostElements;
 import com.apps.pochak.post.dto.request.PostUploadRequest;
@@ -38,6 +39,7 @@ import static com.apps.pochak.global.s3.DirName.POST;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+    private final PostCustomRepository postCustomRepository;
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
     private final TagRepository tagRepository;
@@ -66,7 +68,7 @@ public class PostService {
             final Long postId
     ) {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
-        final Post post = postRepository.findPostById(postId, loginMember);
+        final Post post = postCustomRepository.findPostByIdWithoutBlockPost(postId, accessor.getMemberId());
         final List<Tag> tagList = tagRepository.findTagsByPost(post);
         if (post.isPrivate()) {
             throw new GeneralException(PRIVATE_POST);

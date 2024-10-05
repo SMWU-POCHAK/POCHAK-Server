@@ -1,4 +1,4 @@
-package com.apps.pochak.global.s3;
+package com.apps.pochak.global.annotation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

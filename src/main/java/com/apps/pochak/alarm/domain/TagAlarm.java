@@ -24,11 +24,6 @@ public class TagAlarm extends Alarm {
     @JoinColumn(name = "tag_approval_id")
     private Tag tag;
 
-    private Long taggerId;
-    private String taggerHandle;
-    private String taggerName;
-    private String taggerProfileImage;
-
     private Long postId;
     private String postImage;
 
@@ -38,8 +33,8 @@ public class TagAlarm extends Alarm {
             final Member tagger,
             final Member receiver
     ) {
-        super(id, receiver, TAG_APPROVAL);
-        initializeFields(tag, tagger);
+        super(id, receiver, TAG_APPROVAL, tagger);
+        initializeFields(tag);
     }
 
     public TagAlarm(
@@ -47,20 +42,14 @@ public class TagAlarm extends Alarm {
             final Member tagger,
             final Member receiver
     ) {
-        super(receiver, TAG_APPROVAL);
-        initializeFields(tag, tagger);
+        super(receiver, TAG_APPROVAL, tagger);
+        initializeFields(tag);
     }
 
     private void initializeFields(
-            final Tag tag,
-            final Member tagger
+            final Tag tag
     ) {
         this.tag = tag;
-
-        this.taggerId = tagger.getId();
-        this.taggerHandle = tagger.getHandle();
-        this.taggerName = tagger.getName();
-        this.taggerProfileImage = tagger.getProfileImage();
 
         Post post = tag.getPost();
         this.postId = post.getId();

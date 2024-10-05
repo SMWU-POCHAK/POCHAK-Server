@@ -18,10 +18,10 @@ public class LikeAlarmElement extends AlarmElement {
 
     public LikeAlarmElement(LikeAlarm alarm) {
         super(alarm);
-        this.memberId = alarm.getLikeMemberId();
-        this.memberHandle = alarm.getLikeMemberHandle();
-        this.memberName = alarm.getLikeMemberName();
-        this.memberProfileImage = alarm.getLikeMemberProfileImage();
+        this.memberId = alarm.getSender().getId();
+        this.memberHandle = alarm.getSender().getHandle();
+        this.memberName = alarm.getSender().getName();
+        this.memberProfileImage = alarm.getSender().getProfileImage();
         this.postId = alarm.getLikedPostId();
         this.postImage = alarm.getLikedPostImage();
     }

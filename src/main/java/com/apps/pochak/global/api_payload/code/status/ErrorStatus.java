@@ -63,6 +63,7 @@ public enum ErrorStatus implements BaseErrorCode {
     JSON_PROCESSING_EXCEPTION(INTERNAL_SERVER_ERROR, "APPLE4004", "idToken 파싱에 실패하였습니다."),
     NO_SUCH_ALGORITHM(INTERNAL_SERVER_ERROR, "APPLE5001", "Null algorithm name"),
     INVALID_KEY_SPEC(INTERNAL_SERVER_ERROR, "APPLE5002", "Could not generate public key."),
+    FAIL_GET_REFRESH_TOKEN(INTERNAL_SERVER_ERROR, "APPLE5003", "애플로그인 리프레시 토큰 값 조회에 실패하였습니다."),
 
 
     // Member
@@ -78,6 +79,7 @@ public enum ErrorStatus implements BaseErrorCode {
     EXCEED_TAG_LIMIT(BAD_REQUEST, "POST4004", "최대 멤버 태그 수를 초과하였습니다."),
     TAGGED_ONESELF(BAD_REQUEST, "POST4005", "자기 자신을 태그하였습니다."),
     INVALID_TAG_INFO(BAD_REQUEST, "POST4006", "태그된 멤버의 정보가 확인되지 않습니다."),
+    BLOCKED_POST(BAD_REQUEST, "POST4007", "확인할 수 없는 게시물입니다."),
 
     // Tag
     INVALID_TAG_ID(BAD_REQUEST, "TAG4001", "유효하지 않은 태그 아이디입니다."),

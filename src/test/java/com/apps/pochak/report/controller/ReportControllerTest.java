@@ -2,6 +2,8 @@ package com.apps.pochak.report.controller;
 
 import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.global.ControllerTest;
+import com.apps.pochak.member.domain.Member;
+import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.report.domain.ReportType;
 import com.apps.pochak.report.dto.request.ReportUploadRequest;
 import com.apps.pochak.report.service.ReportService;
@@ -18,8 +20,8 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
-import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
-import static com.apps.pochak.post.fixture.PostFixture.PUBLIC_POST;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
+import static com.apps.pochak.post.fixture.PostFixture.STATIC_PUBLIC_POST;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -35,6 +37,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(ReportController.class)
 @MockBean(JpaMetamodelMappingContext.class)
 class ReportControllerTest extends ControllerTest {
+    private static final Member MEMBER1 = STATIC_MEMBER1;
+    private static final Post PUBLIC_POST = STATIC_PUBLIC_POST;
 
     @MockBean
     ReportService reportService;

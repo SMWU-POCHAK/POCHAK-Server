@@ -1,0 +1,94 @@
+= Memories API
+pochak server team~~
+:doctype: book
+:icons: font
+:source-highlighter: highlishtjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== `GET` Memories
+추억 페이지 조회 API
+
+=== Request
+
+include::{snippets}/get-memories/http-request.adoc[]
+
+==== request headers
+include::{snippets}/get-memories/request-headers.adoc[]
+
+==== path params
+include::{snippets}/get-memories/path-parameters.adoc[]
+
+=== Response
+==== response body
+include::{snippets}/get-memories/response-body.adoc[]
+include::{snippets}/get-memories/response-fields.adoc[]
+
+== `GET` Memories Pochak
+추억 페이지 Pochaked 조회 API
+
+=== Request
+
+include::{snippets}/get-memories-pochaked/http-request.adoc[]
+
+==== request headers
+include::{snippets}/get-memories-pochaked/request-headers.adoc[]
+
+==== path params
+include::{snippets}/get-memories-pochaked/path-parameters.adoc[]
+
+==== query params
+include::{snippets}/get-memories-pochaked/query-parameters.adoc[]
+
+=== Response
+==== response body
+include::{snippets}/get-memories-pochaked/response-body.adoc[]
+include::{snippets}/get-memories-pochaked/response-fields.adoc[]
+
+== `GET` Memories Bonded
+추억 페이지 Bonded 조회 API
+
+=== Request
+
+include::{snippets}/get-memories-bonded/http-request.adoc[]
+
+==== request headers
+include::{snippets}/get-memories-bonded/request-headers.adoc[]
+
+==== path params
+include::{snippets}/get-memories-bonded/path-parameters.adoc[]
+
+==== query params
+include::{snippets}/get-memories-bonded/query-parameters.adoc[]
+
+=== Response
+==== response body
+include::{snippets}/get-memories-bonded/response-body.adoc[]
+include::{snippets}/get-memories-bonded/response-fields.adoc[]
+
+
+== `GET` Memories Pochak
+추억 페이지 Pochak 조회 API
+
+=== Request
+
+include::{snippets}/get-memories-pochak/http-request.adoc[]
+
+==== request headers
+include::{snippets}/get-memories-pochak/request-headers.adoc[]
+
+==== path params
+include::{snippets}/get-memories-pochak/path-parameters.adoc[]
+
+==== query params
+include::{snippets}/get-memories-pochak/query-parameters.adoc[]
+
+=== Response
+==== response body
+include::{snippets}/get-memories-pochak/response-body.adoc[]
+include::{snippets}/get-memories-pochak/response-fields.adoc[]

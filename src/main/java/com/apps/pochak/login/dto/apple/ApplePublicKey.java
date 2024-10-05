@@ -1,4 +1,4 @@
-package com.apps.pochak.login.dto.apple.key;
+package com.apps.pochak.login.dto.apple;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

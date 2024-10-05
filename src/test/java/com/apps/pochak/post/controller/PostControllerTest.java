@@ -1,10 +1,14 @@
 package com.apps.pochak.post.controller;
 
 import com.apps.pochak.auth.domain.Accessor;
+import com.apps.pochak.comment.domain.Comment;
 import com.apps.pochak.global.ControllerTest;
+import com.apps.pochak.member.domain.Member;
+import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.dto.PostElements;
 import com.apps.pochak.post.dto.response.PostDetailResponse;
 import com.apps.pochak.post.service.PostService;
+import com.apps.pochak.tag.domain.Tag;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,14 +20,14 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
 import java.util.List;
 
-import static com.apps.pochak.comment.fixture.CommentFixture.CHILD_COMMENT;
+import static com.apps.pochak.comment.fixture.CommentFixture.STATIC_CHILD_COMMENT;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
 import static com.apps.pochak.global.MockMultipartFileConverter.getSampleMultipartFile;
 import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
-import static com.apps.pochak.member.fixture.MemberFixture.MEMBER1;
-import static com.apps.pochak.post.fixture.PostFixture.PUBLIC_POST;
-import static com.apps.pochak.tag.fixture.TagFixture.APPROVED_TAG;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
+import static com.apps.pochak.post.fixture.PostFixture.STATIC_PUBLIC_POST;
+import static com.apps.pochak.tag.fixture.TagFixture.STATIC_APPROVED_TAG;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -43,6 +47,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(PostController.class)
 @MockBean(JpaMetamodelMappingContext.class)
 class PostControllerTest extends ControllerTest {
+    private static final Member MEMBER1 = STATIC_MEMBER1;
+    private static final Comment CHILD_COMMENT = STATIC_CHILD_COMMENT;
+    private static final Post PUBLIC_POST = STATIC_PUBLIC_POST;
+    private static final Tag APPROVED_TAG = STATIC_APPROVED_TAG;
 
     @MockBean
     PostService postService;

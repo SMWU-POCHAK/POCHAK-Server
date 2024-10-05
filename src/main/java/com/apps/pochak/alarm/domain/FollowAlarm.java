@@ -23,17 +23,12 @@ public class FollowAlarm extends Alarm {
     @JoinColumn(name = "follow_id")
     private Follow follow;
 
-    private Long senderId;
-    private String senderHandle;
-    private String senderName;
-    private String senderProfileImage;
-
     public FollowAlarm(
             final Long id,
             final Follow follow,
             final Member receiver
     ) {
-        super(id, receiver, FOLLOW);
+        super(id, receiver, FOLLOW, follow.getSender());
         initializeFields(follow);
     }
 
@@ -41,18 +36,12 @@ public class FollowAlarm extends Alarm {
             final Follow follow,
             final Member receiver
     ) {
-        super(receiver, FOLLOW);
+        super(receiver, FOLLOW, follow.getSender());
         initializeFields(follow);
     }
 
     private void initializeFields(final Follow follow) {
         this.follow = follow;
-
-        Member sender = follow.getSender();
-        this.senderId = sender.getId();
-        this.senderHandle = sender.getHandle();
-        this.senderName = sender.getName();
-        this.senderProfileImage = sender.getProfileImage();
     }
 
     @Override
