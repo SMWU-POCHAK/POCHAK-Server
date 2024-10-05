@@ -60,11 +60,11 @@ public class LikeAlarm extends Alarm {
 
     @Override
     public String getPushNotificationBody() {
-        return String.format(this.getAlarmType().getBody(), this.likeMemberName);
+        return String.format(this.getAlarmType().getBody(), this.getSender().getName());
     }
 
     @Override
     public String getPushNotificationImage() {
-        return String.format(this.getAlarmType().getImage(), this.likeMemberProfileImage);
+        return String.format(this.getAlarmType().getImage(), this.getSender().getProfileImage());
     }
 }

@@ -51,11 +51,11 @@ public class FollowAlarm extends Alarm {
 
     @Override
     public String getPushNotificationBody() {
-        return String.format(this.getAlarmType().getBody(), this.getSenderName());
+        return String.format(this.getAlarmType().getBody(), this.getSender().getName());
     }
 
     @Override
     public String getPushNotificationImage() {
-        return String.format(this.getAlarmType().getImage(), this.getSenderProfileImage());
+        return String.format(this.getAlarmType().getImage(), this.getSender().getProfileImage());
     }
 }

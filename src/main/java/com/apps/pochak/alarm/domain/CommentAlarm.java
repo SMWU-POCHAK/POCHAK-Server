@@ -63,7 +63,7 @@ public class CommentAlarm extends Alarm {
 
     @Override
     public String getPushNotificationTitle() {
-        return String.format(this.getAlarmType().getTitle(), this.writerName);
+        return String.format(this.getAlarmType().getTitle(), this.getSender().getName());
     }
 
     @Override
@@ -73,6 +73,6 @@ public class CommentAlarm extends Alarm {
 
     @Override
     public String getPushNotificationImage() {
-        return String.format(this.getAlarmType().getImage(), this.writerProfileImage);
+        return String.format(this.getAlarmType().getImage(), this.getSender().getProfileImage());
     }
 }

@@ -63,7 +63,7 @@ public class TagAlarm extends Alarm {
 
     @Override
     public String getPushNotificationBody() {
-        return String.format(this.getAlarmType().getBody(), this.taggerName);
+        return String.format(this.getAlarmType().getBody(), this.getSender().getName());
     }
 
     @Override
