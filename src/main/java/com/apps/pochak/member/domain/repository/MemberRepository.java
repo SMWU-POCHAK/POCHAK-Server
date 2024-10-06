@@ -68,7 +68,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             final SocialType socialType
     );
 
-
     @Query("select m from Member m " +
             "where (m.handle ilike concat('%', :keyword, '%') or m.name ilike concat('%', :keyword, '%')) " +
             "   and m not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +

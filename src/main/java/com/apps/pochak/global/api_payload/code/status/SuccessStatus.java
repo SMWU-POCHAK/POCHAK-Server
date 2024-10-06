@@ -27,6 +27,7 @@ public enum SuccessStatus implements BaseCode {
 
     // FCM
     SUCCESS_SAVE_TOKEN(CREATED, "FCM2001", "성공적으로 토큰을 등록하였습니다."),
+    SUCCESS_DELETE_TOKEN(CREATED, "FCM2002", "성공적으로 토큰을 삭제하였습니다."),
 
     // Follow
     SUCCESS_FOLLOW(CREATED, "FOLLOW2001", "성공적으로 팔로우하였습니다."),

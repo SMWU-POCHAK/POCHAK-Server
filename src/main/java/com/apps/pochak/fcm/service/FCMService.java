@@ -52,4 +52,10 @@ public class FCMService {
 //            throw new FCMMessagingException(FAIL_MESSAGING);
         }
     }
+
+    @Transactional
+    public void deleteToken(final Accessor accessor) {
+        Member member = memberRepository.findMemberById(accessor.getMemberId());
+        member.updateFcmToken(null);
+    }
 }
