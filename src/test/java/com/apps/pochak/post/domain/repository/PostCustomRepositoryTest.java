@@ -22,14 +22,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import static com.apps.pochak.global.BaseEntityStatus.ACTIVE;
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.BLOCKED_POST;
 import static com.apps.pochak.post.fixture.PostFixture.POST_WITH_MULTI_TAG;
 import static com.apps.pochak.tag.fixture.TagFixture.TAG1_WITH_ONE_POST;
 import static com.apps.pochak.tag.fixture.TagFixture.TAG2_WITH_ONE_POST;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @Import(TestQuerydslConfig.class)
@@ -60,18 +58,6 @@ class PostCustomRepositoryTest {
 
     @Autowired
     FollowRepository followRepository;
-
-    private SavedPostData savePost() {
-        return SavedPostData.of()
-                .owner(memberRepository.save(OWNER))
-                .taggedMember1(memberRepository.save(TAGGED_MEMBER1))
-                .taggedMember2(memberRepository.save(TAGGED_MEMBER2))
-                .loginMember(memberRepository.save(LOGIN_MEMBER))
-                .savedPost(postRepository.save(POST))
-                .tag1(tagRepository.save(TAG1))
-                .tag2(tagRepository.save(TAG2))
-                .build();
-    }
 
     @DisplayName("[게시물 id 조회] 차단된 게시물을 제외한 게시물이 조회된다.")
     @Test
@@ -207,8 +193,6 @@ class PostCustomRepositoryTest {
     void findPostOfFollowing() throws Exception {
         //given
         SavedPostData savedPostData = savePost();
-        Post savedPost = savedPostData.getSavedPost();
-        savedPost.makePublic();
         Member loginMember = savedPostData.getLoginMember();
 
         //when
@@ -220,6 +204,7 @@ class PostCustomRepositoryTest {
         //then
         assertEquals(0, postPage.getTotalElements());
         assertEquals(0, postPage.getTotalPages());
+        assertTrue(postPage.getContent().isEmpty());
     }
 
     @DisplayName("[홈탭 조회] 게시물을 업로더를 팔로우하면 게시물이 조회된다.")
@@ -229,18 +214,10 @@ class PostCustomRepositoryTest {
         SavedPostData savedPostData = savePost();
         Post savedPost = savedPostData.getSavedPost();
         savedPost.makePublic();
-        savedPost.setStatus(ACTIVE);
-        savedPostData.getTag1().setStatus(ACTIVE);
-        savedPostData.getTag2().setStatus(ACTIVE);
         Member loginMember = savedPostData.getLoginMember();
 
         //when
-        Follow followOwner = Follow.of()
-                .sender(loginMember)
-                .receiver(savedPost.getOwner())
-                .build();
-        followOwner.setStatus(ACTIVE);
-        followRepository.save(followOwner);
+        follow(loginMember, savedPost.getOwner());
 
         Page<Post> postPage = postCustomRepository.findPostOfFollowing(
                 loginMember.getId(),
@@ -253,54 +230,187 @@ class PostCustomRepositoryTest {
         assertEquals(savedPost.getId(), postPage.getContent().get(0).getId());
     }
 
-    @DisplayName("[홈탭 조회] 업로더가 현재 유저를 차단하였다면 해당 게시물은 제외되어 조회된다.")
+    @DisplayName("[홈탭 조회] 게시물 태그된 사람를 팔로우하면 게시물이 조회된다.")
+    @Test
+    void findPostOfFollowing_WhenFollowTagged() throws Exception {
+        //given
+        SavedPostData savedPostData = savePost();
+        Post savedPost = savedPostData.getSavedPost();
+        savedPost.makePublic();
+        Member loginMember = savedPostData.getLoginMember();
+
+        //when
+        follow(loginMember, savedPostData.getTaggedMember1());
+
+        Page<Post> postPage = postCustomRepository.findPostOfFollowing(
+                loginMember.getId(),
+                PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
+
+        //then
+        assertEquals(1, postPage.getTotalElements());
+        assertEquals(1, postPage.getTotalPages());
+        assertEquals(savedPost.getId(), postPage.getContent().get(0).getId());
+    }
+
+    @DisplayName("[홈탭 조회] 태그된 사람을 팔로우하더라도 업로더가 현재 유저를 차단하였다면 해당 게시물은 제외되어 조회된다.")
     @Test
     void findPostOfFollowing_WhenFollowTaggedAndBlockedByOwner() throws Exception {
         //given
+        SavedPostData savedPostData = savePost();
+        Member loginMember = savedPostData.getLoginMember();
 
         //when
+        follow(loginMember, savedPostData.getTaggedMember1());
+        block(savedPostData.getOwner(), loginMember);
+
+        Page<Post> postPage = postCustomRepository.findPostOfFollowing(
+                loginMember.getId(),
+                PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
 
         //then
+        assertEquals(0, postPage.getTotalElements());
+        assertEquals(0, postPage.getTotalPages());
+        assertTrue(postPage.getContent().isEmpty());
     }
 
-    @DisplayName("[홈탭 조회] 태그된 사람 중 한명이라도 현재 유저를 차단하였다면 해당 게시물은 제외되어 조회된다.")
+    @DisplayName("[홈탭 조회] 업로더를 팔로우하더라도 태그된 사람이 현재 유저를 차단하였다면 해당 게시물은 제외되어 조회된다.")
     @Test
     void findPostOfFollowing_WhenFollowOwnerAndBlockedByTagged() throws Exception {
         //given
+        SavedPostData savedPostData = savePost();
+        Member loginMember = savedPostData.getLoginMember();
 
         //when
+        follow(loginMember, savedPostData.getOwner());
+        block(savedPostData.getTaggedMember1(), loginMember);
+
+        Page<Post> postPage = postCustomRepository.findPostOfFollowing(
+                loginMember.getId(),
+                PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
 
         //then
+        assertEquals(0, postPage.getTotalElements());
+        assertEquals(0, postPage.getTotalPages());
+        assertTrue(postPage.getContent().isEmpty());
+    }
+
+    @DisplayName("[홈탭 조회] 태그된 사람을 팔로우하더라도 함께 태그된 다른 사람이 현재 유저를 차단하였다면 해당 게시물은 제외되어 조회된다.")
+    @Test
+    void findPostOfFollowing_WhenFollowTaggedAndBlockedByTagged() throws Exception {
+        //given
+        SavedPostData savedPostData = savePost();
+        Member loginMember = savedPostData.getLoginMember();
+
+        //when
+        follow(loginMember, savedPostData.getTaggedMember1());
+        block(savedPostData.getTaggedMember2(), loginMember);
+
+        Page<Post> postPage = postCustomRepository.findPostOfFollowing(
+                loginMember.getId(),
+                PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
+
+        //then
+        assertEquals(0, postPage.getTotalElements());
+        assertEquals(0, postPage.getTotalPages());
+        assertTrue(postPage.getContent().isEmpty());
     }
 
     @DisplayName("[홈탭 조회] 태그된 사람을 팔로우하더라도 업로더를 차단하였다면 해당 게시물은 제외되어 조회된다.")
     @Test
     void findPostOfFollowing_WhenFollowTaggedAndBlockOwner() throws Exception {
         //given
+        SavedPostData savedPostData = savePost();
+        Member loginMember = savedPostData.getLoginMember();
 
         //when
+        follow(loginMember, savedPostData.getTaggedMember1());
+        block(loginMember, savedPostData.getOwner());
+
+        Page<Post> postPage = postCustomRepository.findPostOfFollowing(
+                loginMember.getId(),
+                PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
 
         //then
+        assertEquals(0, postPage.getTotalElements());
+        assertEquals(0, postPage.getTotalPages());
+        assertTrue(postPage.getContent().isEmpty());
     }
 
     @DisplayName("[홈탭 조회] 업로더를 팔로우하더라도 태그된 사람을 차단하였다면 해당 게시물은 제외되어 조회된다.")
     @Test
     void findPostOfFollowing_WhenFollowOwnerAndBlockTagged() throws Exception {
         //given
+        SavedPostData savedPostData = savePost();
+        Member loginMember = savedPostData.getLoginMember();
 
         //when
+        follow(loginMember, savedPostData.getOwner());
+        block(loginMember, savedPostData.getTaggedMember1());
+
+        Page<Post> postPage = postCustomRepository.findPostOfFollowing(
+                loginMember.getId(),
+                PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
 
         //then
+        assertEquals(0, postPage.getTotalElements());
+        assertEquals(0, postPage.getTotalPages());
+        assertTrue(postPage.getContent().isEmpty());
     }
 
     @DisplayName("[홈탭 조회] 태그된 사람을 팔로우하더라도 또 다른 태그된 사람을 차단하였다면 해당 게시물은 제외되어 조회된다.")
     @Test
     void findPostOfFollowing_WhenFollowTaggedAndBlockTagged() throws Exception {
         //given
+        SavedPostData savedPostData = savePost();
+        Member loginMember = savedPostData.getLoginMember();
 
         //when
+        follow(loginMember, savedPostData.getTaggedMember1());
+        block(loginMember, savedPostData.getTaggedMember2());
+
+        Page<Post> postPage = postCustomRepository.findPostOfFollowing(
+                loginMember.getId(),
+                PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
 
         //then
+        assertEquals(0, postPage.getTotalElements());
+        assertEquals(0, postPage.getTotalPages());
+        assertTrue(postPage.getContent().isEmpty());
+    }
+
+    private SavedPostData savePost() {
+        return SavedPostData.of()
+                .owner(memberRepository.save(OWNER))
+                .taggedMember1(memberRepository.save(TAGGED_MEMBER1))
+                .taggedMember2(memberRepository.save(TAGGED_MEMBER2))
+                .loginMember(memberRepository.save(LOGIN_MEMBER))
+                .savedPost(postRepository.save(POST))
+                .tag1(tagRepository.save(TAG1))
+                .tag2(tagRepository.save(TAG2))
+                .build();
+    }
+
+    private void follow(Member sender, Member receiver) {
+        Follow follow = Follow.of()
+                .sender(sender)
+                .receiver(receiver)
+                .build();
+        followRepository.save(follow);
+    }
+
+    private void block(Member blocker, Member blockedMember) {
+        Block block = Block.builder()
+                .blocker(blocker)
+                .blockedMember(blockedMember)
+                .build();
+        blockRepository.save(block);
     }
 }
 
