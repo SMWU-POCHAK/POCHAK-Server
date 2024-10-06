@@ -60,7 +60,7 @@ public class GoogleCloudStorageService {
     }
 
     private String getObjectNameFromUrl(final String fileUrl) {
-        String splitStr = ".com/";
+        String splitStr = bucketName + "/";
         String encodedFileName = fileUrl.substring(fileUrl.indexOf(splitStr) + splitStr.length());
         return URLDecoder.decode(encodedFileName, StandardCharsets.UTF_8);
     }
