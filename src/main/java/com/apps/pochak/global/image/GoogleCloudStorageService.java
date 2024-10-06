@@ -27,9 +27,9 @@ public class GoogleCloudStorageService {
     @Value("${spring.cloud.gcp.storage.bucket}")
     private String bucketName;
 
-    public String saveFile(
-            final DirName dirName,
-            final MultipartFile multipartFile
+    public String upload(
+            final MultipartFile multipartFile,
+            final DirName dirName
     ) {
         if (multipartFile.isEmpty()) throw new GeneralException(NULL_FILE);
 
@@ -50,7 +50,7 @@ public class GoogleCloudStorageService {
         return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
     }
 
-    public void deleteFile(final String fileUrl) {
+    public void delete(final String fileUrl) {
         String objectName = getObjectNameFromUrl(fileUrl);
         Blob blob = storage.get(bucketName, objectName);
         if (blob == null) return;
