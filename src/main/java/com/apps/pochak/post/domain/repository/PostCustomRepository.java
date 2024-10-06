@@ -1,6 +1,5 @@
 package com.apps.pochak.post.domain.repository;
 
-import com.apps.pochak.global.BaseEntityStatus;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.post.domain.Post;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -11,7 +10,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 import static com.apps.pochak.block.domain.QBlock.block;
+import static com.apps.pochak.global.BaseEntityStatus.ACTIVE;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.BLOCKED_POST;
+import static com.apps.pochak.post.domain.PostStatus.PUBLIC;
 import static com.apps.pochak.post.domain.QPost.post;
 import static com.apps.pochak.tag.domain.QTag.tag;
 
@@ -27,24 +28,21 @@ public class PostCustomRepository {
         return findByIdWithoutBlockPost(postId, loginMemberId).orElseThrow(() -> new GeneralException(BLOCKED_POST));
     }
 
-    public Optional<Post> findByIdWithoutBlockPost(
+    private Optional<Post> findByIdWithoutBlockPost(
             final Long postId,
             final Long loginMemberId
     ) {
         return Optional.ofNullable(
                 query.selectFrom(post)
                         .join(post.owner).fetchJoin()
-                        .join(tag).on(tag.post.eq(post))
+                        .join(tag).on(tag.post.eq(post).and(post.id.eq(postId)))
                         .leftJoin(block).on(
                                 checkOwnerOrTaggedMemberBlockLoginMember(loginMemberId)
                                         .or(checkLoginMemberBlockOwnerOrTaggedMember(loginMemberId))
                         )
+                        .where(post.status.eq(ACTIVE).and(post.postStatus.eq(PUBLIC)))
                         .groupBy(post)
                         .having(block.id.count().eq(0L))
-                        .where(
-                                post.id.eq(postId),
-                                post.status.eq(BaseEntityStatus.ACTIVE)
-                        )
                         .fetchOne()
         );
     }
