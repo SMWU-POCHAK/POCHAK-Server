@@ -97,14 +97,10 @@ class PostCustomRepositoryTest {
     void findById_WhenOwnerBlockLoginMember() throws Exception {
         //given
         SavedPostData savedPostData = savePost();
-        Member owner = savedPostData.getOwner();
         Member loginMember = savedPostData.getLoginMember();
         Post savedPost = savedPostData.getSavedPost();
 
-        blockRepository.save(new Block(
-                owner,
-                loginMember
-        ));
+        block(savedPostData.getOwner(), loginMember);
 
         //when
         GeneralException exception = assertThrows(
@@ -125,10 +121,7 @@ class PostCustomRepositoryTest {
         Member loginMember = savedPostData.getLoginMember();
         Post savedPost = savedPostData.getSavedPost();
 
-        blockRepository.save(new Block(
-                taggedMember1,
-                loginMember
-        ));
+        block(taggedMember1, loginMember);
 
         //when
         GeneralException exception = assertThrows(
@@ -146,13 +139,9 @@ class PostCustomRepositoryTest {
         //given
         SavedPostData savedPostData = savePost();
         Member loginMember = savedPostData.getLoginMember();
-        Member owner = savedPostData.getOwner();
         Post savedPost = savedPostData.getSavedPost();
 
-        blockRepository.save(new Block(
-                loginMember,
-                owner
-        ));
+        block(loginMember, savedPostData.getOwner());
 
         //when
         GeneralException exception = assertThrows(
@@ -170,13 +159,9 @@ class PostCustomRepositoryTest {
         //given
         SavedPostData savedPostData = savePost();
         Member loginMember = savedPostData.getLoginMember();
-        Member taggedMember1 = savedPostData.getTaggedMember1();
         Post savedPost = savedPostData.getSavedPost();
 
-        blockRepository.save(new Block(
-                loginMember,
-                taggedMember1
-        ));
+        block(loginMember, savedPostData.getTaggedMember1());
 
         //when
         GeneralException exception = assertThrows(
@@ -213,12 +198,11 @@ class PostCustomRepositoryTest {
         //given
         SavedPostData savedPostData = savePost();
         Post savedPost = savedPostData.getSavedPost();
-        savedPost.makePublic();
         Member loginMember = savedPostData.getLoginMember();
 
-        //when
         follow(loginMember, savedPost.getOwner());
 
+        //when
         Page<Post> postPage = postCustomRepository.findPostOfFollowing(
                 loginMember.getId(),
                 PageRequest.of(0, DEFAULT_PAGING_SIZE)
@@ -236,12 +220,11 @@ class PostCustomRepositoryTest {
         //given
         SavedPostData savedPostData = savePost();
         Post savedPost = savedPostData.getSavedPost();
-        savedPost.makePublic();
         Member loginMember = savedPostData.getLoginMember();
 
-        //when
         follow(loginMember, savedPostData.getTaggedMember1());
 
+        //when
         Page<Post> postPage = postCustomRepository.findPostOfFollowing(
                 loginMember.getId(),
                 PageRequest.of(0, DEFAULT_PAGING_SIZE)
@@ -260,10 +243,10 @@ class PostCustomRepositoryTest {
         SavedPostData savedPostData = savePost();
         Member loginMember = savedPostData.getLoginMember();
 
-        //when
         follow(loginMember, savedPostData.getTaggedMember1());
         block(savedPostData.getOwner(), loginMember);
 
+        //when
         Page<Post> postPage = postCustomRepository.findPostOfFollowing(
                 loginMember.getId(),
                 PageRequest.of(0, DEFAULT_PAGING_SIZE)
@@ -282,10 +265,10 @@ class PostCustomRepositoryTest {
         SavedPostData savedPostData = savePost();
         Member loginMember = savedPostData.getLoginMember();
 
-        //when
         follow(loginMember, savedPostData.getOwner());
         block(savedPostData.getTaggedMember1(), loginMember);
 
+        //when
         Page<Post> postPage = postCustomRepository.findPostOfFollowing(
                 loginMember.getId(),
                 PageRequest.of(0, DEFAULT_PAGING_SIZE)
@@ -304,10 +287,10 @@ class PostCustomRepositoryTest {
         SavedPostData savedPostData = savePost();
         Member loginMember = savedPostData.getLoginMember();
 
-        //when
         follow(loginMember, savedPostData.getTaggedMember1());
         block(savedPostData.getTaggedMember2(), loginMember);
 
+        //when
         Page<Post> postPage = postCustomRepository.findPostOfFollowing(
                 loginMember.getId(),
                 PageRequest.of(0, DEFAULT_PAGING_SIZE)
@@ -326,10 +309,10 @@ class PostCustomRepositoryTest {
         SavedPostData savedPostData = savePost();
         Member loginMember = savedPostData.getLoginMember();
 
-        //when
         follow(loginMember, savedPostData.getTaggedMember1());
         block(loginMember, savedPostData.getOwner());
 
+        //when
         Page<Post> postPage = postCustomRepository.findPostOfFollowing(
                 loginMember.getId(),
                 PageRequest.of(0, DEFAULT_PAGING_SIZE)
@@ -348,10 +331,10 @@ class PostCustomRepositoryTest {
         SavedPostData savedPostData = savePost();
         Member loginMember = savedPostData.getLoginMember();
 
-        //when
         follow(loginMember, savedPostData.getOwner());
         block(loginMember, savedPostData.getTaggedMember1());
 
+        //when
         Page<Post> postPage = postCustomRepository.findPostOfFollowing(
                 loginMember.getId(),
                 PageRequest.of(0, DEFAULT_PAGING_SIZE)
@@ -370,10 +353,10 @@ class PostCustomRepositoryTest {
         SavedPostData savedPostData = savePost();
         Member loginMember = savedPostData.getLoginMember();
 
-        //when
         follow(loginMember, savedPostData.getTaggedMember1());
         block(loginMember, savedPostData.getTaggedMember2());
 
+        //when
         Page<Post> postPage = postCustomRepository.findPostOfFollowing(
                 loginMember.getId(),
                 PageRequest.of(0, DEFAULT_PAGING_SIZE)
