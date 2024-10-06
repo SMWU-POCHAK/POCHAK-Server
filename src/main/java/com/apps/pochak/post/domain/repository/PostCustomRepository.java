@@ -2,6 +2,7 @@ package com.apps.pochak.post.domain.repository;
 
 import com.apps.pochak.global.BaseEntityStatus;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
+import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.PostStatus;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -66,40 +67,50 @@ public class PostCustomRepository {
                 .and(block.blockedMember.eq(tag.member).or(block.blockedMember.eq(post.owner)));
     }
 
-    public JPAQuery<Post> findUploadPost(
-            final Long ownerId,
-            final Long loginMemberId
+    private JPAQuery<Post> findUploadPost(
+            final Member owner,
+            final Member loginMember
     ) {
         return query.selectFrom(post)
                 .join(tag).on(tag.post.eq(post))
                 .leftJoin(block).on(
-                        (checkOwnerOrTaggedMemberBlockLoginMember(loginMemberId))
-                                .or(checkLoginMemberBlockOwnerOrTaggedMember(loginMemberId))
+                        (checkTaggedMemberBlockLoginMember(loginMember))
+                                .or(checkLoginMemberBlockTaggedMember(loginMember))
                 )
-                .groupBy(post)
-                .having(block.id.count().eq(0L))
                 .where(
-                        post.owner.id.eq(ownerId),
+                        post.owner.eq(owner),
                         post.status.eq(BaseEntityStatus.ACTIVE),
                         post.postStatus.eq(PostStatus.PUBLIC)
                 )
+                .groupBy(post)
+                .having(block.count().eq(0L))
                 .orderBy(post.allowedDate.desc());
     }
 
     public Page<Post> findUploadPostPage(
-            final Long ownerId,
-            final Long loginMemberId,
+            final Member owner,
+            final Member loginMember,
             final Pageable pageable
     ) {
-        List<Post> contentPage = findUploadPost(ownerId, loginMemberId)
+        List<Post> contentPage = findUploadPost(owner, loginMember)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         JPAQuery<Long> countQuery = query.select(post.count())
                 .from(post)
-                .where(post.in(findUploadPost(ownerId, loginMemberId)));
+                .where(post.in(findUploadPost(owner, loginMember)));
 
         return PageableExecutionUtils.getPage(contentPage, pageable, countQuery::fetchOne);
+    }
+
+    private BooleanExpression checkTaggedMemberBlockLoginMember(final Member loginMember) {
+        return (block.blocker.eq(tag.member))
+                .and(block.blockedMember.eq(loginMember));
+    }
+
+    private BooleanExpression checkLoginMemberBlockTaggedMember(final Member loginMember) {
+        return (block.blocker.eq(loginMember))
+                .and(block.blockedMember.eq(tag.member));
     }
 }
