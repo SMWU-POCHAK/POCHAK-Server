@@ -2,14 +2,12 @@ package com.apps.pochak.post.domain.repository;
 
 import com.apps.pochak.block.domain.Block;
 import com.apps.pochak.block.domain.repository.BlockRepository;
-import com.apps.pochak.global.BaseEntityStatus;
 import com.apps.pochak.global.TestQuerydslConfig;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.member.fixture.MemberFixture;
 import com.apps.pochak.post.domain.Post;
-import com.apps.pochak.post.domain.PostStatus;
 import com.apps.pochak.tag.domain.Tag;
 import com.apps.pochak.tag.domain.repository.TagRepository;
 import lombok.Builder;
@@ -216,10 +214,7 @@ class SavedPostData {
             final Member taggedMember2,
             final Member loginMember
     ) {
-        savedPost.setStatus(BaseEntityStatus.ACTIVE);
         savedPost.makePublic();
-        tag1.setStatus(BaseEntityStatus.ACTIVE);
-        tag2.setStatus(BaseEntityStatus.ACTIVE);
         this.savedPost = savedPost;
         this.tag1 = tag1;
         this.tag2 = tag2;
