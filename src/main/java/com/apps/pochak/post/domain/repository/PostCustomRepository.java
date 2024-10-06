@@ -34,21 +34,18 @@ public class PostCustomRepository {
         return findByIdWithoutBlockPost(postId, loginMemberId).orElseThrow(() -> new GeneralException(BLOCKED_POST));
     }
 
-    public Optional<Post> findByIdWithoutBlockPost(
+    private Optional<Post> findByIdWithoutBlockPost(
             final Long postId,
             final Long loginMemberId
     ) {
         return Optional.ofNullable(
                 query.selectFrom(post)
                         .join(post.owner).fetchJoin()
-                        .join(tag).on(tag.post.eq(post))
+                        .join(tag).on(tag.post.eq(post).and(post.id.eq(postId)))
                         .leftJoin(block).on(checkBlockStatus(loginMemberId))
+                        .where(post.status.eq(ACTIVE).and(post.postStatus.eq(PUBLIC)))
                         .groupBy(post)
                         .having(block.id.count().eq(0L))
-                        .where(
-                                post.id.eq(postId),
-                                post.status.eq(ACTIVE)
-                        )
                         .fetchOne()
         );
     }
