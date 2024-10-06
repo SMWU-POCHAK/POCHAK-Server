@@ -1,4 +1,4 @@
-package com.apps.pochak.global.s3;
+package com.apps.pochak.global.image;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3Client;

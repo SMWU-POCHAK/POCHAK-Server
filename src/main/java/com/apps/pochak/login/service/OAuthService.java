@@ -4,7 +4,7 @@ import com.apps.pochak.comment.domain.repository.CommentRepository;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.global.api_payload.exception.handler.InvalidJwtException;
-import com.apps.pochak.global.s3.S3Service;
+import com.apps.pochak.global.image.S3Service;
 import com.apps.pochak.like.domain.repository.LikeRepository;
 import com.apps.pochak.login.dto.request.MemberInfoRequest;
 import com.apps.pochak.login.dto.response.AccessTokenResponse;
@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
-import static com.apps.pochak.global.s3.DirName.MEMBER;
+import static com.apps.pochak.global.image.DirName.MEMBER;
 
 @Service
 @RequiredArgsConstructor
