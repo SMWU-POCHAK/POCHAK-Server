@@ -24,6 +24,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
@@ -79,6 +80,33 @@ class FCMControllerTest extends ControllerTest {
                                         fieldWithPath("code").type(STRING).description("결과 코드"),
                                         fieldWithPath("message").type(STRING)
                                                 .description("결과 메세지: `성공적으로 토큰을 등록하였습니다.`")
+                                )
+                        )
+                );
+    }
+
+    @Test
+    @DisplayName("회원의 FCM 토큰을 삭제한다.")
+    void deleteFCMToken() throws Exception {
+        doNothing().when(fcmService).deleteToken(any());
+
+        this.mockMvc.perform(
+                        delete("/api/v1/fcm")
+                                .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
+                                .contentType(APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andDo(
+                        document("delete-fcm-token",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(
+                                        headerWithName("Authorization").description("Basic auth credentials")
+                                ),
+                                responseFields(
+                                        fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),
+                                        fieldWithPath("code").type(STRING).description("결과 코드"),
+                                        fieldWithPath("message").type(STRING)
+                                                .description("결과 메세지: `성공적으로 토큰을 삭제하였습니다.`")
                                 )
                         )
                 );
