@@ -82,6 +82,7 @@ public class PostCustomRepository {
                 .leftJoin(block).on(checkBlockStatus(memberId))
                 .where(
                         follow.id.isNotNull()
+                                .or(block.id.isNotNull())
                                 .or(post.owner.id.eq(memberId))
                                 .or(tag.member.id.eq(memberId))
                 )
