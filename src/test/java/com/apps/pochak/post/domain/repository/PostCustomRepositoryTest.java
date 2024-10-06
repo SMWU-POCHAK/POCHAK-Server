@@ -204,7 +204,7 @@ class PostCustomRepositoryTest {
     }
 
     @Test
-    @DisplayName("현재 로그인한 사람이 특정 포차커가 업로드한 게시물을 페이지별로 조회한다.")
+    @DisplayName("[프로필 포착 게시물 조회] 현재 로그인한 사람이 특정 포차커가 업로드한 게시물을 페이지별로 조회한다.")
     void findUploadPostPage() {
         //given
         SavedPostData savedPostData = savePost();
@@ -222,7 +222,7 @@ class PostCustomRepositoryTest {
     }
 
     @Test
-    @DisplayName("현재 로그인한 사람이 게시물 작성자가 태그한 사람 중 한 명이라도 차단했을시 그 게시물은 조회되지 않는다.")
+    @DisplayName("[프로필 포착 게시물 조회] 현재 로그인한 사람이 게시물 작성자가 태그한 사람 중 한 명이라도 차단했을시 그 게시물은 조회되지 않는다.")
     void findUploadPostPageWithoutBlockPostWhenLoginMemberBlockTaggedMember() {
         //given
         SavedPostData savedPostData = savePost();
@@ -245,7 +245,7 @@ class PostCustomRepositoryTest {
     }
 
     @Test
-    @DisplayName("현재 로그인한 사람이 게시물 작성자가 태그한 사람 중 한 명에게라도 차단당했을시 그 게시물은 조회되지 않는다.")
+    @DisplayName("[프로필 포착 게시물 조회] 현재 로그인한 사람이 게시물 작성자가 태그한 사람 중 한 명에게라도 차단당했을시 그 게시물은 조회되지 않는다.")
     void findUploadPostPageWithoutBlockPostWhenTaggedMemberBlockLoginMember() {
         //given
         SavedPostData savedPostData = savePost();
