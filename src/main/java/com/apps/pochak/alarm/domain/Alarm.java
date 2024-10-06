@@ -60,9 +60,15 @@ public abstract class Alarm extends BaseEntity {
         this.sender = sender;
     }
 
-    public abstract String getPushNotificationTitle();
+    public String getPushNotificationTitle() {
+        return this.getAlarmType().getTitle();
+    }
 
-    public abstract String getPushNotificationBody();
+    public String getPushNotificationBody() {
+        return String.format(this.getAlarmType().getBody(), this.getSender().getName());
+    }
 
-    public abstract String getPushNotificationImage();
+    public String getPushNotificationImage() {
+        return String.format(this.getAlarmType().getImage(), this.getSender().getProfileImage());
+    }
 }

@@ -43,19 +43,4 @@ public class FollowAlarm extends Alarm {
     private void initializeFields(final Follow follow) {
         this.follow = follow;
     }
-
-    @Override
-    public String getPushNotificationTitle() {
-        return this.getAlarmType().getTitle();
-    }
-
-    @Override
-    public String getPushNotificationBody() {
-        return String.format(this.getAlarmType().getBody(), this.getSender().getName());
-    }
-
-    @Override
-    public String getPushNotificationImage() {
-        return String.format(this.getAlarmType().getImage(), this.getSender().getProfileImage());
-    }
 }

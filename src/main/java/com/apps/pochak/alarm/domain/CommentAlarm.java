@@ -70,9 +70,4 @@ public class CommentAlarm extends Alarm {
     public String getPushNotificationBody() {
         return String.format(this.getAlarmType().getBody(), this.content);
     }
-
-    @Override
-    public String getPushNotificationImage() {
-        return String.format(this.getAlarmType().getImage(), this.getSender().getProfileImage());
-    }
 }

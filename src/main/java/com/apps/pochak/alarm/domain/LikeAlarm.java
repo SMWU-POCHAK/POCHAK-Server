@@ -52,19 +52,4 @@ public class LikeAlarm extends Alarm {
         this.likedPostId = likedPost.getId();
         this.likedPostImage = likedPost.getPostImage();
     }
-
-    @Override
-    public String getPushNotificationTitle() {
-        return this.getAlarmType().getTitle();
-    }
-
-    @Override
-    public String getPushNotificationBody() {
-        return String.format(this.getAlarmType().getBody(), this.getSender().getName());
-    }
-
-    @Override
-    public String getPushNotificationImage() {
-        return String.format(this.getAlarmType().getImage(), this.getSender().getProfileImage());
-    }
 }
