@@ -5,7 +5,6 @@ import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -15,7 +14,6 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Entity
 @Getter
-@DynamicInsert
 @AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 @SQLDelete(sql = "UPDATE tag SET status = 'DELETED' WHERE id = ?")
@@ -34,7 +32,6 @@ public class Tag extends BaseEntity {
     private Member member;
 
     @Setter
-    @Column(columnDefinition = "boolean default false")
     private Boolean isAccepted;
 
     @Builder
@@ -44,6 +41,7 @@ public class Tag extends BaseEntity {
     ) {
         this.post = post;
         this.member = member;
+        this.isAccepted = false;
     }
 
     public boolean isMember(final Member member) {

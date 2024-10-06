@@ -3,10 +3,11 @@ package com.apps.pochak.post.domain;
 import com.apps.pochak.global.BaseEntity;
 import com.apps.pochak.member.domain.Member;
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
@@ -18,7 +19,6 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Entity
 @Getter
-@DynamicInsert
 @AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 @SQLDelete(sql = "UPDATE post SET status = 'DELETED' WHERE id = ?")
@@ -29,8 +29,6 @@ public class Post extends BaseEntity {
     private Long id;
 
     @Enumerated(STRING)
-    @Setter
-    @Column(columnDefinition = "VARCHAR(255) DEFAULT 'PRIVATE'")
     private PostStatus postStatus;
 
     private LocalDateTime allowedDate;
@@ -52,6 +50,7 @@ public class Post extends BaseEntity {
         this.owner = owner;
         this.postImage = postImage;
         this.caption = caption;
+        this.postStatus = PRIVATE;
     }
 
     public boolean isPrivate() {
