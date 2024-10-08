@@ -69,13 +69,13 @@ public class PostCustomRepository {
 
     private JPAQuery<Post> findUploadPost(
             final Member owner,
-            final Member loginMember
+            final Long loginMemberId
     ) {
         return query.selectFrom(post)
                 .join(tag).on(tag.post.eq(post))
                 .leftJoin(block).on(
-                        (checkTaggedMemberBlockLoginMember(loginMember))
-                                .or(checkLoginMemberBlockTaggedMember(loginMember))
+                        (checkTaggedMemberBlockLoginMember(loginMemberId))
+                                .or(checkLoginMemberBlockTaggedMember(loginMemberId))
                 )
                 .where(
                         post.owner.eq(owner),
@@ -89,28 +89,28 @@ public class PostCustomRepository {
 
     public Page<Post> findUploadPostPage(
             final Member owner,
-            final Member loginMember,
+            final Long loginMemberId,
             final Pageable pageable
     ) {
-        List<Post> contentPage = findUploadPost(owner, loginMember)
+        List<Post> contentPage = findUploadPost(owner, loginMemberId)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         JPAQuery<Long> countQuery = query.select(post.count())
                 .from(post)
-                .where(post.in(findUploadPost(owner, loginMember)));
+                .where(post.in(findUploadPost(owner, loginMemberId)));
 
         return PageableExecutionUtils.getPage(contentPage, pageable, countQuery::fetchOne);
     }
 
-    private BooleanExpression checkTaggedMemberBlockLoginMember(final Member loginMember) {
+    private BooleanExpression checkTaggedMemberBlockLoginMember(final Long loginMemberId) {
         return (block.blocker.eq(tag.member))
-                .and(block.blockedMember.eq(loginMember));
+                .and(block.blockedMember.id.eq(loginMemberId));
     }
 
-    private BooleanExpression checkLoginMemberBlockTaggedMember(final Member loginMember) {
-        return (block.blocker.eq(loginMember))
+    private BooleanExpression checkLoginMemberBlockTaggedMember(final Long loginMemberId) {
+        return (block.blocker.id.eq(loginMemberId))
                 .and(block.blockedMember.eq(tag.member));
     }
 }

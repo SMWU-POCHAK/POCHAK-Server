@@ -100,7 +100,7 @@ public class MemberService {
     ) {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Member owner = memberRepository.findByHandle(handle, loginMember);
-        final Page<Post> taggedPost = postCustomRepository.findUploadPostPage(owner, loginMember, pageable);
+        final Page<Post> taggedPost = postCustomRepository.findUploadPostPage(owner, accessor.getMemberId(), pageable);
         return PostElements.from(taggedPost);
     }
 

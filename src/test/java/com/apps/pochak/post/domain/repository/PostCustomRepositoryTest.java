@@ -214,7 +214,7 @@ class PostCustomRepositoryTest {
         savedPostData.getSavedPost().setStatus(BaseEntityStatus.ACTIVE);
 
         //when
-        Page<Post> posts = postCustomRepository.findUploadPostPage(owner, loginMember, PageRequest.of(0, 1));
+        Page<Post> posts = postCustomRepository.findUploadPostPage(owner, loginMember.getId(), PageRequest.of(0, 1));
 
         //then
         assertThat(posts.getTotalElements()).isEqualTo(1L);
@@ -238,7 +238,7 @@ class PostCustomRepositoryTest {
         ));
 
         //when
-        Page<Post> posts = postCustomRepository.findUploadPostPage(owner, loginMember, PageRequest.of(0, 1));
+        Page<Post> posts = postCustomRepository.findUploadPostPage(owner, loginMember.getId(), PageRequest.of(0, 1));
         //then
         assertThat(posts.getTotalElements()).isEqualTo(0L);
         assertFalse((posts).hasContent());
@@ -261,7 +261,7 @@ class PostCustomRepositoryTest {
         ));
 
         //when
-        Page<Post> posts = postCustomRepository.findUploadPostPage(owner, loginMember, PageRequest.of(0, 1));
+        Page<Post> posts = postCustomRepository.findUploadPostPage(owner, loginMember.getId(), PageRequest.of(0, 1));
         //then
         assertThat(posts.getTotalElements()).isEqualTo(0L);
         assertFalse((posts).hasContent());
