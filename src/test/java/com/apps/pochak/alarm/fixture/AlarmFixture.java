@@ -1,9 +1,8 @@
 package com.apps.pochak.alarm.fixture;
 
-import com.apps.pochak.alarm.domain.CommentAlarm;
-import com.apps.pochak.alarm.domain.FollowAlarm;
-import com.apps.pochak.alarm.domain.LikeAlarm;
-import com.apps.pochak.alarm.domain.TagAlarm;
+import com.apps.pochak.alarm.domain.*;
+import com.apps.pochak.follow.domain.Follow;
+import com.apps.pochak.member.domain.Member;
 
 import static com.apps.pochak.alarm.domain.AlarmType.COMMENT_REPLY;
 import static com.apps.pochak.alarm.domain.AlarmType.OWNER_LIKE;
@@ -42,4 +41,12 @@ public class AlarmFixture {
             STATIC_MEMBER2,
             STATIC_MEMBER1
     );
+
+    public static FollowAlarm buildFollowAlarm(Member receiver, Follow follow) {
+        return new FollowAlarm(
+                follow,
+                receiver
+        );
+    }
+
 }

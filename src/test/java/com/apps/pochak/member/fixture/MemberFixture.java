@@ -2,6 +2,7 @@ package com.apps.pochak.member.fixture;
 
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.SocialType;
+import org.springframework.security.core.parameters.P;
 
 public class MemberFixture {
 
@@ -80,4 +81,33 @@ public class MemberFixture {
             .socialType(SocialType.GOOGLE)
             .socialRefreshToken("SOCIAL_REFRESH_TOKEN")
             .build();
+
+    public static Member buildMember1() {
+        return Member.signupMember()
+                .name("1번 동적 회원의 이름")
+                .email("dynamic1@pochak.com")
+                .handle("dynamic_member1")
+                .message("한 줄 소개")
+                .socialId("SOCIAL_ID")
+                .profileImage(PROFILE_IMAGE)
+                .refreshToken("REFRESH_TOKEN")
+                .socialType(SocialType.GOOGLE)
+                .socialRefreshToken("SOCIAL_REFRESH_TOKEN")
+                .build();
+    }
+
+    public static Member buildMember2() {
+        return Member.signupMember()
+                .name("2번 동적 회원의 이름")
+                .email("dynamic2@pochak.com")
+                .handle("dynamic_member2")
+                .message("한 줄 소개")
+                .socialId("SOCIAL_ID")
+                .profileImage(PROFILE_IMAGE)
+                .refreshToken("REFRESH_TOKEN")
+                .socialType(SocialType.GOOGLE)
+                .socialRefreshToken("SOCIAL_REFRESH_TOKEN")
+                .build();
+    }
+
 }
