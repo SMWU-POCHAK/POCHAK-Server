@@ -43,8 +43,8 @@ public class PostCustomRepository {
                         .join(post.owner).fetchJoin()
                         .join(tag).on(
                                 tag.post.eq(post)
-                                        .and(checkPublicPost())
                                         .and(post.id.eq(postId))
+                                        .and(checkPublicPost())
                         )
                         .leftJoin(block).on(checkBlockStatus(loginMemberId))
                         .groupBy(post)
