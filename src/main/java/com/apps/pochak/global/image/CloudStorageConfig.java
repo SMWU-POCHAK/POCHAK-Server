@@ -11,7 +11,7 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.IOException;
 
 @Configuration
-public class GoogleCloudStorageConfig {
+public class CloudStorageConfig {
     @Value("${spring.cloud.gcp.storage.credentials.location}")
     private String credentialsLocation;
 

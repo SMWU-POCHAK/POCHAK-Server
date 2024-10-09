@@ -20,7 +20,7 @@ import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.NULL_FI
 
 @Service
 @RequiredArgsConstructor
-public class GoogleCloudStorageService {
+public class CloudStorageService {
 
     private final Storage storage;
 

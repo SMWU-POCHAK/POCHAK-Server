@@ -4,7 +4,7 @@ import com.apps.pochak.comment.domain.repository.CommentRepository;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.global.api_payload.exception.handler.InvalidJwtException;
-import com.apps.pochak.global.image.GoogleCloudStorageService;
+import com.apps.pochak.global.image.CloudStorageService;
 import com.apps.pochak.like.domain.repository.LikeRepository;
 import com.apps.pochak.login.dto.request.MemberInfoRequest;
 import com.apps.pochak.login.dto.response.AccessTokenResponse;
@@ -38,7 +38,7 @@ public class OAuthService {
     private final TagRepository tagRepository;
     private final MemberRepository memberRepository;
     private final AppleOAuthService appleOAuthService;
-    private final GoogleCloudStorageService cloudStorageService;
+    private final CloudStorageService cloudStorageService;
 
     public OAuthMemberResponse signup(final MemberInfoRequest memberInfoRequest) {
         SocialType socialType = SocialType.of(memberInfoRequest.getSocialType());

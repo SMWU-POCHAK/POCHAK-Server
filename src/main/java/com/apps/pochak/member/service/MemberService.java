@@ -3,7 +3,7 @@ package com.apps.pochak.member.service;
 import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
-import com.apps.pochak.global.image.GoogleCloudStorageService;
+import com.apps.pochak.global.image.CloudStorageService;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.member.dto.request.ProfileUpdateRequest;
@@ -29,7 +29,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
     private final PostRepository postRepository;
-    private final GoogleCloudStorageService cloudStorageService;
+    private final CloudStorageService cloudStorageService;
 
     @Transactional(readOnly = true)
     public ProfileResponse getProfileDetail(
