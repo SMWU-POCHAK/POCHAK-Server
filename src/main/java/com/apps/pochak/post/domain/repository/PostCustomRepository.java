@@ -41,9 +41,12 @@ public class PostCustomRepository {
         return Optional.ofNullable(
                 query.selectFrom(post)
                         .join(post.owner).fetchJoin()
-                        .join(tag).on(tag.post.eq(post).and(post.id.eq(postId)))
+                        .join(tag).on(
+                                tag.post.eq(post)
+                                        .and(checkPublicPost())
+                                        .and(post.id.eq(postId))
+                        )
                         .leftJoin(block).on(checkBlockStatus(loginMemberId))
-                        .where(post.status.eq(ACTIVE).and(post.postStatus.eq(PUBLIC)))
                         .groupBy(post)
                         .having(block.id.count().eq(0L))
                         .fetchOne()
@@ -60,7 +63,6 @@ public class PostCustomRepository {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        // TODO: 이게 최선인지.. 확인하기
         Long count = query
                 .select(post.count())
                 .from(post)
@@ -75,8 +77,7 @@ public class PostCustomRepository {
                 .selectFrom(post)
                 .join(tag).on(
                         tag.post.eq(post)
-                                .and(post.status.eq(ACTIVE))
-                                .and(post.postStatus.eq(PUBLIC))
+                                .and(checkPublicPost())
                 )
                 .leftJoin(follow).on(checkFollowOwnerOrTaggedMember(memberId))
                 .leftJoin(block).on(checkBlockStatus(memberId))
@@ -88,6 +89,11 @@ public class PostCustomRepository {
                 )
                 .groupBy(post)
                 .having(block.id.count().eq(0L));
+    }
+
+    private BooleanExpression checkPublicPost() {
+        return post.status.eq(ACTIVE)
+                .and(post.postStatus.eq(PUBLIC));
     }
 
     private BooleanExpression checkFollowOwnerOrTaggedMember(final Long memberId) {
