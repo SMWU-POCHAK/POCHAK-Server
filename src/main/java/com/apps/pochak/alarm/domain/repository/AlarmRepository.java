@@ -22,9 +22,6 @@ import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.NOT_YOU
 
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 
-    @Query("select a from Alarm a join fetch a.receiver where a.id = :id ")
-    Optional<Alarm> findAlarmById(@Param("id") final Long id);
-
     Optional<Alarm> findAlarmByIdAndReceiver(final Long id, final Member receiver);
 
     default Alarm findAlarmById(
@@ -38,13 +35,18 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
         return alarm;
     }
 
-    @Query("select a from Alarm a " +
-            "where a.receiver.id = :receiverId " +
-            "order by a.createdDate desc ")
+    @Query("""
+            select a from Alarm a
+            join fetch a.receiver
+            join fetch a.sender
+            where a.receiver.id = :receiverId
+            order by a.createdDate desc
+    """)
     Page<Alarm> getAllAlarm(
             @Param("receiverId") final Long receiverId,
             final Pageable pageable
     );
+
 
     // TODO: TREAT() 에러 확인하기
     /*
