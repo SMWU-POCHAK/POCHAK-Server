@@ -2,9 +2,9 @@ package com.apps.pochak.post.domain.repository;
 
 import com.apps.pochak.block.domain.Block;
 import com.apps.pochak.block.domain.repository.BlockRepository;
-import com.apps.pochak.global.BaseEntityStatus;
 import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
+import com.apps.pochak.global.BaseEntityStatus;
 import com.apps.pochak.global.TestQuerydslConfig;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.member.domain.Member;
@@ -23,8 +23,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import java.util.Arrays;
-import java.util.List;
 
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.BLOCKED_POST;
@@ -66,6 +64,7 @@ class PostCustomRepositoryTest {
 
     @Autowired
     FollowRepository followRepository;
+
 
     @DisplayName("[게시물 id 조회] 차단된 게시물을 제외한 게시물이 조회된다.")
     @Test
@@ -235,6 +234,7 @@ class PostCustomRepositoryTest {
         //then
         assertThat(posts.getTotalElements()).isEqualTo(0L);
         assertFalse((posts).hasContent());
+    }
 
     @DisplayName("[홈탭 조회] 홈 탭이 조회된다.")
     @Test

@@ -1,22 +1,23 @@
 package com.apps.pochak.post.domain.repository;
 
+import com.apps.pochak.global.BaseEntityStatus;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.PostStatus;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.LongSupplier;
 
 import static com.apps.pochak.block.domain.QBlock.block;
 import static com.apps.pochak.follow.domain.QFollow.follow;
