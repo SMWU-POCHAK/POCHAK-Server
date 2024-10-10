@@ -3,7 +3,7 @@ package com.apps.pochak.member.service;
 import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
-import com.apps.pochak.global.s3.S3Service;
+import com.apps.pochak.global.image.CloudStorageService;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.member.dto.request.ProfileUpdateRequest;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.UNAUTHORIZED_MEMBER_REQUEST;
-import static com.apps.pochak.global.s3.DirName.MEMBER;
+import static com.apps.pochak.global.image.DirName.MEMBER;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +29,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
     private final PostRepository postRepository;
-    private final S3Service awsS3Service;
+    private final CloudStorageService cloudStorageService;
 
     @Transactional(readOnly = true)
     public ProfileResponse getProfileDetail(
@@ -67,8 +67,8 @@ public class MemberService {
 
         String profileImageUrl = updateMember.getProfileImage();
         if (profileUpdateRequest.getProfileImage() != null) {
-            awsS3Service.deleteFileFromS3(updateMember.getProfileImage());
-            profileImageUrl = awsS3Service.upload(profileUpdateRequest.getProfileImage(), MEMBER);
+            cloudStorageService.delete(updateMember.getProfileImage());
+            profileImageUrl = cloudStorageService.upload(profileUpdateRequest.getProfileImage(), MEMBER);
         }
 
         updateMember.update(profileUpdateRequest, profileImageUrl);

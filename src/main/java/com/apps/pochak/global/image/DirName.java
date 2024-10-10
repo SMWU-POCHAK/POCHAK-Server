@@ -1,4 +1,4 @@
-package com.apps.pochak.global.s3;
+package com.apps.pochak.global.image;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
