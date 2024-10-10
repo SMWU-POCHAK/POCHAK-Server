@@ -2,6 +2,7 @@ package com.apps.pochak.post.domain.repository;
 
 import com.apps.pochak.block.domain.Block;
 import com.apps.pochak.block.domain.repository.BlockRepository;
+import com.apps.pochak.global.BaseEntityStatus;
 import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.TestQuerydslConfig;
@@ -12,6 +13,7 @@ import com.apps.pochak.member.fixture.MemberFixture;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.tag.domain.Tag;
 import com.apps.pochak.tag.domain.repository.TagRepository;
+import jakarta.persistence.EntityManager;
 import lombok.Builder;
 import lombok.Data;
 import org.junit.jupiter.api.DisplayName;
@@ -21,12 +23,15 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.BLOCKED_POST;
 import static com.apps.pochak.post.fixture.PostFixture.POST_WITH_MULTI_TAG;
 import static com.apps.pochak.tag.fixture.TagFixture.TAG1_WITH_ONE_POST;
 import static com.apps.pochak.tag.fixture.TagFixture.TAG2_WITH_ONE_POST;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
@@ -40,6 +45,9 @@ class PostCustomRepositoryTest {
     private static final Member TAGGED_MEMBER1 = MemberFixture.TAGGED_MEMBER1;
     private static final Member TAGGED_MEMBER2 = MemberFixture.TAGGED_MEMBER2;
     private static final Member LOGIN_MEMBER = MemberFixture.LOGIN_MEMBER;
+
+    @Autowired
+    private EntityManager em;
 
     @Autowired
     PostCustomRepository postCustomRepository;
@@ -172,6 +180,61 @@ class PostCustomRepositoryTest {
         //then
         assertEquals(BLOCKED_POST, exception.getCode());
     }
+
+    @Test
+    @DisplayName("[프로필 포착 게시물 조회] 현재 로그인한 사람이 특정 포차커가 업로드한 게시물을 페이지별로 조회한다.")
+    void findUploadPostPage() {
+        //given
+        SavedPostData savedPostData = savePost();
+        Member owner = savedPostData.getOwner();
+        Member loginMember = savedPostData.getLoginMember();
+        savedPostData.getSavedPost().makePublic();
+        savedPostData.getSavedPost().setStatus(BaseEntityStatus.ACTIVE);
+
+        //when
+        Page<Post> posts = postCustomRepository.findUploadPostPage(owner, loginMember.getId(), PageRequest.of(0, 1));
+
+        //then
+        assertThat(posts.getTotalElements()).isEqualTo(1L);
+        assertThat(posts.getContent().get(0)).isEqualTo(savedPostData.getSavedPost());
+    }
+
+    @Test
+    @DisplayName("[프로필 포착 게시물 조회] 현재 로그인한 사람이 게시물 작성자가 태그한 사람 중 한 명이라도 차단했을시 그 게시물은 조회되지 않는다.")
+    void findUploadPostPageWithoutBlockPostWhenLoginMemberBlockTaggedMember() {
+        //given
+        SavedPostData savedPostData = savePost();
+        Member owner = savedPostData.getOwner();
+        Member loginMember = savedPostData.getLoginMember();
+        savedPostData.getSavedPost().makePublic();
+        savedPostData.getSavedPost().setStatus(BaseEntityStatus.ACTIVE);
+
+        block(loginMember, savedPostData.getTaggedMember1());
+
+        //when
+        Page<Post> posts = postCustomRepository.findUploadPostPage(owner, loginMember.getId(), PageRequest.of(0, 1));
+        //then
+        assertThat(posts.getTotalElements()).isEqualTo(0L);
+        assertFalse((posts).hasContent());
+    }
+
+    @Test
+    @DisplayName("[프로필 포착 게시물 조회] 현재 로그인한 사람이 게시물 작성자가 태그한 사람 중 한 명에게라도 차단당했을시 그 게시물은 조회되지 않는다.")
+    void findUploadPostPageWithoutBlockPostWhenTaggedMemberBlockLoginMember() {
+        //given
+        SavedPostData savedPostData = savePost();
+        Member owner = savedPostData.getOwner();
+        Member loginMember = savedPostData.getLoginMember();
+        savedPostData.getSavedPost().makePublic();
+        savedPostData.getSavedPost().setStatus(BaseEntityStatus.ACTIVE);
+
+        block(savedPostData.getTaggedMember1(), loginMember);
+
+        //when
+        Page<Post> posts = postCustomRepository.findUploadPostPage(owner, loginMember.getId(), PageRequest.of(0, 1));
+        //then
+        assertThat(posts.getTotalElements()).isEqualTo(0L);
+        assertFalse((posts).hasContent());
 
     @DisplayName("[홈탭 조회] 홈 탭이 조회된다.")
     @Test
