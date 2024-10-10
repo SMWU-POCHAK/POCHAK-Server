@@ -2,7 +2,7 @@ package com.apps.pochak.login.util;
 
 import com.apps.pochak.auth.Auth;
 import com.apps.pochak.auth.domain.Accessor;
-import com.apps.pochak.login.provider.JwtProvider;
+import com.apps.pochak.global.api_payload.exception.handler.AuthenticationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,6 +11,8 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus._INVALID_AUTHORITY;
 
 @RequiredArgsConstructor
 @Component
@@ -30,7 +32,11 @@ public class LoginArgumentResolver implements HandlerMethodArgumentResolver {
             final WebDataBinderFactory binderFactory
     ) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        final Long memberId = Long.valueOf(principal.toString());
-        return Accessor.member(memberId);
+        try {
+            final Long memberId = Long.valueOf(principal.toString());
+            return Accessor.member(memberId);
+        } catch (NumberFormatException e) {
+            throw new AuthenticationException(_INVALID_AUTHORITY);
+        }
     }
 }
