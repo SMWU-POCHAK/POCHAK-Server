@@ -13,15 +13,14 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.DUPLICATE_HANDLE;
-import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.INVALID_MEMBER_HANDLE;
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
     default Member findMemberById(
             final Long id
     ) {
-        return findById(id).orElseThrow(() -> new GeneralException(INVALID_MEMBER_HANDLE));
+        return findById(id).orElseThrow(() -> new GeneralException(INVALID_MEMBER_ID));
     }
 
     Optional<Member> findMemberByHandle(final String handle);
@@ -68,7 +67,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             final String socialId,
             final SocialType socialType
     );
-
 
     @Query("select m from Member m " +
             "where (m.handle ilike concat('%', :keyword, '%') or m.name ilike concat('%', :keyword, '%')) " +
