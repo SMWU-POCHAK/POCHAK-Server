@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SQLRestriction;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -15,7 +14,6 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Entity
 @Getter
-@DynamicInsert
 @AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 @SQLRestriction("status = 'ACTIVE'")

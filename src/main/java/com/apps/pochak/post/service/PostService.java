@@ -57,8 +57,7 @@ public class PostService {
             final Accessor accessor,
             final Pageable pageable
     ) {
-        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
-        final Page<Post> taggedPost = postRepository.findTaggedPostsOfFollowing(loginMember, pageable);
+        final Page<Post> taggedPost = postCustomRepository.findPostOfFollowing(accessor.getMemberId(), pageable);
         return PostElements.from(taggedPost);
     }
 
@@ -70,9 +69,6 @@ public class PostService {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Post post = postCustomRepository.findPostByIdWithoutBlockPost(postId, accessor.getMemberId());
         final List<Tag> tagList = tagRepository.findTagsByPost(post);
-        if (post.isPrivate()) {
-            throw new GeneralException(PRIVATE_POST);
-        }
         final Boolean isFollow = post.isOwner(loginMember) ?
                 null : followRepository.existsBySenderAndReceiver(loginMember, post.getOwner());
         final Boolean isLike = likeRepository.existsByLikeMemberAndLikedPost(loginMember, post);

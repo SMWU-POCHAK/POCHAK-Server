@@ -1,6 +1,5 @@
 package com.apps.pochak.post.domain.repository;
 
-import com.apps.pochak.global.BaseEntityStatus;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
@@ -12,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,7 +19,10 @@ import java.util.Optional;
 import java.util.function.LongSupplier;
 
 import static com.apps.pochak.block.domain.QBlock.block;
+import static com.apps.pochak.follow.domain.QFollow.follow;
+import static com.apps.pochak.global.BaseEntityStatus.ACTIVE;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.BLOCKED_POST;
+import static com.apps.pochak.post.domain.PostStatus.PUBLIC;
 import static com.apps.pochak.post.domain.QPost.post;
 import static com.apps.pochak.tag.domain.QTag.tag;
 
@@ -35,26 +38,87 @@ public class PostCustomRepository {
         return findByIdWithoutBlockPost(postId, loginMemberId).orElseThrow(() -> new GeneralException(BLOCKED_POST));
     }
 
-    public Optional<Post> findByIdWithoutBlockPost(
+    private Optional<Post> findByIdWithoutBlockPost(
             final Long postId,
             final Long loginMemberId
     ) {
         return Optional.ofNullable(
                 query.selectFrom(post)
                         .join(post.owner).fetchJoin()
-                        .join(tag).on(tag.post.eq(post))
-                        .leftJoin(block).on(
-                                checkOwnerOrTaggedMemberBlockLoginMember(loginMemberId)
-                                        .or(checkLoginMemberBlockOwnerOrTaggedMember(loginMemberId))
+                        .join(tag).on(
+                                tag.post.eq(post)
+                                        .and(post.id.eq(postId))
+                                        .and(checkPublicPost())
                         )
+                        .leftJoin(block).on(checkBlockStatus(loginMemberId))
                         .groupBy(post)
                         .having(block.id.count().eq(0L))
-                        .where(
-                                post.id.eq(postId),
-                                post.status.eq(BaseEntityStatus.ACTIVE)
-                        )
                         .fetchOne()
         );
+    }
+
+    public Page<Post> findPostOfFollowing(
+            final Long memberId,
+            final Pageable pageable
+    ) {
+        List<Post> postList = findPostOfFollowing(memberId)
+                .orderBy(post.allowedDate.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long count = query
+                .select(post.count())
+                .from(post)
+                .where(post.in(findPostOfFollowing(memberId)))
+                .fetchOne();
+
+        return new PageImpl<>(postList, pageable, count);
+    }
+
+    private JPQLQuery<Post> findPostOfFollowing(final Long memberId) {
+        return query
+                .selectFrom(post)
+                .join(tag).on(
+                        tag.post.eq(post)
+                                .and(checkPublicPost())
+                )
+                .leftJoin(follow).on(checkFollowOwnerOrTaggedMember(memberId))
+                .leftJoin(block).on(checkBlockStatus(memberId))
+                .where(
+                        follow.id.isNotNull()
+                                .or(block.id.isNotNull())
+                                .or(post.owner.id.eq(memberId))
+                                .or(tag.member.id.eq(memberId))
+                )
+                .groupBy(post)
+                .having(block.id.count().eq(0L));
+    }
+
+    private BooleanExpression checkPublicPost() {
+        return post.status.eq(ACTIVE)
+                .and(post.postStatus.eq(PUBLIC));
+    }
+
+    private BooleanExpression checkFollowOwnerOrTaggedMember(final Long memberId) {
+        return checkFollowOwner(memberId).or(checkFollowTaggedMember(memberId));
+    }
+
+    private BooleanExpression checkFollowOwner(final Long loginMemberId) {
+        return follow.receiver.eq(post.owner)
+                .and(follow.sender.id.eq(loginMemberId))
+                .and(follow.status.eq(ACTIVE));
+    }
+
+    private BooleanExpression checkFollowTaggedMember(final Long loginMemberId) {
+        return follow.receiver.eq(tag.member)
+                .and(follow.sender.id.eq(loginMemberId))
+                .and(follow.status.eq(ACTIVE));
+    }
+
+    private BooleanExpression checkBlockStatus(final Long loginMemberId) {
+        return checkOwnerOrTaggedMemberBlockLoginMember(loginMemberId)
+                .or(checkLoginMemberBlockOwnerOrTaggedMember(loginMemberId));
     }
 
     private BooleanExpression checkOwnerOrTaggedMemberBlockLoginMember(final Long loginMemberId) {
