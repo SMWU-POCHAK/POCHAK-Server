@@ -24,8 +24,8 @@ public class FCMController {
     @PostMapping("/api/v1/fcm/register")
     @MemberOnly
     public ApiResponse<Void> saveFCMToken(
-            @Auth Accessor accessor,
-            @RequestBody @Valid FCMToken fcmToken
+            @Auth final Accessor accessor,
+            @RequestBody @Valid final FCMToken fcmToken
     ) {
         fcmService.saveToken(accessor, fcmToken);
         return ApiResponse.of(SUCCESS_SAVE_TOKEN);
