@@ -11,6 +11,7 @@ import com.apps.pochak.member.dto.response.MemberElements;
 import com.apps.pochak.member.dto.response.ProfileResponse;
 import com.apps.pochak.member.dto.response.ProfileUpdateResponse;
 import com.apps.pochak.post.domain.Post;
+import com.apps.pochak.post.domain.repository.PostCustomRepository;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.post.dto.PostElements;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class MemberService {
     private final FollowRepository followRepository;
     private final PostRepository postRepository;
     private final CloudStorageService cloudStorageService;
+    private final PostCustomRepository postCustomRepository;
 
     @Transactional(readOnly = true)
     public ProfileResponse getProfileDetail(
@@ -98,7 +100,7 @@ public class MemberService {
     ) {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Member owner = memberRepository.findByHandle(handle, loginMember);
-        final Page<Post> taggedPost = postRepository.findUploadPost(owner, loginMember, pageable);
+        final Page<Post> taggedPost = postCustomRepository.findUploadPostPage(owner, accessor.getMemberId(), pageable);
         return PostElements.from(taggedPost);
     }
 

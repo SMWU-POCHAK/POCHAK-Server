@@ -57,8 +57,7 @@ public class PostService {
             final Accessor accessor,
             final Pageable pageable
     ) {
-        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
-        final Page<Post> taggedPost = postRepository.findTaggedPostsOfFollowing(loginMember, pageable);
+        final Page<Post> taggedPost = postCustomRepository.findPostOfFollowing(accessor.getMemberId(), pageable);
         return PostElements.from(taggedPost);
     }
 
