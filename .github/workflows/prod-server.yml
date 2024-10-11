@@ -29,6 +29,10 @@ jobs:
         run: echo "${{ secrets.FIREBASE_KEY }}" > ./src/main/resources/static/firebase-adminsdk.json
         shell: bash
 
+      - name: Set up GCS Key file
+        run: echo "${{ secrets.GCS_KEY }}" > ./src/main/resources/static/gcp-img-role.json
+        shell: bash
+
       - name: Set up Apple Key file
         run: echo "${{ secrets.APPLE_AUTH_KEY }}" > ./src/main/resources/static/AuthKey_ZJ4VQZNW7D.p8
         shell: bash

@@ -86,7 +86,8 @@ public enum ErrorStatus implements BaseErrorCode {
     DELETE_FILE_ERROR(SERVICE_UNAVAILABLE, "IMAGE501", "파일 삭제를 실패하였습니다."),
     S3_UPLOAD_ERROR(SERVICE_UNAVAILABLE, "IMAGE502", "S3 업로드를 실패하였습니다."),
     CONVERT_FILE_ERROR(SERVICE_UNAVAILABLE, "IMAGE503", "MultipartFile을 File로 전환 실패하였습니다."),
-    NULL_FILE(BAD_REQUEST, "IMAGE504", "파일이 존재하지 않습니다.");
+    NULL_FILE(BAD_REQUEST, "IMAGE504", "파일이 존재하지 않습니다."),
+    URL_DECODE_ERROR(SERVICE_UNAVAILABLE, "IMAGE505", "파일 url 디코딩 과정에서 에러가 발생하였습니다.");
 
 
     private final HttpStatus httpStatus;
