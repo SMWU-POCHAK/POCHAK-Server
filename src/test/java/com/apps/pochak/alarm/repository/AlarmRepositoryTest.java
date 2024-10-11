@@ -32,9 +32,9 @@ class AlarmRepositoryTest {
     @Autowired
     FollowRepository followRepository;
 
-    @DisplayName("수신자의 모든 알람이 조회된다.")
+    @DisplayName("[알람 조회] 수신자의 팔로우 알람이 조회된다.")
     @Test
-    void getAllAlarmByReceiverId() {
+    void getFollowAlarmByReceiverId() {
         // given
         Member receiverMember = memberRepository.save(MemberFixture.OWNER);
         Member senderMember = memberRepository.save(MemberFixture.LOGIN_MEMBER);
