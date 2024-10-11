@@ -9,6 +9,7 @@ import static com.apps.pochak.alarm.domain.AlarmType.OWNER_LIKE;
 import static com.apps.pochak.comment.fixture.CommentFixture.STATIC_CHILD_COMMENT;
 import static com.apps.pochak.follow.fixture.FollowFixture.FOLLOW;
 import static com.apps.pochak.follow.fixture.FollowFixture.STATIC_RECEIVE_FOLLOW;
+import static com.apps.pochak.like.fixture.LikeFixture.LIKE;
 import static com.apps.pochak.like.fixture.LikeFixture.STATIC_LIKE2;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
 import static com.apps.pochak.tag.fixture.TagFixture.STATIC_WAITING_TAG;
@@ -45,6 +46,12 @@ public class AlarmFixture {
     public static final FollowAlarm FOLLOW_ALARM = new FollowAlarm(
             FOLLOW,
             OWNER
+    );
+
+    public static final LikeAlarm OWNER_LIKE_ALARM = new LikeAlarm(
+            LIKE,
+            LOGIN_MEMBER,
+            OWNER_LIKE
     );
 
 }

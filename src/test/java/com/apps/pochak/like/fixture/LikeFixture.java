@@ -2,8 +2,8 @@ package com.apps.pochak.like.fixture;
 
 import com.apps.pochak.like.domain.LikeEntity;
 
-import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
-import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER2;
+import static com.apps.pochak.member.fixture.MemberFixture.*;
+import static com.apps.pochak.post.fixture.PostFixture.PUBLIC_POST;
 import static com.apps.pochak.post.fixture.PostFixture.STATIC_PUBLIC_POST;
 
 public class LikeFixture {
@@ -18,5 +18,10 @@ public class LikeFixture {
             2L,
             STATIC_MEMBER2,
             STATIC_PUBLIC_POST
+    );
+
+    public static final LikeEntity LIKE = new LikeEntity(
+            OWNER,
+            PUBLIC_POST
     );
 }
