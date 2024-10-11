@@ -36,11 +36,11 @@ class AlarmRepositoryTest {
     @Test
     void getAllAlarmByReceiverId() {
         // given
-        Member receiverMember = memberRepository.save(MemberFixture.buildMember1());
-        Member senderMember = memberRepository.save(MemberFixture.buildMember2());
-        Follow follow = followRepository.save(FollowFixture.buildFollow(senderMember, receiverMember));
+        Member receiverMember = memberRepository.save(MemberFixture.OWNER);
+        Member senderMember = memberRepository.save(MemberFixture.LOGIN_MEMBER);
+        Follow follow = followRepository.save(FollowFixture.FOLLOW);
 
-        FollowAlarm followAlarm = alarmRepository.save(AlarmFixture.buildFollowAlarm(receiverMember, follow));
+        FollowAlarm followAlarm = alarmRepository.save(AlarmFixture.FOLLOW_ALARM);
 
         Pageable pageable = PageRequest.of(0, 10);
 
