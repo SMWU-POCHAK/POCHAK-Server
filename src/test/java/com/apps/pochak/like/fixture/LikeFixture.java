@@ -21,7 +21,7 @@ public class LikeFixture {
     );
 
     public static final LikeEntity LIKE = new LikeEntity(
-            OWNER,
+            LOGIN_MEMBER,
             PUBLIC_POST
     );
 }

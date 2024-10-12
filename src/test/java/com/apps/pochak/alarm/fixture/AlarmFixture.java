@@ -12,7 +12,7 @@ import static com.apps.pochak.follow.fixture.FollowFixture.STATIC_RECEIVE_FOLLOW
 import static com.apps.pochak.like.fixture.LikeFixture.LIKE;
 import static com.apps.pochak.like.fixture.LikeFixture.STATIC_LIKE2;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
-import static com.apps.pochak.tag.fixture.TagFixture.STATIC_WAITING_TAG;
+import static com.apps.pochak.tag.fixture.TagFixture.*;
 
 public class AlarmFixture {
 
@@ -45,13 +45,19 @@ public class AlarmFixture {
 
     public static final FollowAlarm FOLLOW_ALARM = new FollowAlarm(
             FOLLOW,
-            OWNER
+            LOGIN_MEMBER
     );
 
-    public static final LikeAlarm OWNER_LIKE_ALARM = new LikeAlarm(
+    public static final LikeAlarm LIKE_ALARM = new LikeAlarm(
             LIKE,
-            LOGIN_MEMBER,
+            OWNER,
             OWNER_LIKE
+    );
+
+    public static final TagAlarm TAG_ALARM = new TagAlarm(
+            TAG,
+            OWNER,
+            LOGIN_MEMBER
     );
 
 }

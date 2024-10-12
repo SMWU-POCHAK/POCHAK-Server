@@ -19,8 +19,8 @@ public class FollowFixture {
     );
 
     public static final Follow FOLLOW = new Follow(
-            LOGIN_MEMBER,
-            OWNER
+            OWNER,
+            LOGIN_MEMBER
     );
 
 }

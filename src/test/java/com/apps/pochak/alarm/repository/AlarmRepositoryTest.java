@@ -3,6 +3,7 @@ package com.apps.pochak.alarm.repository;
 import com.apps.pochak.alarm.domain.Alarm;
 import com.apps.pochak.alarm.domain.FollowAlarm;
 import com.apps.pochak.alarm.domain.LikeAlarm;
+import com.apps.pochak.alarm.domain.TagAlarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.alarm.fixture.AlarmFixture;
 import com.apps.pochak.follow.domain.Follow;
@@ -17,6 +18,9 @@ import com.apps.pochak.member.fixture.MemberFixture;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.post.fixture.PostFixture;
+import com.apps.pochak.tag.domain.Tag;
+import com.apps.pochak.tag.domain.repository.TagRepository;
+import com.apps.pochak.tag.fixture.TagFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +30,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @DataJpaTest
 class AlarmRepositoryTest {
@@ -42,45 +47,40 @@ class AlarmRepositoryTest {
     private LikeRepository likeRepository;
     @Autowired
     private PostRepository postRepository;
+    @Autowired
+    private TagRepository tagRepository;
 
-    @DisplayName("[알람 조회] 수신자의 팔로우 알람이 조회된다.")
+    @DisplayName("[알람 조회] 수신자의 알람들이 조회된다.")
     @Test
-    void getFollowAlarmByReceiverId() {
+    void getAlarmsByReceiverId() {
         // given
-        Member receiverMember = memberRepository.save(MemberFixture.OWNER);
-        Member senderMember = memberRepository.save(MemberFixture.LOGIN_MEMBER);
+        Member loginMember = memberRepository.save(MemberFixture.LOGIN_MEMBER);
+        Member postOwner = memberRepository.save(MemberFixture.OWNER);
+
         Follow follow = followRepository.save(FollowFixture.FOLLOW);
+        FollowAlarm followAlarmByPostOwner = alarmRepository.save(AlarmFixture.FOLLOW_ALARM);
 
-        FollowAlarm followAlarm = alarmRepository.save(AlarmFixture.FOLLOW_ALARM);
+        Tag tag = tagRepository.save(TagFixture.TAG);
+        TagAlarm tagAlarmByPostOwner = alarmRepository.save(AlarmFixture.TAG_ALARM);
 
-        Pageable pageable = PageRequest.of(0, 10);
-
-        // when
-        Page<Alarm> alarms = alarmRepository.getAllAlarm(receiverMember.getId(), pageable);
-
-        // then
-        assertEquals(1, alarms.getTotalElements());
-        assertEquals(followAlarm.getId(), alarms.getContent().get(0).getId());
-    }
-
-    @DisplayName("[알람 조회] 수신자의 좋아요 알람이 조회된다.")
-    @Test
-    void getLikeAlarmByReceiverId() {
-        // given
-        Member receiverMember = memberRepository.save(MemberFixture.LOGIN_MEMBER);
-        Member senderMember = memberRepository.save(MemberFixture.OWNER);
         Post post = postRepository.save(PostFixture.PUBLIC_POST);
         LikeEntity likeEntity = likeRepository.save(LikeFixture.LIKE);
-
-        LikeAlarm likeAlarm = alarmRepository.save(AlarmFixture.OWNER_LIKE_ALARM);
+        LikeAlarm likeAlarmByLoginMember = alarmRepository.save(AlarmFixture.LIKE_ALARM);
 
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<Alarm> alarms = alarmRepository.getAllAlarm(receiverMember.getId(), pageable);
+        Page<Alarm> loginMemberAlarms = alarmRepository.getAllAlarm(loginMember.getId(), pageable);
+
+        Page<Alarm> taggedMemberAlarms = alarmRepository.getAllAlarm(postOwner.getId(), pageable);
 
         // then
-        assertEquals(1, alarms.getTotalElements());
-        assertEquals(likeAlarm.getId(), alarms.getContent().get(0).getId());
+        assertEquals(2, loginMemberAlarms.getTotalElements());
+        assertEquals(followAlarmByPostOwner.getId(), loginMemberAlarms.getContent().get(0).getId());
+        assertEquals(tagAlarmByPostOwner.getId(), loginMemberAlarms.getContent().get(1).getId());
+
+        assertEquals(1, taggedMemberAlarms.getTotalElements());
+        assertEquals(likeAlarmByLoginMember.getId(), taggedMemberAlarms.getContent().get(0).getId());
     }
+
 }
