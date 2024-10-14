@@ -43,18 +43,14 @@
 
 ### 🛠️ CI/CD
 
-<img width="85%" src="https://github.com/user-attachments/assets/fa995254-3e67-4363-8b34-7dec02f9e0d9">
+<img width="90%" src="https://github.com/user-attachments/assets/fa995254-3e67-4363-8b34-7dec02f9e0d9">
 
 ### ⚒️ Infra
-<img width="85%" src="https://github.com/user-attachments/assets/f41061af-3359-4d99-ae6b-9fc1b4394b58">
-
-<!-- 
+<img width="90%" src="https://github.com/user-attachments/assets/f41061af-3359-4d99-ae6b-9fc1b4394b58">
 
 ## ERD
+<img width="90%" src="https://github.com/user-attachments/assets/7aa5330e-bc3d-4cee-aaf5-ade5a07125d4">
 
-> ERD 사진 넣기
-
--->
 
 ## Team Rule
 
