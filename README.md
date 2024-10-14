@@ -41,7 +41,12 @@
 - Authentication `JWT`
 - API Document `Spring REST Docs`
 
-<!-- 아키텍처 사진 넣기 -->
+### 🛠️ CI/CD
+
+<img width="85%" src="https://github.com/user-attachments/assets/fa995254-3e67-4363-8b34-7dec02f9e0d9">
+
+### ⚒️ Infra
+<img width="85%" src="https://github.com/user-attachments/assets/f41061af-3359-4d99-ae6b-9fc1b4394b58">
 
 <!-- 
 
@@ -56,9 +61,7 @@
 [![GitHub](https://img.shields.io/badge/github%20convention-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://smwu-pochak.github.io/posts/server-team-rule/)
 
 
-
 ## Contributors
-
 
 <table>
   <tr>
