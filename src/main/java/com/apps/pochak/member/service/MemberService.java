@@ -43,7 +43,7 @@ public class MemberService {
         final Member member = memberRepository.findByHandle(handle, loginMember);
         final long followerCount = followRepository.countActiveFollowByReceiver(member);
         final long followingCount = followRepository.countActiveFollowBySender(member);
-        final Page<Post> taggedPost = postCustomRepository.findTaggedPost(member, loginMember, pageable);
+        final Page<Post> taggedPost = postCustomRepository.findTaggedPost(member, loginMember.getId(), pageable);
         final Boolean isFollow = (handle.equals(loginMember.getHandle())) ?
                 null : followRepository.existsBySenderAndReceiver(loginMember, member);
 
@@ -88,7 +88,7 @@ public class MemberService {
     ) {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Member member = memberRepository.findByHandle(handle, loginMember);
-        final Page<Post> taggedPost = postCustomRepository.findTaggedPost(member, loginMember, pageable);
+        final Page<Post> taggedPost = postCustomRepository.findTaggedPost(member, loginMember.getId(), pageable);
         return PostElements.from(taggedPost);
     }
 

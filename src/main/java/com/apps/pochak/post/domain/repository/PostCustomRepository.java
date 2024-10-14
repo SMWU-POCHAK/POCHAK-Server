@@ -182,15 +182,14 @@ public class PostCustomRepository {
 
     public Page<Post> findTaggedPost(
             final Member member,
-            final Member loginMember,
+            final long loginMemberId,
             final Pageable pageable
     ) {
         List<Post> postList = query.selectFrom(post)
                 .join(tag).on(tag.post.eq(post)
                         .and(tag.member.eq(member))
                         .and(checkPublicPost()))
-                .leftJoin(block).on(checkBlockStatus(loginMember.getId()))
-                .where(checkBlockStatus(loginMember.getId()))
+                .leftJoin(block).on(checkBlockStatus(loginMemberId))
                 .orderBy(tag.lastModifiedDate.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -203,6 +202,7 @@ public class PostCustomRepository {
                                 .join(tag).on(tag.post.eq(post)
                                         .and(tag.member.eq(member))
                                         .and(checkPublicPost()))
+                                .leftJoin(block).on(checkBlockStatus(loginMemberId))
                 ));
 
         return PageableExecutionUtils.getPage(postList, pageable, postCount::fetchOne);
