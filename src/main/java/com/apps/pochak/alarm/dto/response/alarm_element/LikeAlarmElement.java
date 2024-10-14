@@ -22,7 +22,7 @@ public class LikeAlarmElement extends AlarmElement {
         this.memberHandle = alarm.getSender().getHandle();
         this.memberName = alarm.getSender().getName();
         this.memberProfileImage = alarm.getSender().getProfileImage();
-        this.postId = alarm.getLikedPostId();
-        this.postImage = alarm.getLikedPostImage();
+        this.postId = alarm.getPostId();
+        this.postImage = alarm.getPostImage();
     }
 }
