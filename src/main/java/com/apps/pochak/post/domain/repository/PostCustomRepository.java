@@ -203,7 +203,6 @@ public class PostCustomRepository {
                                 .join(tag).on(tag.post.eq(post)
                                         .and(tag.member.eq(member))
                                         .and(checkPublicPost()))
-                                .where(post.status.eq(ACTIVE))
                 ));
 
         return PageableExecutionUtils.getPage(postList, pageable, postCount::fetchOne);
