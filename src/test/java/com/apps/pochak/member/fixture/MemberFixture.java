@@ -2,7 +2,6 @@ package com.apps.pochak.member.fixture;
 
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.SocialType;
-import org.springframework.security.core.parameters.P;
 
 public class MemberFixture {
 

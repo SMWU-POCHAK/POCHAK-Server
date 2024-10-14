@@ -1,7 +1,6 @@
 package com.apps.pochak.follow.fixture;
 
 import com.apps.pochak.follow.domain.Follow;
-import com.apps.pochak.member.domain.Member;
 
 import static com.apps.pochak.member.fixture.MemberFixture.*;
 

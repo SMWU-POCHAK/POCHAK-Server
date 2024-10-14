@@ -1,8 +1,6 @@
 package com.apps.pochak.alarm.fixture;
 
 import com.apps.pochak.alarm.domain.*;
-import com.apps.pochak.follow.domain.Follow;
-import com.apps.pochak.member.domain.Member;
 
 import static com.apps.pochak.alarm.domain.AlarmType.COMMENT_REPLY;
 import static com.apps.pochak.alarm.domain.AlarmType.OWNER_LIKE;
