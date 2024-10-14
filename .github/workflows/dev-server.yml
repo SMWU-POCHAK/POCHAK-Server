@@ -2,7 +2,7 @@ name: dev server
 
 on:
   push:
-    branches: [ fix/#100-json-file ]
+    branches: [ develop ]
 
 jobs:
   build:
