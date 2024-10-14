@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SQLRestriction;
 
 import static jakarta.persistence.FetchType.LAZY;
@@ -15,7 +14,6 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Entity
 @Getter
-@DynamicInsert
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn
 @SQLRestriction("status = 'ACTIVE'")
@@ -30,7 +28,6 @@ public abstract class Alarm extends BaseEntity {
     private Member receiver;
 
     @Setter
-    @Column(columnDefinition = "boolean default false")
     private Boolean isChecked;
 
     @Enumerated(EnumType.STRING)
@@ -58,5 +55,6 @@ public abstract class Alarm extends BaseEntity {
         this.receiver = receiver;
         this.alarmType = alarmType;
         this.sender = sender;
+        this.isChecked = false;
     }
 }

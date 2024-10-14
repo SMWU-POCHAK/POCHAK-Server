@@ -2,6 +2,7 @@ package com.apps.pochak.login.filter;
 
 import com.apps.pochak.global.api_payload.code.ErrorReasonDTO;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
+import com.apps.pochak.global.api_payload.exception.handler.InvalidJwtException;
 import com.apps.pochak.login.provider.JwtProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
@@ -17,7 +18,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 import static com.apps.pochak.global.Constant.*;
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.NULL_TOKEN;
 
 @Slf4j
 @RequiredArgsConstructor

@@ -9,7 +9,7 @@ import com.apps.pochak.comment.domain.Comment;
 import com.apps.pochak.comment.domain.repository.CommentRepository;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
-import com.apps.pochak.global.s3.S3Service;
+import com.apps.pochak.global.image.CloudStorageService;
 import com.apps.pochak.like.domain.repository.LikeRepository;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
-import static com.apps.pochak.global.s3.DirName.POST;
+import static com.apps.pochak.global.image.DirName.POST;
 
 @Service
 @Transactional
@@ -48,7 +48,7 @@ public class PostService {
     private final AlarmRepository alarmRepository;
 
     private final TagAlarmService tagAlarmService;
-    private final S3Service s3Service;
+    private final CloudStorageService cloudStorageService;
 
     private static final int MAX_TAG_COUNT = 5;
 
@@ -57,8 +57,7 @@ public class PostService {
             final Accessor accessor,
             final Pageable pageable
     ) {
-        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
-        final Page<Post> taggedPost = postRepository.findTaggedPostsOfFollowing(loginMember, pageable);
+        final Page<Post> taggedPost = postCustomRepository.findPostOfFollowing(accessor.getMemberId(), pageable);
         return PostElements.from(taggedPost);
     }
 
@@ -70,9 +69,6 @@ public class PostService {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Post post = postCustomRepository.findPostByIdWithoutBlockPost(postId, accessor.getMemberId());
         final List<Tag> tagList = tagRepository.findTagsByPost(post);
-        if (post.isPrivate()) {
-            throw new GeneralException(PRIVATE_POST);
-        }
         final Boolean isFollow = post.isOwner(loginMember) ?
                 null : followRepository.existsBySenderAndReceiver(loginMember, post.getOwner());
         final Boolean isLike = likeRepository.existsByLikeMemberAndLikedPost(loginMember, post);
@@ -103,7 +99,7 @@ public class PostService {
             throw new GeneralException(TAGGED_ONESELF);
         }
 
-        final String image = s3Service.upload(request.getPostImage(), POST);
+        final String image = cloudStorageService.upload(request.getPostImage(), POST);
         final Post post = request.toEntity(image, loginMember);
         postRepository.save(post);
 
@@ -112,7 +108,7 @@ public class PostService {
 
         int foundTagSize = taggedMemberList.size();
         if (requestTagCount != foundTagSize) {
-            s3Service.deleteFileFromS3(image);
+            cloudStorageService.delete(image);
             throw new GeneralException(INVALID_TAG_INFO);
         }
 

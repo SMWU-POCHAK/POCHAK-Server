@@ -7,19 +7,17 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.util.Objects;
 
-import static jakarta.persistence.EnumType.*;
+import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
 @Getter
-@DynamicInsert
 @AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 @SQLDelete(sql = "UPDATE member SET status = 'DELETED' WHERE id = ?")
@@ -75,7 +73,7 @@ public class Member extends BaseEntity {
     public void update(
             final ProfileUpdateRequest profileUpdateRequest,
             final String profileImageUrl
-    ){
+    ) {
         this.name = getOrDefault(profileUpdateRequest.getName(), this.name);
         this.message = getOrDefault(profileUpdateRequest.getMessage(), this.message);
         this.profileImage = getOrDefault(profileImageUrl, this.profileImage);
@@ -84,7 +82,7 @@ public class Member extends BaseEntity {
     private <T> T getOrDefault(
             final T property,
             final T alternative
-    ){
+    ) {
         if (property != null)
             return property;
         return alternative;
@@ -102,7 +100,7 @@ public class Member extends BaseEntity {
             return false;
         }
 
-        Member member = (Member)o;
+        Member member = (Member) o;
         return Objects.equals(id, member.id);
     }
 
