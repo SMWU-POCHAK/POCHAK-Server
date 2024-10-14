@@ -6,6 +6,7 @@ import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.PostStatus;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -178,4 +179,34 @@ public class PostCustomRepository {
         return (block.blocker.id.eq(loginMemberId))
                 .and(block.blockedMember.eq(tag.member));
     }
+
+    public Page<Post> findTaggedPost(
+            final Member member,
+            final Member loginMember,
+            final Pageable pageable
+    ) {
+        List<Post> postList = query.selectFrom(post)
+                .join(tag).on(tag.post.eq(post)
+                        .and(tag.member.eq(member))
+                        .and(checkPublicPost()))
+                .leftJoin(block).on(checkBlockStatus(loginMember.getId()))
+                .where(checkBlockStatus(loginMember.getId()))
+                .orderBy(tag.lastModifiedDate.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPQLQuery<Long> postCount = query.select(post.count())
+                .from(post)
+                .where(post.in(
+                        query.selectFrom(post)
+                                .join(tag).on(tag.post.eq(post)
+                                        .and(tag.member.eq(member))
+                                        .and(checkPublicPost()))
+                                .where(post.status.eq(ACTIVE))
+                ));
+
+        return PageableExecutionUtils.getPage(postList, pageable, postCount::fetchOne);
+    }
+
 }
