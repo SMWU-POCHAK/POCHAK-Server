@@ -32,11 +32,10 @@
 
 - DB `MySQL`
 - Host
-  - GCP `Computing Engine` `Cloud SQL` `Cloud DNS` 
-  - AWS `S3`
+  - GCP `Compute Engine` `Cloud SQL` `Cloud DNS` `Cloud Storage`
   - `Ubuntu 20.04.6 LTS` `nginx/1.18.0 (Ubuntu)`
   - `Docker version 27.1.2`
-- CI/CD `GitHub Actions` `Jenkins Version 2.473`
+- CI/CD `GitHub Actions`
 - Framework `Spring Boot 3.2.1 (Java 17)`
 - Authentication `JWT`
 - API Document `Spring REST Docs`
