@@ -42,13 +42,13 @@
 - API Document `Spring REST Docs`
 
 ## CI/CD
-<img width="90%" src="https://github.com/user-attachments/assets/fa995254-3e67-4363-8b34-7dec02f9e0d9">
+<img width="100%" src="https://github.com/user-attachments/assets/fa995254-3e67-4363-8b34-7dec02f9e0d9">
 
 ## Infra
-<img width="90%" src="https://github.com/user-attachments/assets/f41061af-3359-4d99-ae6b-9fc1b4394b58">
+<img width="100%" src="https://github.com/user-attachments/assets/66a18fe2-2ef3-4646-97c6-7e5008878245">
 
 ## ERD
-<img width="90%" src="https://github.com/user-attachments/assets/d662081b-60c5-437c-bb6b-685faaeaf8ce">
+<img width="100%" src="https://github.com/user-attachments/assets/9cffaa55-a5a9-4b3c-8100-4294aba84b02">
 
 
 # Team Rule
@@ -72,55 +72,81 @@
   <tr>
     <td valign="top"> <!-- 지수 -->
         <ul>
-            <li>CI/CD 및 인프라 개선</li>
-            <li>AWS RDS → CLOUD SQL 마이그레이션</li>
-            <li>Spring REST Docs 연결</li>
             <li>게시물 신고 및 유저 차단 기능 개발</li>
             <li>회원 검색 기능 개발</li>
-            <li>인증/인가 로직 리팩토링</li>
-            <li>테스트코드 기본 설정</li>
+            <li>인증/인가 기능 개선</li>
             <li>
-                프로필 탭 기능 개발
+                <details>
+                <summary>프로필 탭 기능 개발</summary>
+                <div markdown="1">
                   <ul>
                       <li>기본 프로필 정보, 포착된/포착한 게시물 조회</li>
                       <li>팔로워, 팔로우 목록 조회</li>
                       <li>타 유저 팔로우 및 취소</li>
                       <li>팔로워 삭제</li>
                   </ul>
+                </div>
+                </details>
             </li>
             <li>
-                홈 탭 (게시물) 기능 개발
+                <details>
+                <summary>홈 탭 (게시물) 기능 개발</summary>
+                <div markdown="1">
                   <ul>
                       <li>새로운 게시글 업로드</li>
                       <li>좋아요 반영, 좋아요 누른 유저 리스트 조회</li>
                       <li>댓글, 대댓글 조회, 등록, 삭제</li>
                   </ul>
+                </div>
+                </details>
             </li>
             <li>
-                알람 및 게시글 수락 기능 개발
+                <details>
+                <summary>알람 및 게시글 수락 기능 개발</summary>
+                <div markdown="1">
                   <ul>
                       <li>댓글, 팔로우 알람 생성</li>
                       <li>게시글 업로드 수락 과정 설정</li>
                       <li>알람 조회</li>
                   </ul>
+                </div>
+                </details>
             </li>
+            <li><a href="https://github.com/SMWU-POCHAK/POCHAK-Server/pulls?q=assignee%3A5jisoo+is%3Aclosed">👀 Contribution</a></li>
         </ul>
     </td>
     <td valign="top"> <!-- 영서 -->
         <ul>
-            <li>CI/CD 및 인프라 개선</li>
             <li>
-                프로필 탭 기능 개발
+                <details>
+                <summary>프로필 탭 기능 개발</summary>
+                <div markdown="1">
                   <ul>
                       <li>프로필 정보 수정</li>
                   </ul>
+                </div>
+                </details>
             </li>
+            <li><a href="https://github.com/SMWU-POCHAK/POCHAK-Server/pulls?q=is%3Aclosed+assignee%3Adudrhy12">👀 Contribution</a></li>
         </ul>
     </td> 
     <td valign="top"> <!-- 예진 -->
         <ul>
+          <li>
+              <details>
+              <summary>추억페이지 기능 개발</summary>
+              <div markdown="1">
+                <ul>
+                    <li>추억페이지 조회</li>
+                    <li>포착해준 게시물 조회 </li>
+                    <li>함께 포착된 게시물 조회</li>
+                    <li>포착된 게시물 조회</li>
+                </ul>
+              </div>
+              </details>
+          </li>
+          <li><a href="https://github.com/SMWU-POCHAK/POCHAK-Server/pulls?q=is%3Aclosed+assignee%3Ayeahjinjeong">👀 Contribution</a></li>
         </ul>
     </td>
-
   </tr>
 </table>
