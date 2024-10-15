@@ -17,7 +17,7 @@ public class MemoriesElement {
 
     public static MemoriesElement from(final Tag tag) {
         if (tag == null) {
-            return new MemoriesElement(null, null, null);
+            return new MemoriesElement();
         }
         return new MemoriesElement(tag.getPost().getId(), tag.getPost().getPostImage(), tag.getPost().getAllowedDate());
     }
