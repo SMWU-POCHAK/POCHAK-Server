@@ -13,7 +13,6 @@ import com.apps.pochak.member.fixture.MemberFixture;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.tag.domain.Tag;
 import com.apps.pochak.tag.domain.repository.TagRepository;
-import jakarta.persistence.EntityManager;
 import lombok.Builder;
 import lombok.Data;
 import org.junit.jupiter.api.DisplayName;
@@ -43,9 +42,6 @@ class PostCustomRepositoryTest {
     private static final Member TAGGED_MEMBER1 = MemberFixture.TAGGED_MEMBER1;
     private static final Member TAGGED_MEMBER2 = MemberFixture.TAGGED_MEMBER2;
     private static final Member LOGIN_MEMBER = MemberFixture.LOGIN_MEMBER;
-
-    @Autowired
-    private EntityManager em;
 
     @Autowired
     PostCustomRepository postCustomRepository;
@@ -182,7 +178,7 @@ class PostCustomRepositoryTest {
 
     @Test
     @DisplayName("[프로필 포착 게시물 조회] 현재 로그인한 사람이 특정 포차커가 업로드한 게시물을 페이지별로 조회한다.")
-    void findUploadPostPage() {
+    void findUploadPost() {
         //given
         SavedPostData savedPostData = savePost();
         Member owner = savedPostData.getOwner();
@@ -191,7 +187,7 @@ class PostCustomRepositoryTest {
         savedPostData.getSavedPost().setStatus(BaseEntityStatus.ACTIVE);
 
         //when
-        Page<Post> posts = postCustomRepository.findUploadPostPage(owner, loginMember.getId(), PageRequest.of(0, 1));
+        Page<Post> posts = postCustomRepository.findUploadPost(owner, loginMember.getId(), PageRequest.of(0, 1));
 
         //then
         assertThat(posts.getTotalElements()).isEqualTo(1L);
@@ -200,7 +196,7 @@ class PostCustomRepositoryTest {
 
     @Test
     @DisplayName("[프로필 포착 게시물 조회] 현재 로그인한 사람이 게시물 작성자가 태그한 사람 중 한 명이라도 차단했을시 그 게시물은 조회되지 않는다.")
-    void findUploadPostPageWithoutBlockPostWhenLoginMemberBlockTaggedMember() {
+    void findUploadPostWithoutBlockPostWhenLoginMemberBlockTaggedMember() {
         //given
         SavedPostData savedPostData = savePost();
         Member owner = savedPostData.getOwner();
@@ -211,7 +207,7 @@ class PostCustomRepositoryTest {
         block(loginMember, savedPostData.getTaggedMember1());
 
         //when
-        Page<Post> posts = postCustomRepository.findUploadPostPage(owner, loginMember.getId(), PageRequest.of(0, 1));
+        Page<Post> posts = postCustomRepository.findUploadPost(owner, loginMember.getId(), PageRequest.of(0, 1));
         //then
         assertThat(posts.getTotalElements()).isEqualTo(0L);
         assertFalse((posts).hasContent());
@@ -219,7 +215,7 @@ class PostCustomRepositoryTest {
 
     @Test
     @DisplayName("[프로필 포착 게시물 조회] 현재 로그인한 사람이 게시물 작성자가 태그한 사람 중 한 명에게라도 차단당했을시 그 게시물은 조회되지 않는다.")
-    void findUploadPostPageWithoutBlockPostWhenTaggedMemberBlockLoginMember() {
+    void findUploadPostWithoutBlockPostWhenTaggedMemberBlockLoginMember() {
         //given
         SavedPostData savedPostData = savePost();
         Member owner = savedPostData.getOwner();
@@ -230,7 +226,7 @@ class PostCustomRepositoryTest {
         block(savedPostData.getTaggedMember1(), loginMember);
 
         //when
-        Page<Post> posts = postCustomRepository.findUploadPostPage(owner, loginMember.getId(), PageRequest.of(0, 1));
+        Page<Post> posts = postCustomRepository.findUploadPost(owner, loginMember.getId(), PageRequest.of(0, 1));
         //then
         assertThat(posts.getTotalElements()).isEqualTo(0L);
         assertFalse((posts).hasContent());
