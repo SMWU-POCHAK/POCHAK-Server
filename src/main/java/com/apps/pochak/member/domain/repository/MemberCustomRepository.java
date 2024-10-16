@@ -7,6 +7,7 @@ import com.apps.pochak.member.dto.response.MemberElement;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPQLQuery;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -47,8 +48,12 @@ public class MemberCustomRepository {
                                 )
                         ).collect(Collectors.toList());
 
-        JPQLQuery<Long> countQuery = findFollowersOfMemberAndIsFollow(memberId, loginMemberId)
-                .select(member.count());
+        JPAQuery<Long> countQuery = query.select(member.count())
+                .from(member)
+                .where(member
+                        .in(
+                                findFollowersOfMemberAndIsFollow(memberId, loginMemberId).select(member)
+                        ));
 
         return PageableExecutionUtils.getPage(memberElementList, pageable, countQuery::fetchOne);
     }
