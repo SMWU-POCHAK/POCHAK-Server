@@ -58,15 +58,6 @@ public class MemberCustomRepository {
         return PageableExecutionUtils.getPage(memberElementList, pageable, countQuery::fetchOne);
     }
 
-    private Boolean getFollowStatus(
-            final Member member,
-            final Follow follow,
-            final Long loginMemberId
-    ) {
-        if (member.getId().equals(loginMemberId)) return null;
-        else return follow != null;
-    }
-
     private JPQLQuery<Tuple> findFollowersOfMemberAndIsFollow(
             final Long memberId,
             final Long loginMemberId
@@ -86,6 +77,15 @@ public class MemberCustomRepository {
                 .leftJoin(block).on(checkBlockStatus(loginMemberId))
                 .groupBy(member, follow, f)
                 .having(block.id.count().eq(0L));
+    }
+
+    private Boolean getFollowStatus(
+            final Member member,
+            final Follow follow,
+            final Long loginMemberId
+    ) {
+        if (member.getId().equals(loginMemberId)) return null;
+        else return follow != null;
     }
 
     private BooleanExpression checkBlockStatus(final Long loginMemberId) {
