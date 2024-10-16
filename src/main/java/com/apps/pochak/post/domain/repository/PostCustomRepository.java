@@ -66,13 +66,12 @@ public class PostCustomRepository {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        Long count = query
+        JPAQuery<Long> countQuery = query
                 .select(post.count())
                 .from(post)
-                .where(post.in(findPostOfFollowing(memberId)))
-                .fetchOne();
+                .where(post.in(findPostOfFollowing(memberId)));
 
-        return new PageImpl<>(postList, pageable, count);
+        return PageableExecutionUtils.getPage(postList, pageable, countQuery::fetchOne);
     }
 
     private JPQLQuery<Post> findPostOfFollowing(final Long memberId) {
@@ -99,7 +98,7 @@ public class PostCustomRepository {
             final Long loginMemberId,
             final Pageable pageable
     ) {
-        List<Post> contentPage = findUploadPost(owner, loginMemberId)
+        List<Post> postList = findUploadPost(owner, loginMemberId)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -108,7 +107,7 @@ public class PostCustomRepository {
                 .from(post)
                 .where(post.in(findUploadPost(owner, loginMemberId)));
 
-        return PageableExecutionUtils.getPage(contentPage, pageable, countQuery::fetchOne);
+        return PageableExecutionUtils.getPage(postList, pageable, countQuery::fetchOne);
     }
 
     private JPAQuery<Post> findUploadPost(
