@@ -57,4 +57,16 @@ public abstract class Alarm extends BaseEntity {
         this.sender = sender;
         this.isChecked = false;
     }
+
+    public String getPushNotificationTitle() {
+        return this.getAlarmType().getTitle();
+    }
+
+    public String getPushNotificationBody() {
+        return String.format(this.getAlarmType().getBody(), this.getSender().getName());
+    }
+
+    public String getPushNotificationImage() {
+        return String.format(this.getAlarmType().getImage(), this.getSender().getProfileImage());
+    }
 }
