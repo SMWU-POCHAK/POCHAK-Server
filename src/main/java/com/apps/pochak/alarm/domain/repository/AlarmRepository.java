@@ -132,7 +132,7 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     @Modifying
     @Query(value = """
             update alarm a set a.status = 'DELETED'
-                   where a.post_id = :postId or a.liked_post_id = :postId
+                   where a.post_id = :postId
             """,
             nativeQuery = true)
     void deleteByPost(@Param("postId") final Long postId);

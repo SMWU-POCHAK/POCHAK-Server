@@ -21,8 +21,8 @@ public class LikeAlarm extends Alarm {
     @JoinColumn(name = "like_id")
     private LikeEntity like;
 
-    private Long likedPostId;
-    private String likedPostImage;
+    private Long postId;
+    private String postImage;
 
     public LikeAlarm(
             final Long id,
@@ -47,7 +47,7 @@ public class LikeAlarm extends Alarm {
         this.like = like;
 
         Post likedPost = like.getLikedPost();
-        this.likedPostId = likedPost.getId();
-        this.likedPostImage = likedPost.getPostImage();
+        this.postId = likedPost.getId();
+        this.postImage = likedPost.getPostImage();
     }
 }
