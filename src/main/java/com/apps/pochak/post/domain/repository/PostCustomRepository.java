@@ -180,32 +180,36 @@ public class PostCustomRepository {
                 .and(block.blockedMember.eq(tag.member));
     }
 
-    public Page<Post> findTaggedPost(
-            final Member member,
+    private JPAQuery<Post> findTaggedPost(
+            final Member owner,
+            final long loginMemberId
+    ) {
+        return query.selectFrom(post)
+                .join(tag).on(tag.post.eq(post)
+                        .and(tag.member.eq(owner))
+                        .and(checkPublicPost()))
+                .leftJoin(block).on(checkBlockStatus(loginMemberId))
+                .groupBy(post)
+                .having(block.id.count().eq(0L))
+                .orderBy(tag.lastModifiedDate.desc());
+    }
+
+    public Page<Post> findTaggedPostPage(
+            final Member owner,
             final long loginMemberId,
             final Pageable pageable
     ) {
-        List<Post> postList = query.selectFrom(post)
-                .join(tag).on(tag.post.eq(post)
-                        .and(tag.member.eq(member))
-                        .and(checkPublicPost()))
-                .leftJoin(block).on(checkBlockStatus(loginMemberId))
-                .orderBy(tag.lastModifiedDate.desc())
+        List<Post> postList = findTaggedPost(owner, loginMemberId)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        JPQLQuery<Long> postCount = query.select(post.count())
+        JPAQuery<Long> postCount = query.select(post.count())
                 .from(post)
-                .where(post.in(
-                        query.selectFrom(post)
-                                .join(tag).on(tag.post.eq(post)
-                                        .and(tag.member.eq(member))
-                                        .and(checkPublicPost()))
-                                .leftJoin(block).on(checkBlockStatus(loginMemberId))
-                ));
+                .where(post.in(findTaggedPost(owner, loginMemberId)));
 
         return PageableExecutionUtils.getPage(postList, pageable, postCount::fetchOne);
     }
+
 
 }
