@@ -25,16 +25,16 @@ public class LikeEntity extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "like_member_id")
-    private Member likeMember;
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "liked_post_id")
-    private Post likedPost;
+    @JoinColumn(name = "post_id")
+    private Post post;
 
     @Builder
-    public LikeEntity(Member likeMember, Post likedPost) {
-        this.likeMember = likeMember;
-        this.likedPost = likedPost;
+    public LikeEntity(Member member, Post post) {
+        this.member = member;
+        this.post = post;
     }
 }
