@@ -36,7 +36,7 @@ public class LikeService {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Post post = postRepository.findPostById(postId);
 
-        final Optional<LikeEntity> optionalLike = likeRepository.findByLikeMemberAndLikedPost(loginMember, post);
+        final Optional<LikeEntity> optionalLike = likeRepository.findByMemberAndPost(loginMember, post);
         if (optionalLike.isPresent()) {
             final LikeEntity postLike = optionalLike.get();
             toggleLikeStatus(postLike);
@@ -54,7 +54,7 @@ public class LikeService {
             likeAlarmService.deleteAlarmByLike(like);
         } else {
             like.setStatus(ACTIVE);
-            likeAlarmService.sendLikeAlarm(like, like.getLikedPost().getOwner());
+            likeAlarmService.sendLikeAlarm(like, like.getPost().getOwner());
         }
     }
 
@@ -63,8 +63,8 @@ public class LikeService {
             final Post post
     ) {
         final LikeEntity like = LikeEntity.builder()
-                .likeMember(loginMember)
-                .likedPost(post)
+                .member(loginMember)
+                .post(post)
                 .build();
         likeRepository.save(like);
         likeAlarmService.sendLikeAlarm(like, post.getOwner());

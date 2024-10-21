@@ -47,7 +47,7 @@ public class LikeAlarmService {
     private void sendTaggedPostLikeAlarm(
             final LikeEntity like
     ) {
-        final List<Tag> tagList = tagRepository.findTagsByPost(like.getLikedPost());
+        final List<Tag> tagList = tagRepository.findTagsByPost(like.getPost());
 
         final List<Alarm> alarmList = new ArrayList<>();
         for (Tag tag : tagList) {
@@ -68,7 +68,7 @@ public class LikeAlarmService {
             final LikeEntity like,
             final Member receiver
     ) {
-        return like.getLikeMember().equals(receiver);
+        return like.getMember().equals(receiver);
     }
 
     public void deleteAlarmByLike(final LikeEntity like) {

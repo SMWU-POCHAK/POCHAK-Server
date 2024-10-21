@@ -118,7 +118,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Long> findPostIdListByOwnerOrTaggedMember(@Param("member") final Member member);
 
     @Query("select p from Post p " +
-            "left join LikeEntity l on l.likedPost = p " +
+            "left join LikeEntity l on l.post = p " +
             "where p.postStatus = 'PUBLIC' and p.status = 'ACTIVE' " +
             "group by p.id " +
             "order by count(l) desc, p.allowedDate desc ")

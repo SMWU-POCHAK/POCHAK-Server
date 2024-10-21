@@ -30,7 +30,7 @@ public class LikeAlarm extends Alarm {
             final Member receiver,
             final AlarmType alarmType
     ) {
-        super(id, receiver, alarmType, like.getLikeMember());
+        super(id, receiver, alarmType, like.getMember());
         initializeFields(like);
     }
 
@@ -39,14 +39,14 @@ public class LikeAlarm extends Alarm {
             final Member receiver,
             final AlarmType alarmType
     ) {
-        super(receiver, alarmType, like.getLikeMember());
+        super(receiver, alarmType, like.getMember());
         initializeFields(like);
     }
 
     private void initializeFields(LikeEntity like) {
         this.like = like;
 
-        Post likedPost = like.getLikedPost();
+        Post likedPost = like.getPost();
         this.postId = likedPost.getId();
         this.postImage = likedPost.getPostImage();
     }
