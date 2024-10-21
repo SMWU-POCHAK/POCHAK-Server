@@ -34,7 +34,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         }
         return post;
     }
-    
+
 
     @Query("select p from Post p " +
             "where p.owner = :owner and p.status = 'ACTIVE' and p.postStatus = 'PUBLIC' " +

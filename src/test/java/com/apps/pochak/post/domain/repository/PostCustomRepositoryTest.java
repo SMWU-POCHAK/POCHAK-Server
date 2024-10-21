@@ -431,6 +431,91 @@ class PostCustomRepositoryTest {
         assertTrue(postPage.getContent().isEmpty());
     }
 
+    @DisplayName("[프로필 POCHAKED 탭 조회] 게시글의 주인에게 차단 당하였다면 해당 게시물은 제외되어 조회된다. ")
+    @Test
+    void findTaggedPost_WhenBlockedByPostOwner() throws Exception {
+        //given
+        SavedPostData savedPostData = savePost();
+        Member loginMember = savedPostData.getLoginMember();
+        block(savedPostData.getOwner(), loginMember);
+
+        //when
+        Page<Post> postPage = postCustomRepository.findTaggedPostPage(
+                savedPostData.getOwner(),
+                loginMember.getId(),
+                PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
+
+        //then
+        assertEquals(0, postPage.getTotalElements());
+        assertEquals(0, postPage.getTotalPages());
+        assertTrue(postPage.getContent().isEmpty());
+    }
+
+    @DisplayName("[프로필 POCHAKED 탭 조회] 게시글에 태그된 멤버에게 차단 당하였다면 해당 게시물은 제외되어 조회된다. ")
+    @Test
+    void findTaggedPost_WhenBlockedByTaggedMember() throws Exception {
+        //given
+        SavedPostData savedPostData = savePost();
+        Member loginMember = savedPostData.getLoginMember();
+        block(savedPostData.getTaggedMember1(), loginMember);
+
+        //when
+        Page<Post> postPage = postCustomRepository.findTaggedPostPage(
+                savedPostData.getOwner(),
+                loginMember.getId(),
+                PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
+
+        //then
+        assertEquals(0, postPage.getTotalElements());
+        assertEquals(0, postPage.getTotalPages());
+        assertTrue(postPage.getContent().isEmpty());
+    }
+
+    @DisplayName("[프로필 POCHAKED 탭 조회] 게시글의 주인을 차단하였다면 해당 게시물은 제외되어 조회된다. ")
+    @Test
+    void findTaggedPost_WhenBlockingPostOwner() throws Exception {
+        //given
+        SavedPostData savedPostData = savePost();
+        Member loginMember = savedPostData.getLoginMember();
+        block(loginMember, savedPostData.getLoginMember());
+
+        //when
+        Page<Post> postPage = postCustomRepository.findTaggedPostPage(
+                savedPostData.getOwner(),
+                loginMember.getId(),
+                PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
+
+        //then
+        assertEquals(0, postPage.getTotalElements());
+        assertEquals(0, postPage.getTotalPages());
+        assertTrue(postPage.getContent().isEmpty());
+    }
+
+    @DisplayName("[프로필 POCHAKED 탭 조회] 게시글에 태그된 멤버를 차단하였다면 해당 게시물은 제외되어 조회된다. ")
+    @Test
+    void findTaggedPost_WhenBlockingTaggedMember() throws Exception {
+        //given
+        SavedPostData savedPostData = savePost();
+        Member loginMember = savedPostData.getLoginMember();
+        block(loginMember, savedPostData.getTaggedMember1());
+
+        //when
+        Page<Post> postPage = postCustomRepository.findTaggedPostPage(
+                savedPostData.getOwner(),
+                loginMember.getId(),
+                PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
+
+        //then
+        assertEquals(0, postPage.getTotalElements());
+        assertEquals(0, postPage.getTotalPages());
+        assertTrue(postPage.getContent().isEmpty());
+    }
+
+
     private SavedPostData savePost() {
         return SavedPostData.of()
                 .owner(memberRepository.save(OWNER))
