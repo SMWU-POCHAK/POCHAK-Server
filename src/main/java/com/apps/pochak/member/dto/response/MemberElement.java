@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Optional;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,6 +29,17 @@ public class MemberElement {
         this.handle = handle;
         this.name = name;
         this.isFollow = convert(isFollow);
+    }
+
+    public MemberElement(
+            final Member member,
+            final Boolean isFollow
+    ) {
+        this.memberId = member.getId();
+        this.profileImage = member.getProfileImage();
+        this.handle = member.getHandle();
+        this.name = member.getName();
+        this.isFollow = isFollow;
     }
 
     public MemberElement(final Member member) {
