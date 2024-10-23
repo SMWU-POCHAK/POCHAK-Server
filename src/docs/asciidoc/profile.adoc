@@ -55,6 +55,31 @@ include::{snippets}/get-uploaded-post/query-parameters.adoc[]
 include::{snippets}/get-uploaded-post/response-body.adoc[]
 include::{snippets}/get-uploaded-post/response-fields.adoc[]
 
+== `PUT` Update Profile API
+
+프로필 수정 API
+
+=== Request
+include::{snippets}/update-profile/curl-request.adoc[]
+
+==== path parameters
+include::{snippets}/update-profile/path-parameters.adoc[]
+
+==== request headers
+include::{snippets}/update-profile/request-headers.adoc[]
+
+==== request parts
+include::{snippets}/upload-post/request-parts.adoc[]
+
+==== query parameters
+include::{snippets}/update-profile/query-parameters.adoc[]
+
+=== Response
+==== response body
+include::{snippets}/update-profile/response-body.adoc[]
+include::{snippets}/update-profile/response-fields.adoc[]
+
+
 == `GET` Check Duplicate Handle API
 
 중복되는 아이디 (handle) 검사용 API

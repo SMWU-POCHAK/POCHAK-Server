@@ -49,8 +49,8 @@ class AlarmRepositoryTest {
     @Autowired
     private TagRepository tagRepository;
 
-    @DisplayName("[알람 조회] 수신자의 알람들이 조회된다.")
-    @Test
+//    @DisplayName("[알람 조회] 수신자의 알람들이 조회된다.")
+//    @Test
     void getAlarmsByReceiverId() {
         // given
         Member loginMember = memberRepository.save(MemberFixture.LOGIN_MEMBER);

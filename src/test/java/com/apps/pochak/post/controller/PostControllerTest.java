@@ -23,7 +23,7 @@ import java.util.List;
 import static com.apps.pochak.comment.fixture.CommentFixture.STATIC_CHILD_COMMENT;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
-import static com.apps.pochak.global.MockMultipartFileConverter.getSampleMultipartFile;
+import static com.apps.pochak.global.MockMultipartFileConverter.getMockMultipartFileOfPost;
 import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
 import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
 import static com.apps.pochak.post.fixture.PostFixture.STATIC_PUBLIC_POST;
@@ -182,7 +182,7 @@ class PostControllerTest extends ControllerTest {
 
         this.mockMvc.perform(
                         multipart("/api/v2/posts")
-                                .file(getSampleMultipartFile())
+                                .file(getMockMultipartFileOfPost())
                                 .queryParam("taggedMemberHandleList", String.join(", ", taggedMemberHandles))
                                 .queryParam("caption", caption)
                                 .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
