@@ -7,7 +7,6 @@ import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.api_payload.code.BaseCode;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.member.domain.Member;
-import com.apps.pochak.member.domain.repository.CustomMemberRepository;
 import com.apps.pochak.member.domain.repository.MemberCustomRepository;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.member.dto.response.MemberElement;
@@ -32,7 +31,6 @@ import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCE
 public class FollowService {
     private final FollowRepository followRepository;
     private final MemberRepository memberRepository;
-    private final CustomMemberRepository customMemberRepository;
     private final MemberCustomRepository memberCustomRepository;
     private final FollowAlarmService followAlarmService;
 
@@ -105,11 +103,10 @@ public class FollowService {
             final String handle,
             final Pageable pageable
     ) {
-        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
-        final Member member = memberRepository.findByHandle(handle, loginMember);
-        final Page<MemberElement> followingPage = customMemberRepository.findFollowingsAndIsFollow(
-                member,
-                loginMember.getId(),
+        final Member member = memberRepository.findByHandleWithoutLogin(handle);
+        final Page<MemberElement> followingPage = memberCustomRepository.findFollowingsOfMemberAndIsFollow(
+                member.getId(),
+                accessor.getMemberId(),
                 pageable
         );
 
