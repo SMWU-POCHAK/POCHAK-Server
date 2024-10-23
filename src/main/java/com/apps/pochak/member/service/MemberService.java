@@ -69,7 +69,9 @@ public class MemberService {
 
         String profileImageUrl = updateMember.getProfileImage();
         if (profileUpdateRequest.getProfileImage() != null) {
-            cloudStorageService.delete(updateMember.getProfileImage());
+            if (profileImageUrl != null) {
+                cloudStorageService.delete(updateMember.getProfileImage());
+            }
             profileImageUrl = cloudStorageService.upload(profileUpdateRequest.getProfileImage(), MEMBER);
         }
 

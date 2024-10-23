@@ -49,7 +49,11 @@ public class OAuthService {
         Optional<Member> memberByHandle = memberRepository.findMemberByHandle(memberInfoRequest.getHandle());
         if (memberByHandle.isPresent()) throw new GeneralException(DUPLICATE_HANDLE);
 
-        String profileImageUrl = cloudStorageService.upload(memberInfoRequest.getProfileImage(), MEMBER);
+        String profileImageUrl= null;
+        if (memberInfoRequest.getProfileImage() != null) {
+            profileImageUrl = cloudStorageService.upload(memberInfoRequest.getProfileImage(), MEMBER);
+        }
+
         String refreshToken = jwtProvider.createRefreshToken();
 
         Member member = Member.signupMember()
