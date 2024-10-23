@@ -1,6 +1,5 @@
 package com.apps.pochak.login.dto.request;
 
-import com.apps.pochak.global.annotation.ValidFile;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,7 +31,6 @@ public class MemberInfoRequest {
     @NotNull(message = "사용자의 소셜 아이디는 필수입니다.")
     private String socialId;
 
-    @ValidFile(message = "프로필 이미지는 필수입니다.")
     private MultipartFile profileImage;
 
     @NotNull(message = "사용자의 소셜 로그인 플랫폼은 필수입니다.")

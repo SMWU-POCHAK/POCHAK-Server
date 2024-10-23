@@ -38,13 +38,13 @@ public class MemberFixture {
             ".wrong_member#",
             "공백이 아닌 열다섯자 이내인 회원의 이름",
             """
-                    1
-                    2
-                    3
-                    3줄 이내
-                    """,
+            1
+            2
+            3
+            3줄 이내
+            """,
             "aaa@pochak.com",
-            PROFILE_IMAGE,
+            null,
             "REFRESH_TOKEN",
             "SOCIAL_ID",
             SocialType.APPLE,
