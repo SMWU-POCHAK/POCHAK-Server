@@ -4,6 +4,7 @@ import com.apps.pochak.alarm.domain.Alarm;
 import com.apps.pochak.alarm.domain.AlarmType;
 import com.apps.pochak.alarm.domain.LikeAlarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
+import com.apps.pochak.fcm.service.FCMService;
 import com.apps.pochak.like.domain.LikeEntity;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.tag.domain.Tag;
@@ -21,6 +22,7 @@ import static com.apps.pochak.alarm.domain.AlarmType.OWNER_LIKE;
 public class LikeAlarmService {
     private final AlarmRepository alarmRepository;
     private final TagRepository tagRepository;
+    private final FCMService fcmService;
 
     public void sendLikeAlarm(
             final LikeEntity like,
@@ -42,6 +44,7 @@ public class LikeAlarmService {
                 OWNER_LIKE
         );
         alarmRepository.save(likeAlarm);
+        fcmService.sendPushNotification(likeAlarm);
     }
 
     private void sendTaggedPostLikeAlarm(
@@ -62,6 +65,7 @@ public class LikeAlarmService {
             );
         }
         alarmRepository.saveAll(alarmList);
+        fcmService.sendPushNotification(alarmList);
     }
 
     private boolean isSenderEqualToReceiver(

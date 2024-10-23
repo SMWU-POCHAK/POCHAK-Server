@@ -47,6 +47,8 @@ public class Member extends BaseEntity {
 
     private String socialRefreshToken;
 
+    private String fcmToken;
+
     @Builder(builderMethodName = "signupMember", builderClassName = "signupMember")
     public Member(
             final String name,
@@ -110,5 +112,13 @@ public class Member extends BaseEntity {
 
     public void updateHandle(final String handle) {
         this.handle = handle;
+    }
+
+    public void updateFcmToken(final String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
+
+    public boolean hasFcmToken() {
+        return this.fcmToken != null;
     }
 }
