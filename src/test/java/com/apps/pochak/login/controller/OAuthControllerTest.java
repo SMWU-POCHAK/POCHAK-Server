@@ -220,15 +220,6 @@ public class OAuthControllerTest extends ControllerTest {
     @Test
     @DisplayName("회원가입 유효성 검사를 한다.")
     void signUpValidationTest() throws Exception {
-        when(oAuthService.signup(any()))
-                .thenReturn(
-                        new OAuthMemberResponse(
-                                MEMBER2,
-                                false,
-                                ACCESS_TOKEN
-                        )
-                );
-
         this.mockMvc.perform(
                         multipart("/api/v2/signup")
                                 .file("profileImage", null)
