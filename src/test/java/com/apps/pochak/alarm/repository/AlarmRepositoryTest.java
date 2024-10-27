@@ -59,12 +59,12 @@ class AlarmRepositoryTest {
         Follow follow = followRepository.save(FollowFixture.FOLLOW);
         FollowAlarm followAlarmByPostOwner = alarmRepository.save(AlarmFixture.FOLLOW_ALARM);
 
-        Tag tag = tagRepository.save(TagFixture.TAG);
-        TagAlarm tagAlarmByPostOwner = alarmRepository.save(AlarmFixture.TAG_ALARM);
-
         Post post = postRepository.save(PostFixture.PUBLIC_POST);
         LikeEntity likeEntity = likeRepository.save(LikeFixture.LIKE);
         LikeAlarm likeAlarmByLoginMember = alarmRepository.save(AlarmFixture.LIKE_ALARM);
+
+        Tag tag = tagRepository.save(TagFixture.TAG);
+        TagAlarm tagAlarmByPostOwner = alarmRepository.save(AlarmFixture.TAG_ALARM);
 
         Pageable pageable = PageRequest.of(0, 10);
 
