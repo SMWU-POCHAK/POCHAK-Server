@@ -181,12 +181,12 @@ public class PostCustomRepository {
     }
 
     private JPAQuery<Post> findTaggedPost(
-            final Member owner,
+            final Member taggedMember,
             final long loginMemberId
     ) {
         return query.selectFrom(post)
                 .join(tag).on(tag.post.eq(post)
-                        .and(tag.member.eq(owner))
+                        .and(tag.member.eq(taggedMember))
                         .and(checkPublicPost()))
                 .leftJoin(block).on(checkBlockStatus(loginMemberId))
                 .groupBy(post)
@@ -195,18 +195,18 @@ public class PostCustomRepository {
     }
 
     public Page<Post> findTaggedPostPage(
-            final Member owner,
+            final Member taggedMember,
             final long loginMemberId,
             final Pageable pageable
     ) {
-        List<Post> postList = findTaggedPost(owner, loginMemberId)
+        List<Post> postList = findTaggedPost(taggedMember, loginMemberId)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         JPAQuery<Long> postCount = query.select(post.count())
                 .from(post)
-                .where(post.in(findTaggedPost(owner, loginMemberId)));
+                .where(post.in(findTaggedPost(taggedMember, loginMemberId)));
 
         return PageableExecutionUtils.getPage(postList, pageable, postCount::fetchOne);
     }
