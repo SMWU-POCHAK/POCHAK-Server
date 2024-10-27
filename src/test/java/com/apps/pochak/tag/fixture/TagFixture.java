@@ -34,4 +34,9 @@ public class TagFixture {
             .post(POST_WITH_MULTI_TAG)
             .member(TAGGED_MEMBER2)
             .build();
+
+    public static final Tag TAG = Tag.builder()
+            .post(PUBLIC_POST)
+            .member(LOGIN_MEMBER)
+            .build();
 }

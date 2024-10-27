@@ -62,8 +62,8 @@ public class MemoriesPreviewResponse {
 
     private int findFollowDay(LocalDateTime followDate, LocalDateTime followedDate) {
         if (followDate.isAfter(followedDate)) {
-            return Period.between(LocalDate.now(), followDate.toLocalDate()).getDays();
+            return Period.between(followDate.toLocalDate(), LocalDate.now()).getDays();
         } else
-            return Period.between(LocalDate.now(), followedDate.toLocalDate()).getDays();
+            return Period.between(followedDate.toLocalDate(), LocalDate.now()).getDays();
     }
 }

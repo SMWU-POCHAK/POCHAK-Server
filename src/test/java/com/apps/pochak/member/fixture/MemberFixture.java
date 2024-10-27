@@ -80,4 +80,5 @@ public class MemberFixture {
             .socialType(SocialType.GOOGLE)
             .socialRefreshToken("SOCIAL_REFRESH_TOKEN")
             .build();
+
 }

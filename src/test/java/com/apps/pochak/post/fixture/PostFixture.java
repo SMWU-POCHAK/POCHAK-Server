@@ -41,4 +41,5 @@ public class PostFixture {
             .postImage(POST_IMAGE)
             .caption("다중 태그를 가진 게시물입니다.")
             .build();
+
 }

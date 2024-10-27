@@ -49,19 +49,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             final Pageable pageable
     );
 
-    @Query("select p from Post p " +
-            "where p.owner = :owner and p.status = 'ACTIVE' and p.postStatus = 'PUBLIC' " +
-            "   and p.owner not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
-            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker = p.owner) " +
-            "   and not exists (select t.member from Tag t where t.post = p intersect select b.blockedMember from Block b where b.blocker = :loginMember) " +
-            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker in (select t.member from Tag t where t.post = p)) " +
-            "order by p.createdDate desc ")
-    Page<Post> findUploadPost(
-            @Param("owner") final Member owner,
-            @Param("loginMember") final Member loginMember,
-            final Pageable pageable
-    );
-
     @Query("select distinct p from Post p " +
             "join Tag t on p = t.post and p.postStatus = 'PUBLIC' and t.status = 'ACTIVE' and " +
             "   ( " +
@@ -131,7 +118,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Long> findPostIdListByOwnerOrTaggedMember(@Param("member") final Member member);
 
     @Query("select p from Post p " +
-            "left join LikeEntity l on l.likedPost = p " +
+            "left join LikeEntity l on l.post = p " +
             "where p.postStatus = 'PUBLIC' and p.status = 'ACTIVE' " +
             "group by p.id " +
             "order by count(l) desc, p.allowedDate desc ")
