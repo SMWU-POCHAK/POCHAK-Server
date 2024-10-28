@@ -4,14 +4,14 @@ import com.apps.pochak.block.domain.Block;
 import com.apps.pochak.block.domain.repository.BlockRepository;
 import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
-import com.apps.pochak.global.TestQuerydslConfig;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.dto.response.MemberElement;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -19,9 +19,10 @@ import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-@DataJpaTest
-@Import(TestQuerydslConfig.class)
+@Transactional
+@SpringBootTest
 class MemberCustomRepositoryTest {
+
     @Autowired
     MemberCustomRepository memberCustomRepository;
 
@@ -33,6 +34,13 @@ class MemberCustomRepositoryTest {
 
     @Autowired
     BlockRepository blockRepository;
+
+    @AfterEach
+    void deleteAll() {
+        memberRepository.deleteAll();
+        followRepository.deleteAll();
+        blockRepository.deleteAll();
+    }
 
     @DisplayName("[팔로워 조회] 팔로워가 정상적으로 조회된다.")
     @Test
@@ -100,7 +108,7 @@ class MemberCustomRepositoryTest {
         assertEquals(1L, memberElementPage.getTotalElements());
         assertEquals(1L, memberElementPage.getTotalPages());
         assertEquals(member2.getId(), memberElementPage.getContent().get(0).getMemberId());
-        assertEquals(false, memberElementPage.getContent().get(0).getIsFollow());
+        assertFalse(memberElementPage.getContent().get(0).getIsFollow());
     }
 
     @DisplayName("[팔로워 조회] 현재 유저가 팔로워를 차단하였다면 해당 유저는 제외되어 조회된다.")
@@ -131,7 +139,7 @@ class MemberCustomRepositoryTest {
         assertEquals(1L, memberElementPage.getTotalElements());
         assertEquals(1L, memberElementPage.getTotalPages());
         assertEquals(member2.getId(), memberElementPage.getContent().get(0).getMemberId());
-        assertEquals(false, memberElementPage.getContent().get(0).getIsFollow());
+        assertFalse(memberElementPage.getContent().get(0).getIsFollow());
     }
 
     private void follow(

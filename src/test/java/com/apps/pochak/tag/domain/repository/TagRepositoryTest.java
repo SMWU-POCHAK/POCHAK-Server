@@ -1,19 +1,18 @@
 package com.apps.pochak.tag.domain.repository;
 
-import com.apps.pochak.global.config.JpaAuditingConfig;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.PostStatus;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.tag.domain.Tag;
-import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,38 +21,45 @@ import java.util.List;
 
 import static com.apps.pochak.global.util.PageUtil.getFirstContentFromPage;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
-import static com.apps.pochak.post.fixture.PostFixture.POST_WITH_MULTI_TAG;
-import static com.apps.pochak.post.fixture.PostFixture.PUBLIC_POST;
-import static com.apps.pochak.tag.fixture.TagFixture.*;
+import static com.apps.pochak.post.fixture.PostFixture.CAPTION;
+import static com.apps.pochak.post.fixture.PostFixture.POST_IMAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
-@Import(JpaAuditingConfig.class)
+@Transactional
+@SpringBootTest
 class TagRepositoryTest {
     @Autowired
     private MemberRepository memberRepository;
+
     @Autowired
     private TagRepository tagRepository;
+
     @Autowired
     private PostRepository postRepository;
-    @Autowired
-    private EntityManager entityManager;
+
+    @AfterEach
+    void deleteAll() {
+        postRepository.deleteAll();
+        memberRepository.deleteAll();
+        tagRepository.deleteAll();
+    }
 
     @BeforeEach
     void setUp() {
-        memberRepository.save(OWNER);
-        memberRepository.save(TAGGED_MEMBER1);
-        memberRepository.save(TAGGED_MEMBER2);
+        Member owner = memberRepository.save(OWNER);
+        Member taggedMember1 = memberRepository.save(TAGGED_MEMBER1);
+        Member taggedMember2 = memberRepository.save(TAGGED_MEMBER2);
 
-        PUBLIC_POST.makePublic();
-        postRepository.save(PUBLIC_POST);;
-        tagRepository.save(APPROVAL_TAG);
+        Post post = postRepository.save(new Post(owner, POST_IMAGE, CAPTION));
+        post.makePublic();
 
-        POST_WITH_MULTI_TAG.makePublic();
-        postRepository.save(POST_WITH_MULTI_TAG);
+        tagRepository.save(new Tag(post, taggedMember1));
 
-        tagRepository.save(TAG1_WITH_ONE_POST);
-        tagRepository.save(TAG2_WITH_ONE_POST);
+        Post multiTagPost = postRepository.save(new Post(owner, POST_IMAGE, CAPTION));
+        multiTagPost.makePublic();
+
+        tagRepository.save(new Tag(multiTagPost, taggedMember1));
+        tagRepository.save(new Tag(multiTagPost, taggedMember2));
     }
 
     @Test
