@@ -50,7 +50,8 @@ public class MemberFixture {
             "REFRESH_TOKEN",
             "SOCIAL_ID",
             SocialType.APPLE,
-            "SOCIAL_REFRESH_TOKEN"
+            "SOCIAL_REFRESH_TOKEN",
+            null
     );
 
     public static final Member OWNER = Member.signupMember()
