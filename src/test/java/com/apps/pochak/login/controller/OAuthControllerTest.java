@@ -21,6 +21,7 @@ import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
 import static com.apps.pochak.global.MockMultipartFileConverter.getSampleMultipartFile;
 import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
+import static com.apps.pochak.member.fixture.MemberFixture.WRONG_MEMBER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -41,6 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @MockBean(JpaMetamodelMappingContext.class)
 public class OAuthControllerTest extends ControllerTest {
     private static final Member MEMBER1 = STATIC_MEMBER1;
+    private static final Member MEMBER2 = WRONG_MEMBER;
 
     @MockBean
     OAuthService oAuthService;
@@ -213,5 +215,22 @@ public class OAuthControllerTest extends ControllerTest {
                                 )
                         )
                 );
+    }
+
+    @Test
+    @DisplayName("회원가입 유효성 검사를 한다.")
+    void signUpValidationTest() throws Exception {
+        this.mockMvc.perform(
+                        multipart("/api/v2/signup")
+                                .file("profileImage", null)
+                                .queryParam("name", MEMBER2.getName())
+                                .queryParam("email", MEMBER2.getEmail())
+                                .queryParam("handle", MEMBER2.getHandle())
+                                .queryParam("message", MEMBER2.getMessage())
+                                .queryParam("socialId", MEMBER2.getSocialId())
+                                .queryParam("socialType", MEMBER2.getSocialType().getCode())
+                                .queryParam("socialRefreshToken", MEMBER2.getSocialRefreshToken())
+                                .contentType(APPLICATION_JSON)
+                ).andExpect(status().isBadRequest());
     }
 }

@@ -9,7 +9,7 @@ public class MemberFixture {
 
     public static final Member STATIC_MEMBER1 = new Member(
             1L,
-            "static-member1",
+            "static_member1",
             "1번 회원의 이름",
             "한 줄 소개",
             "aaa@pochak.com",
@@ -22,11 +22,29 @@ public class MemberFixture {
 
     public static final Member STATIC_MEMBER2 = new Member(
             2L,
-            "static-member2",
+            "static_member2",
             "2번 회원의 이름",
             "한 줄 소개",
             "aaa@pochak.com",
             PROFILE_IMAGE,
+            "REFRESH_TOKEN",
+            "SOCIAL_ID",
+            SocialType.APPLE,
+            "SOCIAL_REFRESH_TOKEN"
+    );
+
+    public static final Member WRONG_MEMBER = new Member(
+            3L,
+            ".wrong_member#",
+            "공백이 아닌 열다섯자 이내인 회원의 이름",
+            """
+            1
+            2
+            3
+            3줄 이내
+            """,
+            "aaa@pochak.com",
+            null,
             "REFRESH_TOKEN",
             "SOCIAL_ID",
             SocialType.APPLE,
