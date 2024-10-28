@@ -25,7 +25,7 @@ import java.util.List;
 
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
-import static com.apps.pochak.global.MockMultipartFileConverter.getSampleMultipartFile;
+import static com.apps.pochak.global.MockMultipartFileConverter.getMockMultipartFileOfMember;
 import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
 import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
 import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER2;
@@ -230,11 +230,10 @@ class MemberControllerTest extends ControllerTest {
 
         this.mockMvc.perform(
                         builder
-                                .file("profileImage", getSampleMultipartFile().getBytes())
+                                .file(getMockMultipartFileOfMember())
                                 .queryParam("name", MEMBER1.getName())
                                 .queryParam("message", MEMBER1.getMessage())
                                 .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
-                                .contentType(APPLICATION_JSON)
                 ).andExpect(status().isOk())
                 .andDo(
                         document("update-profile",
@@ -243,12 +242,15 @@ class MemberControllerTest extends ControllerTest {
                                 requestHeaders(
                                         headerWithName("Authorization").description("Basic auth credentials")
                                 ),
+                                pathParameters(
+                                        parameterWithName("handle").description("수정하고자 하는 멤버의 아이디(handle)")
+                                ),
                                 requestParts(
                                         partWithName("profileImage").description("회원 프로필 이미지")
                                 ),
                                 queryParameters(
-                                        parameterWithName("name").description("회원 이름"),
-                                        parameterWithName("message").description("프로필 한 줄 소개")
+                                        parameterWithName("name").description("회원 이름: 최대 15자, (공백만 있는 \" \" 와 같은 경우는 불가능합니다.)"),
+                                        parameterWithName("message").description("프로필 한 줄 소개: 최대 50자, 최대 3줄까지 입력 가능합니다.")
                                 ),
                                 responseFields(
                                         fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),
