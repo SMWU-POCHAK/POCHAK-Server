@@ -17,7 +17,8 @@ public class MemberFixture {
             "REFRESH_TOKEN",
             "SOCIAL_ID",
             SocialType.GOOGLE,
-            "SOCIAL_REFRESH_TOKEN"
+            "SOCIAL_REFRESH_TOKEN",
+            null
     );
 
     public static final Member STATIC_MEMBER2 = new Member(
@@ -30,7 +31,8 @@ public class MemberFixture {
             "REFRESH_TOKEN",
             "SOCIAL_ID",
             SocialType.APPLE,
-            "SOCIAL_REFRESH_TOKEN"
+            "SOCIAL_REFRESH_TOKEN",
+            null
     );
 
     public static final Member WRONG_MEMBER = new Member(
