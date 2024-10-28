@@ -28,21 +28,21 @@ public class Report extends BaseEntity {
     private ReportType reportType;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "reported_post_id")
-    private Post reportedPost;
+    @JoinColumn(name = "post_id")
+    private Post post;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "reporter_id")
-    private Member reporter;
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @Builder
     public Report(
             final ReportType reportType,
-            final Post reportedPost,
-            final Member reporter
+            final Post post,
+            final Member member
     ) {
         this.reportType = reportType;
-        this.reportedPost = reportedPost;
-        this.reporter = reporter;
+        this.post = post;
+        this.member = member;
     }
 }
