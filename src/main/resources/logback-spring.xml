@@ -14,12 +14,6 @@
         <property name="LOG_PATTERN" value="%-5level %d{yy-MM-dd HH:mm:ss} [%thread] [%logger{0}-%M:%line] - %msg%n "/>
 
         <appender name="DEV_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-            <filter class="ch.qos.logback.classic.filter.LevelFilter">
-                <!-- 에러로그를 설정하고 로그의 레벨이 맞으면 onMatch, 아니라면 onMismatch  -->
-                <level>info</level>
-                <onMatch>ACCEPT</onMatch>
-                <onMismatch>DENY</onMismatch>
-            </filter>
             <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
                 <pattern>${LOG_PATTERN}</pattern>
             </encoder>

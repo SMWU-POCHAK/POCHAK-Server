@@ -20,7 +20,7 @@ import static org.springframework.util.ClassUtils.getMethod;
 @Slf4j
 public class LoggingAspect {
 
-    @Pointcut("@within(org.springframework.stereotype.Controller)")
+    @Pointcut("execution(* com.apps.pochak..*Controller.*(..))")
     private void apiLogging() {}
 
     @Before("apiLogging()")
