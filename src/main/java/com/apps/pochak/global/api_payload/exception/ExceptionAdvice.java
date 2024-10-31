@@ -39,6 +39,8 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
             final HttpStatusCode status,
             final WebRequest request
     ) {
+        log.error("ExceptionAdvice catch MethodArgumentNotValidException : {}", e.getMessage());
+
         Map<String, String> errors = new LinkedHashMap<>();
 
         e.getBindingResult().getFieldErrors().stream()
@@ -65,6 +67,8 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
             final Exception e,
             final WebRequest request
     ) {
+        log.error("ExceptionAdvice catch Exception : {}", e.getMessage());
+
         ErrorStatus errorCommonStatus = _INTERNAL_SERVER_ERROR;
         String errorPoint = e.getMessage();
         ApiResponse<Object> body = ApiResponse.onFailure(errorCommonStatus.getCode(), errorCommonStatus.getMessage(), errorPoint);
@@ -85,6 +89,8 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
             final GeneralException generalException,
             final HttpServletRequest request
     ) {
+        log.error("ExceptionAdvice catch GeneralException : {}", generalException.getMessage());
+
         ErrorReasonDTO errorReasonDTO = generalException.getErrorReasonHttpStatus();
         ApiResponse<Object> body = ApiResponse.onFailure(errorReasonDTO.getCode(), errorReasonDTO.getMessage(), null);
         final ServletWebRequest webRequest = new ServletWebRequest(request);
@@ -104,6 +110,8 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
             final ConstraintViolationException e,
             final WebRequest request
     ) {
+        log.error("ExceptionAdvice catch ConstraintViolationException : {}", e.getMessage());
+
         String errorMessage =
                 e.getConstraintViolations()
                         .stream()
@@ -120,6 +128,8 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
             final HttpHeaders headers,
             final WebRequest request
     ) {
+        log.error("ExceptionAdvice catch ExceptionInternalConstraint : {}", e.getMessage());
+
         ApiResponse<Object> body = ApiResponse
                 .onFailure(
                         errorCommonStatus.getCode(),
