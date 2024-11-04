@@ -7,7 +7,7 @@ import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.api_payload.code.BaseCode;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.member.domain.Member;
-import com.apps.pochak.member.domain.repository.MemberCustomRepository;
+import com.apps.pochak.member.domain.repository.MemberFollowCustomRepository;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.member.dto.response.MemberElement;
 import com.apps.pochak.member.dto.response.MemberElements;
@@ -31,7 +31,7 @@ import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCE
 public class FollowService {
     private final FollowRepository followRepository;
     private final MemberRepository memberRepository;
-    private final MemberCustomRepository memberCustomRepository;
+    private final MemberFollowCustomRepository memberFollowCustomRepository;
     private final FollowAlarmService followAlarmService;
 
     public BaseCode follow(
@@ -104,7 +104,7 @@ public class FollowService {
             final Pageable pageable
     ) {
         final Member member = memberRepository.findByHandleWithoutLogin(handle);
-        final Page<MemberElement> followingPage = memberCustomRepository.findFollowingsOfMemberAndIsFollow(
+        final Page<MemberElement> followingPage = memberFollowCustomRepository.findFollowingsOfMemberAndIsFollow(
                 member.getId(),
                 accessor.getMemberId(),
                 pageable
@@ -120,7 +120,7 @@ public class FollowService {
             final Pageable pageable
     ) {
         final Member member = memberRepository.findByHandleWithoutLogin(handle);
-        final Page<MemberElement> followerPage = memberCustomRepository.findFollowersOfMemberAndIsFollow(
+        final Page<MemberElement> followerPage = memberFollowCustomRepository.findFollowersOfMemberAndIsFollow(
                 member.getId(),
                 accessor.getMemberId(),
                 pageable

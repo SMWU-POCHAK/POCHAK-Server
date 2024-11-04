@@ -1,6 +1,6 @@
 package com.apps.pochak.global;
 
-import com.apps.pochak.member.domain.repository.MemberCustomRepository;
+import com.apps.pochak.member.domain.repository.MemberFollowCustomRepository;
 import com.apps.pochak.post.domain.repository.PostCustomRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -26,7 +26,7 @@ public class TestQuerydslConfig {
     }
 
     @Bean
-    public MemberCustomRepository memberCustomRepository() {
-        return new MemberCustomRepository(jpaQueryFactory());
+    public MemberFollowCustomRepository memberCustomRepository() {
+        return new MemberFollowCustomRepository(jpaQueryFactory());
     }
 }
