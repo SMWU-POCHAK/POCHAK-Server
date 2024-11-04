@@ -25,7 +25,7 @@ import static com.apps.pochak.member.domain.QMember.member;
 
 @Repository
 @RequiredArgsConstructor
-public class MemberCustomRepository {
+public class MemberFollowCustomRepository {
     private final JPAQueryFactory query;
     public static final QFollow f = new QFollow("f");
 

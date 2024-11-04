@@ -21,9 +21,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @Import(TestQuerydslConfig.class)
-class MemberCustomRepositoryTest {
+class MemberFollowCustomRepositoryTest {
     @Autowired
-    MemberCustomRepository memberCustomRepository;
+    MemberFollowCustomRepository memberFollowCustomRepository;
 
     @Autowired
     MemberRepository memberRepository;
@@ -50,7 +50,7 @@ class MemberCustomRepositoryTest {
 
         //when
         PageRequest pageRequest = PageRequest.of(0, DEFAULT_PAGING_SIZE);
-        Page<MemberElement> memberElementPage = memberCustomRepository
+        Page<MemberElement> memberElementPage = memberFollowCustomRepository
                 .findFollowersOfMemberAndIsFollow(
                         receiver.getId(),
                         loginMember.getId(),
@@ -88,7 +88,7 @@ class MemberCustomRepositoryTest {
 
         //when
         PageRequest pageRequest = PageRequest.of(0, DEFAULT_PAGING_SIZE);
-        Page<MemberElement> memberElementPage = memberCustomRepository
+        Page<MemberElement> memberElementPage = memberFollowCustomRepository
                 .findFollowersOfMemberAndIsFollow(
                         receiver.getId(),
                         loginMember.getId(),
@@ -119,7 +119,7 @@ class MemberCustomRepositoryTest {
 
         //when
         PageRequest pageRequest = PageRequest.of(0, DEFAULT_PAGING_SIZE);
-        Page<MemberElement> memberElementPage = memberCustomRepository
+        Page<MemberElement> memberElementPage = memberFollowCustomRepository
                 .findFollowersOfMemberAndIsFollow(
                         receiver.getId(),
                         loginMember.getId(),
