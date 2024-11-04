@@ -25,8 +25,8 @@ public class ReportUploadRequest {
     ) {
         return Report.builder()
                 .reportType(reportType)
-                .reportedPost(reportedPost)
-                .reporter(reporter)
+                .post(reportedPost)
+                .member(reporter)
                 .build();
     }
 }

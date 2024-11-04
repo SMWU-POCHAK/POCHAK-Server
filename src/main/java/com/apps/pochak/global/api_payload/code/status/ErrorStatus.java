@@ -33,6 +33,9 @@ public enum ErrorStatus implements BaseErrorCode {
     // Comment
     INVALID_COMMENT_ID(BAD_REQUEST, "COMMENT4001", "유효하지 않은 댓글 아이디입니다."),
 
+    // FCM
+    FAIL_MESSAGING(INTERNAL_SERVER_ERROR, "FCM5001", "푸시 알림 전송과정에서 에러가 발생하였습니다."),
+
     // Follow
     NOT_FOLLOW(INTERNAL_SERVER_ERROR, "FOLLOW4001", "데이터에러: 팔로우 상태를 찾을 수 없습니다, 관리자에게 문의 바랍니다."),
     FOLLOW_ONESELF(BAD_REQUEST, "FOLLOW4002", "자기 자신을 팔로우할 수 없습니다."),
