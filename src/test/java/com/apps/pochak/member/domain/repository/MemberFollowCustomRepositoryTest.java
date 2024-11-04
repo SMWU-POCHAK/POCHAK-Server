@@ -146,6 +146,110 @@ class MemberFollowCustomRepositoryTest {
         );
     }
 
+    @DisplayName("[팔로잉 조회] 팔로잉이 정상적으로 조회된다.")
+    @Test
+    void findFollowings() throws Exception {
+        // given
+        Member member1 = memberRepository.save(TAGGED_MEMBER1);
+        Member member2 = memberRepository.save(TAGGED_MEMBER2);
+        Member sender = memberRepository.save(OWNER);
+        Member loginMember = memberRepository.save(LOGIN_MEMBER);
+
+        follow(sender, member1);
+        follow(sender, member2);
+        follow(sender, loginMember);
+        follow(loginMember, member2);
+
+        // when
+        PageRequest pageRequest = PageRequest.of(0, DEFAULT_PAGING_SIZE);
+        Page<MemberElement> memberElementPage = memberFollowCustomRepository
+                .findFollowingsOfMemberAndIsFollow(
+                        sender.getId(),
+                        loginMember.getId(),
+                        pageRequest
+                );
+
+        // then
+        assertAll(
+                () -> assertEquals(3L, memberElementPage.getContent().size()),
+                () -> assertEquals(3L, memberElementPage.getTotalElements()),
+                () -> assertEquals(1L, memberElementPage.getTotalPages()),
+                // order desc
+                () -> assertEquals(loginMember.getId(), memberElementPage.getContent().get(0).getMemberId()),
+                () -> assertNull(memberElementPage.getContent().get(0).getIsFollow()),
+                () -> assertEquals(member2.getId(), memberElementPage.getContent().get(1).getMemberId()),
+                () -> assertTrue(memberElementPage.getContent().get(1).getIsFollow()),
+                () -> assertEquals(member1.getId(), memberElementPage.getContent().get(2).getMemberId()),
+                () -> assertFalse(memberElementPage.getContent().get(2).getIsFollow())
+        );
+    }
+
+    @DisplayName("[팔로잉 조회] 팔로잉 유저가 현재 유저를 차단하였다면, 해당 유저는 제외되어 조회된다.")
+    @Test
+    void findFollowings_WhenFollowingBlockLoginMember() throws Exception{
+        // given
+        Member member1 = memberRepository.save(TAGGED_MEMBER1);
+        Member member2 = memberRepository.save(TAGGED_MEMBER2);
+        Member sender = memberRepository.save(OWNER);
+        Member loginMember = memberRepository.save(LOGIN_MEMBER);
+
+        follow(sender, member1);
+        follow(sender, member2);
+
+        block(member1, loginMember);
+
+        // when
+        PageRequest pageRequest = PageRequest.of(0, DEFAULT_PAGING_SIZE);
+        Page<MemberElement> memberElementPage = memberFollowCustomRepository
+                .findFollowingsOfMemberAndIsFollow(
+                        sender.getId(),
+                        loginMember.getId(),
+                        pageRequest
+                );
+
+        // then
+        assertAll(
+                () -> assertEquals(1L, memberElementPage.getContent().size()),
+                () -> assertEquals(1L, memberElementPage.getTotalElements()),
+                () -> assertEquals(1L, memberElementPage.getTotalPages()),
+                () -> assertEquals(member2.getId(), memberElementPage.getContent().get(0).getMemberId()),
+                () -> assertFalse(memberElementPage.getContent().get(0).getIsFollow())
+        );
+    }
+
+    @DisplayName("[팔로잉 조회] 현재 유저가 팔로잉을 차단하였다면 해당 유저는 제외되어 조회된다.")
+    @Test
+    void findFollowings_WhenLoginMemberBlockFollowing() throws Exception{
+        // given
+        Member member1 = memberRepository.save(TAGGED_MEMBER1);
+        Member member2 = memberRepository.save(TAGGED_MEMBER2);
+        Member sender = memberRepository.save(OWNER);
+        Member loginMember = memberRepository.save(LOGIN_MEMBER);
+
+        follow(sender, member1);
+        follow(sender, member2);
+
+        block(loginMember, member1);
+
+        // when
+        PageRequest pageRequest = PageRequest.of(0, DEFAULT_PAGING_SIZE);
+        Page<MemberElement> memberElementPage = memberFollowCustomRepository
+                .findFollowingsOfMemberAndIsFollow(
+                        sender.getId(),
+                        loginMember.getId(),
+                        pageRequest
+                );
+
+        // then
+        assertAll(
+                () -> assertEquals(1L, memberElementPage.getContent().size()),
+                () -> assertEquals(1L, memberElementPage.getTotalElements()),
+                () -> assertEquals(1L, memberElementPage.getTotalPages()),
+                () -> assertEquals(member2.getId(), memberElementPage.getContent().get(0).getMemberId()),
+                () -> assertFalse(memberElementPage.getContent().get(0).getIsFollow())
+        );
+    }
+
     private void follow(
             final Member sender,
             final Member receiver
