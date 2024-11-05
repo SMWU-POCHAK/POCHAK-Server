@@ -36,7 +36,7 @@ public class FCMService {
     }
 
     public void sendPushNotification(final Alarm alarm) {
-        if (!alarm.getReceiver().hasFcmToken()) return;
+        if (checkFCMTokenNotInAlarm(alarm)) return;
         try {
             Message message = makeMessage(alarm);
             firebaseMessaging.send(message);
@@ -49,12 +49,22 @@ public class FCMService {
     }
 
     public void sendPushNotification(final List<Alarm> alarmList) {
+        if (checkFCMTokenNotInAlarm(alarmList)) return;
         try {
             MulticastMessage multicastMessage = makeMessages(alarmList);
             firebaseMessaging.sendEachForMulticast(multicastMessage);
         } catch (FirebaseMessagingException e) {
             log.error(String.format("[FCM Error]\n Msg: %s", e.getMessage()));
         }
+    }
+
+    private boolean checkFCMTokenNotInAlarm(final Alarm alarm) {
+        return !alarm.getReceiver().hasFcmToken();
+    }
+
+    private boolean checkFCMTokenNotInAlarm(final List<Alarm> alarmList) {
+        return alarmList.stream()
+                .noneMatch(alarm -> alarm.getReceiver().hasFcmToken());
     }
 
     @Transactional
