@@ -120,15 +120,15 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
             final ConstraintViolationException e,
             final WebRequest request
     ) {
-        log.error("ExceptionAdvice catch ConstraintViolationException in {} : {}",
-                createRequestFullPath(request), e.getMessage());
-
         String errorMessage =
                 e.getConstraintViolations()
                         .stream()
                         .map(constraintViolation -> constraintViolation.getMessage())
                         .findFirst()
                         .orElseThrow(() -> new RuntimeException("ConstraintViolationException 추출 도중 에러 발생"));
+
+        log.error("ExceptionAdvice catch ConstraintViolationException in {} : {}",
+                createRequestFullPath(request), ErrorStatus.valueOf(errorMessage).getMessage());
 
         return handleExceptionInternalConstraint(e, ErrorStatus.valueOf(errorMessage), HttpHeaders.EMPTY, request);
     }
