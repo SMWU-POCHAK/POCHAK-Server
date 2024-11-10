@@ -51,7 +51,7 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 
         ErrorStatus errorStatus = ErrorStatus.valueOf("_BAD_REQUEST");
 
-        log.error("ExceptionAdvice catch MethodArgumentNotValidException from {} : {}",
+        log.error("ExceptionAdvice catch MethodArgumentNotValidException in {} : {}",
                 createRequestFullPath(request), errorStatus.getMessage());
 
         ApiResponse<Map<String, String>> body = ApiResponse.onFailure(errorStatus.getCode(), errorStatus.getMessage(), errors);
@@ -70,10 +70,13 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
             final Exception e,
             final WebRequest request
     ) {
-        ErrorStatus errorCommonStatus = _INTERNAL_SERVER_ERROR;
+        log.error("ExceptionAdvice catch Exception in {} : {}: {}",
+                createRequestFullPath(request), e.getClass(), e.getMessage());
+        for (StackTraceElement element : e.getStackTrace()) {
+            log.error(element.toString());
+        }
 
-        log.error("ExceptionAdvice catch Exception from {} : {}",
-                createRequestFullPath(request), errorCommonStatus.getMessage());
+        ErrorStatus errorCommonStatus = _INTERNAL_SERVER_ERROR;
 
         String errorPoint = e.getMessage();
         ApiResponse<Object> body = ApiResponse.onFailure(errorCommonStatus.getCode(), errorCommonStatus.getMessage(), errorPoint);
@@ -96,7 +99,7 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
     ) {
         ErrorReasonDTO errorReasonDTO = generalException.getErrorReasonHttpStatus();
 
-        log.error("ExceptionAdvice catch GeneralException from {} : {}",
+        log.error("ExceptionAdvice catch GeneralException in {} : {}",
                 createRequestFullPath(request), errorReasonDTO.getMessage());
 
         ApiResponse<Object> body = ApiResponse.onFailure(errorReasonDTO.getCode(), errorReasonDTO.getMessage(), null);
@@ -117,7 +120,7 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
             final ConstraintViolationException e,
             final WebRequest request
     ) {
-        log.error("ExceptionAdvice catch ConstraintViolationException from {} : {}",
+        log.error("ExceptionAdvice catch ConstraintViolationException in {} : {}",
                 createRequestFullPath(request), e.getMessage());
 
         String errorMessage =
@@ -136,7 +139,7 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
             final HttpHeaders headers,
             final WebRequest request
     ) {
-        log.error("ExceptionAdvice catch ExceptionInternalConstraint from {} : {}",
+        log.error("ExceptionAdvice catch ExceptionInternalConstraint in {} : {}",
                 createRequestFullPath(request), errorCommonStatus.getMessage());
 
         ApiResponse<Object> body = ApiResponse
