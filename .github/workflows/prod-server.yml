@@ -68,6 +68,7 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_PROD_USERNAME }}/pochak-prod
           build-args: |
             SPRING_PROFILES_ACTIVE=PROD
+            JASYPT_KEY=${{ secrets.JASYPT_KEY }}
 
       - name: Execute remote ssh & Deploy Prod server
         uses: appleboy/ssh-action@master
