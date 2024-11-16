@@ -17,6 +17,34 @@ jobs:
           java-version: 17
           distribution: 'temurin'
 
+      - name: Set up COMMON file
+        run: echo "${{ secrets.COMMON }}" > ./src/main/resources/application-COMMON.properties
+        shell: bash
+
+      - name: Set up DEV file
+        run: echo "${{ secrets.DEV }}" > ./src/main/resources/application-DEV.properties
+        shell: bash
+
+      - name: Set up GCS Key file
+        id: gcs-key-file
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "gcp-img-role.json"
+          json: ${{ secrets.GCS_KEY }}
+          dir: './src/main/resources/static/'
+
+      - name: Set up Firebase Key file
+        id: firebase-key-file
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "firebase-adminsdk.json"
+          json: ${{ secrets.FIREBASE_KEY }}
+          dir: './src/main/resources/static/'
+
+      - name: Set up Apple Key file
+        run: echo "${{ secrets.APPLE_AUTH_KEY }}" > ./src/main/resources/static/AuthKey_ZJ4VQZNW7D.p8
+        shell: bash
+
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
