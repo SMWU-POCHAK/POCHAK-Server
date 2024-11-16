@@ -72,6 +72,5 @@ public class MessageUtil {
                 .setNotification(notification)
                 .addAllTokens(targetTokens)
                 .build();
-
     }
 }
