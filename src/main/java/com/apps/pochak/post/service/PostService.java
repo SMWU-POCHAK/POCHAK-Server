@@ -89,31 +89,30 @@ public class PostService {
             final Accessor accessor,
             final PostUploadRequest request
     ) {
-        int requestTagCount = request.getTaggedMemberHandleList().size();
-        if (requestTagCount > MAX_TAG_COUNT) {
-            throw new GeneralException(EXCEED_TAG_LIMIT);
-        }
-
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
-        if (request.getTaggedMemberHandleList().contains(loginMember.getHandle())) {
-            throw new GeneralException(TAGGED_ONESELF);
-        }
+        request.validateMemberNotTagged(loginMember);
 
         final String image = cloudStorageService.upload(request.getPostImage(), POST);
         final Post post = request.toEntity(image, loginMember);
         postRepository.save(post);
 
-        final List<String> taggedMemberHandles = request.getTaggedMemberHandleList();
-        final List<Member> taggedMemberList = memberRepository.findMemberByHandleList(taggedMemberHandles, loginMember);
-
-        int foundTagSize = taggedMemberList.size();
-        if (requestTagCount != foundTagSize) {
-            cloudStorageService.delete(image);
-            throw new GeneralException(INVALID_TAG_INFO);
-        }
+        final List<String> taggedMemberHandleList = request.getTaggedMemberHandleList();
+        final List<Member> taggedMemberList = memberRepository.findMemberByHandleList(taggedMemberHandleList, loginMember);
+        validateInvalidMemberTag(taggedMemberHandleList, taggedMemberList, image);
 
         final List<Tag> tagList = saveTags(taggedMemberList, post);
         tagAlarmService.saveTagApprovalAlarms(tagList, loginMember);
+    }
+
+    private void validateInvalidMemberTag(
+            final List<String> requestMemberList,
+            final List<Member> foundMemberList,
+            final String postImage
+    ) {
+        if (requestMemberList.size() != foundMemberList.size()) {
+            cloudStorageService.delete(postImage);
+            throw new GeneralException(TAG_INVALID_MEMBER);
+        }
     }
 
     private List<Tag> saveTags(
