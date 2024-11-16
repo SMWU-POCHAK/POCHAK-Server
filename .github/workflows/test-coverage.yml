@@ -59,8 +59,9 @@ jobs:
       - name: Build and run tests with JaCoCo
         run: ./gradlew clean test jacocoTestReport
 
-      - name: Upload JaCoCo report
+      - name: Upload Jacoco Test Report
         uses: actions/upload-artifact@v3
         with:
           name: jacoco-report
-          path: build/reports/jacoco/test
+          path: build/jacoco/html/*
+
