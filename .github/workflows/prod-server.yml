@@ -17,14 +17,6 @@ jobs:
           java-version: 17
           distribution: "corretto"
 
-      - name: Set up COMMON file
-        run: echo "${{ secrets.COMMON }}" > ./src/main/resources/application-COMMON.properties
-        shell: bash
-
-      - name: Set up PROD file
-        run: echo "${{ secrets.PROD }}" > ./src/main/resources/application-PROD.properties
-        shell: bash
-
       - name: Set up GCS Key file
         id: gcs-key-file
         uses: jsdaniell/create-json@1.1.2
