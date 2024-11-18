@@ -58,4 +58,19 @@ public class CommentAlarm extends Alarm {
         this.postImage = post.getPostImage();
 
     }
+
+    @Override
+    public String getPushNotificationTitle() {
+        return String.format(this.getAlarmType().getTitle(), this.getSender().getName());
+    }
+
+    @Override
+    public String getPushNotificationBody() {
+        return String.format(this.getAlarmType().getBody(), this.content);
+    }
+
+    @Override
+    public String getPushNotificationImage() {
+        return String.format(this.getAlarmType().getImage(), this.postImage);
+    }
 }

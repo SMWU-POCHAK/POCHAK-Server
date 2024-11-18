@@ -69,7 +69,9 @@ public class MemberService {
 
         String profileImageUrl = updateMember.getProfileImage();
         if (profileUpdateRequest.getProfileImage() != null) {
-            cloudStorageService.delete(updateMember.getProfileImage());
+            if (profileImageUrl != null) {
+                cloudStorageService.delete(updateMember.getProfileImage());
+            }
             profileImageUrl = cloudStorageService.upload(profileUpdateRequest.getProfileImage(), MEMBER);
         }
 
@@ -100,7 +102,7 @@ public class MemberService {
     ) {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Member owner = memberRepository.findByHandle(handle, loginMember);
-        final Page<Post> taggedPost = postCustomRepository.findUploadPostPage(owner, accessor.getMemberId(), pageable);
+        final Page<Post> taggedPost = postCustomRepository.findUploadPost(owner, accessor.getMemberId(), pageable);
         return PostElements.from(taggedPost);
     }
 

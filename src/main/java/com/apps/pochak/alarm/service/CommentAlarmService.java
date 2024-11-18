@@ -5,6 +5,7 @@ import com.apps.pochak.alarm.domain.AlarmType;
 import com.apps.pochak.alarm.domain.CommentAlarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.comment.domain.Comment;
+import com.apps.pochak.fcm.service.FCMService;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.tag.domain.Tag;
 import com.apps.pochak.tag.domain.repository.TagRepository;
@@ -19,6 +20,7 @@ import java.util.List;
 public class CommentAlarmService {
     private final AlarmRepository alarmRepository;
     private final TagRepository tagRepository;
+    private final FCMService fcmService;
 
     public void sendParentCommentAlarm(
             final Comment savedComment,
@@ -51,6 +53,7 @@ public class CommentAlarmService {
         );
 
         alarmRepository.save(alarm);
+        fcmService.sendPushNotification(alarm);
     }
 
     private void sendPostOwnerCommentAlarm(
@@ -65,6 +68,7 @@ public class CommentAlarmService {
                 AlarmType.OWNER_COMMENT
         );
         alarmRepository.save(alarm);
+        fcmService.sendPushNotification(alarm);
     }
 
     private void sendTaggedPostCommentAlarm(
@@ -86,6 +90,7 @@ public class CommentAlarmService {
             );
         }
         alarmRepository.saveAll(alarmList);
+        fcmService.sendPushNotification(alarmList);
     }
 
     private boolean isSenderEqualToReceiver(

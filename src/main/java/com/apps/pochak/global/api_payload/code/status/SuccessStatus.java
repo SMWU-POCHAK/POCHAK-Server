@@ -25,6 +25,10 @@ public enum SuccessStatus implements BaseCode {
     SUCCESS_UPLOAD_COMMENT(CREATED, "COMMENT2001", "성공적으로 댓글을 등록하였습니다."),
     SUCCESS_DELETE_COMMENT(NO_CONTENT, "COMMENT2002", "성공적으로 댓글을 삭제하였습니다."),
 
+    // FCM
+    SUCCESS_SAVE_TOKEN(CREATED, "FCM2001", "성공적으로 토큰을 등록하였습니다."),
+    SUCCESS_DELETE_TOKEN(CREATED, "FCM2002", "성공적으로 토큰을 삭제하였습니다."),
+
     // Follow
     SUCCESS_FOLLOW(CREATED, "FOLLOW2001", "성공적으로 팔로우하였습니다."),
     SUCCESS_UNFOLLOW(NO_CONTENT, "FOLLOW2002", "성공적으로 팔로우를 취소하였습니다."),
