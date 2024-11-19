@@ -19,19 +19,4 @@ public class TagFixture {
             STATIC_MEMBER1,
             false
     );
-
-    public static final Tag APPROVAL_TAG = Tag.builder()
-            .post(PUBLIC_POST)
-            .member(TAGGED_MEMBER1)
-            .build();
-
-    public static final Tag TAG1_WITH_ONE_POST = Tag.builder()
-            .post(POST_WITH_MULTI_TAG)
-            .member(TAGGED_MEMBER1)
-            .build();
-
-    public static final Tag TAG2_WITH_ONE_POST = Tag.builder()
-            .post(POST_WITH_MULTI_TAG)
-            .member(TAGGED_MEMBER2)
-            .build();
 }

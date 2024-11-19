@@ -71,8 +71,8 @@ public class PostService {
         final List<Tag> tagList = tagRepository.findTagsByPost(post);
         final Boolean isFollow = post.isOwner(loginMember) ?
                 null : followRepository.existsBySenderAndReceiver(loginMember, post.getOwner());
-        final Boolean isLike = likeRepository.existsByLikeMemberAndLikedPost(loginMember, post);
-        final int likeCount = likeRepository.countByLikedPost(post);
+        final Boolean isLike = likeRepository.existsByMemberAndPost(loginMember, post);
+        final int likeCount = likeRepository.countByPost(post);
         final Comment comment = commentRepository.findFirstByPost(post, loginMember).orElse(null);
 
         return PostDetailResponse.of()
@@ -139,7 +139,7 @@ public class PostService {
         postRepository.delete(post);
         commentRepository.deleteByPost(post);
         tagRepository.deleteByPost(post);
-        likeRepository.deleteByLikedPost(post);
+        likeRepository.deleteByPost(post);
         alarmRepository.deleteByPost(post.getId());
     }
 

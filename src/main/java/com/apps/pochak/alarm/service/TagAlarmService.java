@@ -3,6 +3,7 @@ package com.apps.pochak.alarm.service;
 import com.apps.pochak.alarm.domain.Alarm;
 import com.apps.pochak.alarm.domain.TagAlarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
+import com.apps.pochak.fcm.service.FCMService;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.tag.domain.Tag;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TagAlarmService {
     private final AlarmRepository alarmRepository;
+    private final FCMService fcmService;
 
     public void saveTagApprovalAlarms(
             final List<Tag> tagList,
@@ -24,6 +26,7 @@ public class TagAlarmService {
                 tag -> new TagAlarm(tag, tagger, tag.getMember())
         ).collect(Collectors.toList());
         alarmRepository.saveAll(tagApprovalAlarmList);
+        fcmService.sendPushNotification(tagApprovalAlarmList);
     }
 
     public void deleteAlarmByTag(final Tag tag) {
