@@ -54,7 +54,11 @@ public class LogAspect {
             response = joinPoint.proceed();
             ApiResponse<?> entity = (ApiResponse<?>) response;
             log.info("Response status code = {}", entity.getCode());
-        } catch (GeneralException e) {
+        } catch (RuntimeException e) {
+            log.error("RuntimeException occurred in method = {}, Error message = {}",
+                    joinPoint.getSignature().getName(), e.getMessage());
+            throw e;
+        } catch (Exception e) {
             log.error("Exception occurred in method = {}, Error message = {}",
                     joinPoint.getSignature().getName(), e.getMessage());
             throw e;
@@ -62,6 +66,7 @@ public class LogAspect {
             long executionTime = System.currentTimeMillis() - startAt;
             log.info("Execution time = {} ms", executionTime);
         }
+
         return response;
     }
 
