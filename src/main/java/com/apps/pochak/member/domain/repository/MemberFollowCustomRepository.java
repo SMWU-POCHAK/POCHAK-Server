@@ -25,7 +25,7 @@ import static com.apps.pochak.member.domain.QMember.member;
 
 @Repository
 @RequiredArgsConstructor
-public class MemberCustomRepository {
+public class MemberFollowCustomRepository {
     private final JPAQueryFactory query;
     public static final QFollow f = new QFollow("f");
 
@@ -34,8 +34,70 @@ public class MemberCustomRepository {
             final Long loginMemberId,
             final Pageable pageable
     ) {
+        JPQLQuery<Tuple> followerQuery = getFollowerQuery(memberId, loginMemberId);
+        return getFollowerOrFollowingMemberElement(memberId, loginMemberId, followerQuery, pageable);
+    }
+
+    private JPQLQuery<Tuple> getFollowerQuery(
+            final Long memberId,
+            final Long loginMemberId
+    ) {
+        return getFollowerOrFollowingQuery(getFollowerCondition(memberId), loginMemberId);
+    }
+
+    private BooleanExpression getFollowerCondition(final Long memberId) {
+        return follow.sender.eq(member)
+                .and(follow.receiver.id.eq(memberId))
+                .and(follow.status.eq(ACTIVE));
+    }
+
+    public Page<MemberElement> findFollowingsOfMemberAndIsFollow(
+            final Long memberId,
+            final Long loginMemberId,
+            final Pageable pageable
+    ) {
+        JPQLQuery<Tuple> followingQuery = getFollowingQuery(memberId, loginMemberId);
+        return getFollowerOrFollowingMemberElement(memberId, loginMemberId, followingQuery, pageable);
+    }
+
+    private JPQLQuery<Tuple> getFollowingQuery(
+            final Long memberId,
+            final Long loginMemberId
+    ) {
+        return getFollowerOrFollowingQuery(getFollowingCondition(memberId), loginMemberId);
+    }
+
+    private BooleanExpression getFollowingCondition(final Long memberId) {
+        return follow.sender.id.eq(memberId)
+                .and(follow.receiver.eq(member))
+                .and(follow.status.eq(ACTIVE));
+    }
+
+    private JPQLQuery<Tuple> getFollowerOrFollowingQuery(
+            final BooleanExpression followCondition,
+            final Long loginMemberId
+    ) {
+        return query.select(member, follow, f)
+                .from(member)
+                .join(follow).on(followCondition)
+                .leftJoin(f).on(
+                        f.sender.id.eq(loginMemberId)
+                                .and(f.receiver.eq(member))
+                                .and(f.status.eq(ACTIVE))
+                )
+                .leftJoin(block).on(checkBlockStatus(loginMemberId))
+                .groupBy(member, follow, f)
+                .having(block.id.count().eq(0L));
+    }
+
+    private Page<MemberElement> getFollowerOrFollowingMemberElement(
+            final Long memberId,
+            final Long loginMemberId,
+            final JPQLQuery<Tuple> followQuery,
+            final Pageable pageable
+    ) {
         List<MemberElement> memberElementList =
-                findFollowersOfMemberAndIsFollow(memberId, loginMemberId)
+                followQuery
                         .orderBy(follow.lastModifiedDate.desc())
                         .offset(pageable.getOffset())
                         .limit(pageable.getPageSize())
@@ -52,31 +114,10 @@ public class MemberCustomRepository {
                 .from(member)
                 .where(member
                         .in(
-                                findFollowersOfMemberAndIsFollow(memberId, loginMemberId).select(member)
+                                followQuery.select(member)
                         ));
 
         return PageableExecutionUtils.getPage(memberElementList, pageable, countQuery::fetchOne);
-    }
-
-    private JPQLQuery<Tuple> findFollowersOfMemberAndIsFollow(
-            final Long memberId,
-            final Long loginMemberId
-    ) {
-        return query.select(member, follow, f)
-                .from(member)
-                .join(follow).on(
-                        follow.sender.eq(member)
-                                .and(follow.receiver.id.eq(memberId))
-                                .and(follow.status.eq(ACTIVE))
-                )
-                .leftJoin(f).on(
-                        f.sender.id.eq(loginMemberId)
-                                .and(f.receiver.eq(member))
-                                .and(f.status.eq(ACTIVE))
-                )
-                .leftJoin(block).on(checkBlockStatus(loginMemberId))
-                .groupBy(member, follow, f)
-                .having(block.id.count().eq(0L));
     }
 
     private Boolean getFollowStatus(
