@@ -7,6 +7,9 @@ on:
 env:
   JASYPT_KEY: ${{ secrets.JASYPT_KEY }}
 
+permissions:
+  pull-requests: write
+
 jobs:
   test-coverage:
     runs-on: ubuntu-latest
@@ -58,7 +61,7 @@ jobs:
         run: ./gradlew jacocoTestReport
 
       - name: Post coverage report on PR
-        uses: madrapps/jacoco-report@v1.7.1
+        uses: madrapps/jacoco-report@v1.2
         with:
           paths: |
             ${{ github.workspace }}/**/build/reports/jacoco/test/jacocoTestReport.xml
