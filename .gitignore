@@ -22,11 +22,6 @@ AuthKey_ZJ4VQZNW7D.p8
 firebase-adminsdk.json
 gcp-img-role.json
 
-# ignore properties file
-application-COMMON.properties
-application-DEV.properties
-application-PROD.properties
-
 # deploy
 .tar
 application-API-KEY.tar
