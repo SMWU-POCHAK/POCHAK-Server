@@ -19,8 +19,9 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
-import static com.apps.pochak.global.MockMultipartFileConverter.getSampleMultipartFile;
+import static com.apps.pochak.global.MockMultipartFileConverter.getMockMultipartFileOfMember;
 import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
+import static com.apps.pochak.member.fixture.MemberFixture.WRONG_MEMBER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -41,6 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @MockBean(JpaMetamodelMappingContext.class)
 public class OAuthControllerTest extends ControllerTest {
     private static final Member MEMBER1 = STATIC_MEMBER1;
+    private static final Member MEMBER2 = WRONG_MEMBER;
 
     @MockBean
     OAuthService oAuthService;
@@ -73,7 +75,7 @@ public class OAuthControllerTest extends ControllerTest {
 
         this.mockMvc.perform(
                         multipart("/api/v2/signup")
-                                .file("profileImage", getSampleMultipartFile().getBytes())
+                                .file(getMockMultipartFileOfMember())
                                 .queryParam("name", MEMBER1.getName())
                                 .queryParam("email", MEMBER1.getEmail())
                                 .queryParam("handle", MEMBER1.getHandle())
@@ -91,10 +93,10 @@ public class OAuthControllerTest extends ControllerTest {
                                         partWithName("profileImage").description("회원 프로필 사진 파일")
                                 ),
                                 queryParameters(
-                                        parameterWithName("name").description("회원 이름"),
+                                        parameterWithName("name").description("회원 이름: 최대 15자, (공백만 있는 \" \" 와 같은 경우는 불가능합니다.)"),
                                         parameterWithName("email").description("회원 이메일"),
-                                        parameterWithName("handle").description("회원 닉네임"),
-                                        parameterWithName("message").description("프로필 한 줄 소개"),
+                                        parameterWithName("handle").description("회원 아이디(다른 회원과 중복 불가능): 대문자, 소문자, 숫자, _(언더바), .(마침표) 만 입력이 가능하며, 최대 15자까지 입력 가능합니다."),
+                                        parameterWithName("message").description("프로필 한 줄 소개: 최대 50자, 최대 3줄까지 입력 가능합니다."),
                                         parameterWithName("socialId").description("소셜 아이디"),
                                         parameterWithName("socialType").description("소셜 타입 (google, apple)"),
                                         parameterWithName("socialRefreshToken").description("애플 리프레쉬 토큰 (구글에는 해당되지 않음)")
@@ -213,5 +215,22 @@ public class OAuthControllerTest extends ControllerTest {
                                 )
                         )
                 );
+    }
+
+    @Test
+    @DisplayName("회원가입 유효성 검사를 한다.")
+    void signUpValidationTest() throws Exception {
+        this.mockMvc.perform(
+                        multipart("/api/v2/signup")
+                                .file("profileImage", null)
+                                .queryParam("name", MEMBER2.getName())
+                                .queryParam("email", MEMBER2.getEmail())
+                                .queryParam("handle", MEMBER2.getHandle())
+                                .queryParam("message", MEMBER2.getMessage())
+                                .queryParam("socialId", MEMBER2.getSocialId())
+                                .queryParam("socialType", MEMBER2.getSocialType().getCode())
+                                .queryParam("socialRefreshToken", MEMBER2.getSocialRefreshToken())
+                                .contentType(APPLICATION_JSON)
+                ).andExpect(status().isBadRequest());
     }
 }

@@ -16,10 +16,4 @@ public class FollowFixture {
             STATIC_MEMBER2,
             STATIC_MEMBER1
     );
-
-    public static final Follow FOLLOW = new Follow(
-            OWNER,
-            LOGIN_MEMBER
-    );
-
 }
