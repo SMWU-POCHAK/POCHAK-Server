@@ -1,8 +1,11 @@
 name: dev server
 
+env:
+  JASYPT_KEY: ${{ secrets.JASYPT_KEY }}
+
 on:
   push:
-    branches: [ develop ]
+    branches: [ feat/#116-encrypt-secret-file ]
 
 jobs:
   build:
