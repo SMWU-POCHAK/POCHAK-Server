@@ -28,7 +28,7 @@ public class PostUploadRequest {
     private String caption;
 
     @Valid
-    @Size(min = 1, max = 5, message = "유저는 최대 1명 이상, 5명 이하로 태그 가능합니다.")
+    @Size(min = 1, max = 5, message = "유저는 1명 이상, 5명 이하로 태그 가능합니다.")
     @NotNull(message = "태그된 유저들의 아이디 리스트는 필수로 전달해야 합니다.")
     @ValidDuplicateList
     private List<String> taggedMemberHandleList;
