@@ -47,4 +47,8 @@ public abstract class BaseEntity {
     public void updateLastModifiedDate() {
         this.lastModifiedDate = LocalDateTime.now();
     }
+
+    public void updateCreatedDate() {
+        this.createdDate = LocalDateTime.now();
+    }
 }
