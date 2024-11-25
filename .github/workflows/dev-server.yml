@@ -5,7 +5,7 @@ env:
 
 on:
   push:
-    branches: [ feat/#116-encrypt-secret-file ]
+    branches: [ develop ]
 
 jobs:
   build:
