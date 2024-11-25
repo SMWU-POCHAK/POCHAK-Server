@@ -69,3 +69,9 @@ jobs:
           min-coverage-overall: 40
           min-coverage-changed-files: 60
           comment: true
+
+      - name: Fail the build if coverage is below the required minimum
+        run: |
+          if [ $(./gradlew jacocoTestReport --quiet | grep 'Total' | awk '{print $4}' | cut -d% -f1) -lt 40 ]; then
+            echo "Coverage is below the minimum threshold" && exit 1;
+          fi
