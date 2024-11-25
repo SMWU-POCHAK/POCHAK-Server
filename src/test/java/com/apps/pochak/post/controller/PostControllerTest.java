@@ -376,4 +376,19 @@ class PostControllerTest extends ControllerTest {
                         .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
         ).andExpect(status().isBadRequest());
     }
+
+    @Test
+    @DisplayName("[게시물 업로드] 태그 가능한 회원에 도달하지 않았을 시 유효성 검사를 한다.")
+    void uploadPost_WhenTagMinMember() throws Exception {
+        String caption = "test caption";
+        final List<String> taggedMemberHandles = List.of();
+
+        this.mockMvc.perform(
+                multipart("/api/v2/posts")
+                        .file(getMockMultipartFileOfPost())
+                        .queryParam("taggedMemberHandleList", String.join(", ", taggedMemberHandles))
+                        .queryParam("caption", caption)
+                        .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
+        ).andExpect(status().isBadRequest());
+    }
 }
