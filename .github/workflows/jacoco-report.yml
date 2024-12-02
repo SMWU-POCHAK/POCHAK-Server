@@ -30,7 +30,7 @@ jobs:
           name: "gcp-img-role.json"
           json: ${{ secrets.GCS_KEY }}
           dir: './src/main/resources/static/'
-          
+
       - name: Set up Firebase Key file
         id: firebase-key-file
         uses: jsdaniell/create-json@1.1.2
@@ -38,7 +38,7 @@ jobs:
           name: "firebase-adminsdk.json"
           json: ${{ secrets.FIREBASE_KEY }}
           dir: './src/main/resources/static/'
-          
+
       - name: Set up Apple Key file
         run: echo "${{ secrets.APPLE_AUTH_KEY }}" > ./src/main/resources/static/AuthKey_ZJ4VQZNW7D.p8
         shell: bash
@@ -60,15 +60,21 @@ jobs:
       - name: Generate JaCoCo coverage report
         run: ./gradlew jacocoTestReport
 
-      - name: Post coverage report on PR
+      - name: Upload JaCoCo HTML report
+        uses: actions/upload-artifact@v3
+        with:
+          name: jacoco-html-report
+          path: ./build/reports/jacoco/test/html/
+
+      - name: Post overall coverage report
         uses: madrapps/jacoco-report@v1.7.1
         with:
           paths: |
             ${{ github.workspace }}/**/build/reports/jacoco/test/jacocoTestReport.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 40
-          min-coverage-changed-files: 60
           comment: true
+          show-line-coverage: true
 
       - name: Fail the build if coverage is below the required minimum
         run: |
