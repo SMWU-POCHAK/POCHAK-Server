@@ -74,9 +74,6 @@ class AlarmControllerTest extends ControllerTest {
     @Test
     @DisplayName("로그인한 회원의 알람을 전부 조회한다.")
     void getAllAlarmsTest() throws Exception {
-
-        System.out.println(LocalDateTime.now());
-
         AlarmElements alarmElements = new AlarmElements(
                 toPage(
                         ALARM_LIST.stream().map(
