@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus._INTERNAL_SERVER_ERROR;
+import static com.apps.pochak.global.util.RequestInfo.createRequestFullPath;
 
 @Slf4j
 @RestControllerAdvice(annotations = {RestController.class})
@@ -49,6 +50,10 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
                 });
 
         ErrorStatus errorStatus = ErrorStatus.valueOf("_BAD_REQUEST");
+
+        log.error("ExceptionAdvice catch MethodArgumentNotValidException in {} : {}",
+                createRequestFullPath(request), errorStatus.getMessage());
+
         ApiResponse<Map<String, String>> body = ApiResponse.onFailure(errorStatus.getCode(), errorStatus.getMessage(), errors);
 
         return super.handleExceptionInternal(
@@ -65,7 +70,14 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
             final Exception e,
             final WebRequest request
     ) {
+        log.error("ExceptionAdvice catch Exception in {} : {}: {}",
+                createRequestFullPath(request), e.getClass(), e.getMessage());
+        for (StackTraceElement element : e.getStackTrace()) {
+            log.error(element.toString());
+        }
+
         ErrorStatus errorCommonStatus = _INTERNAL_SERVER_ERROR;
+
         String errorPoint = e.getMessage();
         ApiResponse<Object> body = ApiResponse.onFailure(errorCommonStatus.getCode(), errorCommonStatus.getMessage(), errorPoint);
 
@@ -86,6 +98,10 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
             final HttpServletRequest request
     ) {
         ErrorReasonDTO errorReasonDTO = generalException.getErrorReasonHttpStatus();
+
+        log.error("ExceptionAdvice catch GeneralException in {} : {}",
+                createRequestFullPath(request), errorReasonDTO.getMessage());
+
         ApiResponse<Object> body = ApiResponse.onFailure(errorReasonDTO.getCode(), errorReasonDTO.getMessage(), null);
         final ServletWebRequest webRequest = new ServletWebRequest(request);
 
@@ -111,6 +127,9 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
                         .findFirst()
                         .orElseThrow(() -> new RuntimeException("ConstraintViolationException 추출 도중 에러 발생"));
 
+        log.error("ExceptionAdvice catch ConstraintViolationException in {} : {}",
+                createRequestFullPath(request), ErrorStatus.valueOf(errorMessage).getMessage());
+
         return handleExceptionInternalConstraint(e, ErrorStatus.valueOf(errorMessage), HttpHeaders.EMPTY, request);
     }
 
@@ -120,6 +139,9 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
             final HttpHeaders headers,
             final WebRequest request
     ) {
+        log.error("ExceptionAdvice catch ExceptionInternalConstraint in {} : {}",
+                createRequestFullPath(request), errorCommonStatus.getMessage());
+
         ApiResponse<Object> body = ApiResponse
                 .onFailure(
                         errorCommonStatus.getCode(),
