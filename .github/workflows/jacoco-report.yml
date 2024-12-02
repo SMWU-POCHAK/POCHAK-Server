@@ -68,21 +68,41 @@ jobs:
             echo "build_status=failure" >> $GITHUB_ENV
           fi
 
-      - name: Generate JaCoCo coverage report
-        run: ./gradlew jacocoTestReport
+      - name: Parse JaCoCo coverage results and post as a table
+        id: post-coverage-table
+        run: |
+          COVERAGE_TABLE="| File | Line Coverage | Branch Coverage |\n"
+          COVERAGE_TABLE+="| ---- | ------------- | --------------- |\n"
+          
+          COVERAGE_FILES=$(find build/reports/jacoco/test/xml -type f -name "*.xml")
+          
+          for FILE in $COVERAGE_FILES; do
+            FILENAME=$(basename $FILE .xml)
+            LINE_COVERAGE=$(xmllint --xpath "string(//package/class/lineCoverage)" $FILE)
+            BRANCH_COVERAGE=$(xmllint --xpath "string(//package/class/branchCoverage)" $FILE)
+
+            COVERAGE_TABLE+="| $FILENAME | $LINE_COVERAGE% | $BRANCH_COVERAGE% |\n"
+          done
+          
+          echo "$COVERAGE_TABLE" >> $GITHUB_ENV
+          echo "Coverage table generated."
 
       - name: Post coverage and build status report on PR
-        uses: madrapps/jacoco-report@v1.7.1
+        uses: github-script@v6
         with:
-          paths: |
-            ${{ github.workspace }}/**/build/reports/jacoco/test/jacocoTestReport.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: 40
-          min-coverage-changed-files: 60
-          comment: true
-          extra-comment: |
-            Build Status: ${{ env.build_status }}
-
+          script: |
+            const coverageTable = process.env.COVERAGE_TABLE;
+            const buildStatus = process.env.BUILD_STATUS;
+            
+            const commentBody = `**Build Status**: ${buildStatus}\n\n**Test Coverage Report**:\n\n${coverageTable}`;
+            
+            const { data: comment } = await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody,
+            });
+      
       - name: Fail the build if coverage is below the required minimum
         run: |
           if [ $(./gradlew jacocoTestReport --quiet | grep 'Total' | awk '{print $4}' | cut -d% -f1) -lt 40 ]; then
