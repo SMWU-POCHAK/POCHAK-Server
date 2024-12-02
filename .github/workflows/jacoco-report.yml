@@ -57,35 +57,34 @@ jobs:
       - name: Build and run tests with JaCoCo
         run: ./gradlew clean test jacocoTestReport
 
+      - name: Check build success
+        id: build-status
+        run: |
+          if [ $? -eq 0 ]; then
+            echo "Build Successful"
+            echo "build_status=success" >> $GITHUB_ENV
+          else
+            echo "Build Failed"
+            echo "build_status=failure" >> $GITHUB_ENV
+          fi
+
       - name: Generate JaCoCo coverage report
         run: ./gradlew jacocoTestReport
 
-      - name: Upload JaCoCo HTML report
-        uses: actions/upload-artifact@v3
-        with:
-          name: jacoco-html-report
-          path: ./build/reports/jacoco/test/html/
-
-      - name: Post overall coverage report
+      - name: Post coverage and build status report on PR
         uses: madrapps/jacoco-report@v1.7.1
         with:
           paths: |
             ${{ github.workspace }}/**/build/reports/jacoco/test/jacocoTestReport.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 40
+          min-coverage-changed-files: 60
           comment: true
-          show-line-coverage: true
+          extra-comment: |
+            Build Status: ${{ env.build_status }}
 
       - name: Fail the build if coverage is below the required minimum
         run: |
           if [ $(./gradlew jacocoTestReport --quiet | grep 'Total' | awk '{print $4}' | cut -d% -f1) -lt 40 ]; then
             echo "Coverage is below the minimum threshold" && exit 1;
           fi
-
-      - name: Add build failure comment
-        if: failure()
-        run: echo "❌ Build failed. Please check the logs for details."
-
-      - name: Add build success comment
-        if: success()
-        run: echo "✅ Build and test coverage checked successfully!"
