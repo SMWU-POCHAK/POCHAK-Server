@@ -157,8 +157,10 @@ jacocoTestReport {
     dependsOn test
 
     reports {
-        xml.required.set(true)
-        html.required.set(true)
+        xml.required = true
+        html.required = true
+        xml.outputLocation.set(layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml"))
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/test/html"))
 
         // QueryDSL Q클래스 제외
         def Qdomains = []
@@ -172,12 +174,6 @@ jacocoTestReport {
                         exclude: [] + Qdomains)
             }))
         }
-
-        xml.outputLocation.set(layout.buildDirectory.file("jacoco/xml/index.xml"))
-        html.outputLocation.set(layout.buildDirectory.dir("jacoco/html"))
     }
 }
-
-
-
 /** Jacoco end **/
