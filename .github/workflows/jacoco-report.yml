@@ -81,3 +81,11 @@ jobs:
           if [ $(./gradlew jacocoTestReport --quiet | grep 'Total' | awk '{print $4}' | cut -d% -f1) -lt 40 ]; then
             echo "Coverage is below the minimum threshold" && exit 1;
           fi
+
+      - name: Add build failure comment
+        if: failure()
+        run: echo "❌ Build failed. Please check the logs for details."
+
+      - name: Add build success comment
+        if: success()
+        run: echo "✅ Build and test coverage checked successfully!"
