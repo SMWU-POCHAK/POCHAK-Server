@@ -4,6 +4,7 @@ import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.comment.domain.repository.CommentRepository;
 import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
+import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.global.image.CloudStorageService;
 import com.apps.pochak.like.domain.repository.LikeRepository;
 import com.apps.pochak.login.provider.JwtProvider;
@@ -26,15 +27,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.apps.pochak.global.BaseEntityStatus.DELETED;
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.global.MockMultipartFileConverter.getMockMultipartFileOfPost;
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.NOT_YOUR_POST;
 import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
 import static com.apps.pochak.post.fixture.PostFixture.CAPTION;
 import static com.apps.pochak.post.fixture.PostFixture.POST_IMAGE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -160,6 +162,51 @@ class PostServiceTest {
                 () -> assertEquals(expected.getPostImage(), actual.getPostImage()),
                 () -> assertEquals(expected.getCaption(), actual.getCaption())
         );
+    }
+
+    @DisplayName("게시물을 삭제한다.")
+    @Test
+    void deletePost() throws Exception {
+        // given
+        Member owner = memberRepository.save(OWNER);
+        Member taggedMember1 = memberRepository.save(TAGGED_MEMBER1);
+        Member taggedMember2 = memberRepository.save(TAGGED_MEMBER2);
+
+        Post post = savePost(owner, taggedMember1, taggedMember2);
+
+        // when
+        postService.deletePost(
+                Accessor.member(owner.getId()),
+                post.getId()
+        );
+
+        // then
+        assertThat(postRepository.findAll()).hasSize(1);
+        Post actual = postRepository.findAll().get(0);
+        assertEquals(DELETED, actual.getStatus());
+    }
+
+    @DisplayName("게시물 삭제 권한이 없을 시 예외가 발생한다.")
+    @Test
+    void deletePost_WithoutAuthority() throws Exception {
+        // given
+        Member owner = memberRepository.save(OWNER);
+        Member taggedMember1 = memberRepository.save(TAGGED_MEMBER1);
+        Member taggedMember2 = memberRepository.save(TAGGED_MEMBER2);
+        Member loginMember = memberRepository.save(LOGIN_MEMBER);
+
+        Post post = savePost(owner, taggedMember1, taggedMember2);
+
+        // when, then
+        GeneralException exception = assertThrows(
+                GeneralException.class,
+                () -> postService.deletePost(
+                        Accessor.member(loginMember.getId()),
+                        post.getId()
+                )
+        );
+
+        assertEquals(NOT_YOUR_POST, exception.getCode());
     }
 
     private Post savePost(Member owner, Member... taggedMemberList) {
