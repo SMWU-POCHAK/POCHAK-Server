@@ -1,5 +1,7 @@
 package com.apps.pochak.post.service;
 
+import com.apps.pochak.alarm.domain.TagAlarm;
+import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.comment.domain.repository.CommentRepository;
 import com.apps.pochak.follow.domain.Follow;
@@ -15,6 +17,7 @@ import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.post.dto.PostElements;
 import com.apps.pochak.post.dto.request.PostUploadRequest;
 import com.apps.pochak.post.dto.response.PostDetailResponse;
+import com.apps.pochak.post.dto.response.PostPreviewResponse;
 import com.apps.pochak.tag.domain.Tag;
 import com.apps.pochak.tag.domain.repository.TagRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -71,7 +74,10 @@ class PostServiceTest {
     @MockBean
     CloudStorageService cloudStorageService;
 
-    @DisplayName("팔로우하고 있는 유저들의 게시물을 포함한 홈 탭을 조회한다")
+    @Autowired
+    private AlarmRepository alarmRepository;
+
+    @DisplayName("홈 탭을 조회한다")
     @Test
     void getHomeTab() throws Exception {
         // given
@@ -108,9 +114,10 @@ class PostServiceTest {
 
         Post post = savePost(owner, taggedMember1, taggedMember2);
 
+        List<Tag> tagList = tagRepository.findTagsByPost(post);
         PostDetailResponse expected = PostDetailResponse.of()
                 .post(post)
-                .tagList(List.of(new Tag(post, taggedMember1), new Tag(post, taggedMember2)))
+                .tagList(tagList)
                 .isFollow(false)
                 .isLike(false)
                 .likeCount(0)
@@ -207,6 +214,69 @@ class PostServiceTest {
         );
 
         assertEquals(NOT_YOUR_POST, exception.getCode());
+    }
+
+    @DisplayName("탐색탭을 조회한다.")
+    @Test
+    void getSearchTab() throws Exception {
+        // given
+        Member owner = memberRepository.save(OWNER);
+        Member taggedMember1 = memberRepository.save(TAGGED_MEMBER1);
+        Member taggedMember2 = memberRepository.save(TAGGED_MEMBER2);
+        Member loginMember = memberRepository.save(LOGIN_MEMBER);
+
+        Post post = savePost(owner, taggedMember1, taggedMember2);
+
+        PostElements expected = PostElements.from(toPage(List.of(post)));
+
+        // when
+        PostElements actual = postService
+                .getSearchTab(
+                        Accessor.member(loginMember.getId()),
+                        PageRequest.of(0, DEFAULT_PAGING_SIZE)
+                );
+
+        // then
+        assertThat(actual.getPostList()).hasSize(1)
+                .containsAll(expected.getPostList());
+    }
+
+    @DisplayName("게시물 미리보기를 조회한다.")
+    @Test
+    void getPreviewPost() throws Exception {
+        // given
+        when(cloudStorageService.upload(any(), any()))
+                .thenReturn("");
+
+        Member owner = memberRepository.save(OWNER);
+        Member taggedMember1 = memberRepository.save(TAGGED_MEMBER1);
+        Member taggedMember2 = memberRepository.save(TAGGED_MEMBER2);
+
+        PostUploadRequest request = new PostUploadRequest(
+                getMockMultipartFileOfPost(),
+                "test caption",
+                List.of(taggedMember1.getHandle(), taggedMember2.getHandle())
+        );
+
+        postService.savePost(
+                Accessor.member(owner.getId()),
+                request
+        );
+
+        Post post = postRepository.findAll().get(0);
+        List<Tag> tagList = tagRepository.findTagsByPost(post);
+        PostPreviewResponse expected = new PostPreviewResponse(post, tagList);
+
+        TagAlarm alarm = (TagAlarm) alarmRepository.findAll().get(0);
+
+        // when
+        PostPreviewResponse actual = postService.getPreviewPost(
+                Accessor.member(alarm.getReceiver().getId()),
+                alarm.getId()
+        );
+
+        // then
+        assertEquals(expected, actual);
     }
 
     private Post savePost(Member owner, Member... taggedMemberList) {
