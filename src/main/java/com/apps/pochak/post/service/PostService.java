@@ -50,8 +50,6 @@ public class PostService {
     private final TagAlarmService tagAlarmService;
     private final CloudStorageService cloudStorageService;
 
-    private static final int MAX_TAG_COUNT = 5;
-
     @Transactional(readOnly = true)
     public PostElements getHomeTab(
             final Accessor accessor,
@@ -89,31 +87,30 @@ public class PostService {
             final Accessor accessor,
             final PostUploadRequest request
     ) {
-        int requestTagCount = request.getTaggedMemberHandleList().size();
-        if (requestTagCount > MAX_TAG_COUNT) {
-            throw new GeneralException(EXCEED_TAG_LIMIT);
-        }
-
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
-        if (request.getTaggedMemberHandleList().contains(loginMember.getHandle())) {
-            throw new GeneralException(TAGGED_ONESELF);
-        }
+        request.validateMemberNotTagged(loginMember);
 
         final String image = cloudStorageService.upload(request.getPostImage(), POST);
         final Post post = request.toEntity(image, loginMember);
         postRepository.save(post);
 
-        final List<String> taggedMemberHandles = request.getTaggedMemberHandleList();
-        final List<Member> taggedMemberList = memberRepository.findMemberByHandleList(taggedMemberHandles, loginMember);
-
-        int foundTagSize = taggedMemberList.size();
-        if (requestTagCount != foundTagSize) {
-            cloudStorageService.delete(image);
-            throw new GeneralException(INVALID_TAG_INFO);
-        }
+        final List<String> taggedMemberHandleList = request.getTaggedMemberHandleList();
+        final List<Member> taggedMemberList = memberRepository.findMemberByHandleList(taggedMemberHandleList, loginMember);
+        validateInvalidMemberTag(taggedMemberHandleList, taggedMemberList, image);
 
         final List<Tag> tagList = saveTags(taggedMemberList, post);
         tagAlarmService.saveTagApprovalAlarms(tagList, loginMember);
+    }
+
+    private void validateInvalidMemberTag(
+            final List<String> requestMemberList,
+            final List<Member> foundMemberList,
+            final String postImage
+    ) {
+        if (requestMemberList.size() != foundMemberList.size()) {
+            cloudStorageService.delete(postImage);
+            throw new GeneralException(TAG_INVALID_MEMBER);
+        }
     }
 
     private List<Tag> saveTags(
@@ -135,7 +132,7 @@ public class PostService {
     ) {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Post post = postRepository.findById(postId).orElseThrow(() -> new GeneralException(INVALID_POST_ID));
-        checkAuthorized(post, loginMember);
+        validateDeleteAccess(post, loginMember);
         postRepository.delete(post);
         commentRepository.deleteByPost(post);
         tagRepository.deleteByPost(post);
@@ -143,21 +140,19 @@ public class PostService {
         alarmRepository.deleteByPost(post.getId());
     }
 
-
-    private void checkAuthorized(
+    private void validateDeleteAccess(
             final Post post,
             final Member member
     ) {
         if (post.isOwner(member)) return;
 
-        List<Tag> tagList = tagRepository.findTagsByPost(post);
+        final List<Tag> tagList = tagRepository.findTagsByPost(post);
         for (Tag tag : tagList) {
             if (tag.isMember(member)) return;
         }
 
-        throw new GeneralException(NOT_YOUR_POST);
+        throw new GeneralException(NO_DELETE_PERMISSION);
     }
-
 
     @Transactional(readOnly = true)
     public PostElements getSearchTab(
@@ -173,14 +168,13 @@ public class PostService {
             final Accessor accessor,
             final Long alarmId
     ) {
-        Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
-        Alarm alarm = alarmRepository.findAlarmByIdAndReceiver(alarmId, loginMember)
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
+        final Alarm alarm = alarmRepository.findAlarmByIdAndReceiver(alarmId, loginMember)
                 .orElseThrow(() -> new GeneralException(INVALID_ALARM_ID));
 
         if (!(alarm instanceof TagAlarm tagAlarm)) throw new GeneralException(CANNOT_PREVIEW);
-
-        Post previewPost = postRepository.findPostByTag(tagAlarm.getTag()).orElseThrow(() -> new GeneralException(INVALID_POST_ID));
-        List<Tag> tagList = tagRepository.findTagsByPost(previewPost);
+        final Post previewPost = postRepository.findPostByTag(tagAlarm.getTag()).orElseThrow(() -> new GeneralException(INVALID_POST_ID));
+        final List<Tag> tagList = tagRepository.findTagsByPost(previewPost);
 
         return new PostPreviewResponse(previewPost, tagList);
     }
