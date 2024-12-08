@@ -1,5 +1,6 @@
 package com.apps.pochak.alarm.service;
 
+import com.apps.pochak.alarm.domain.Alarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.alarm.dto.response.AlarmElements;
 import com.apps.pochak.auth.domain.Accessor;
@@ -26,6 +27,7 @@ import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.global.MockMultipartFileConverter.getMockMultipartFileOfPost;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -90,6 +92,25 @@ class AlarmServiceTest {
 
         // then
         assertEquals(expected, actual);
+    }
+
+    @DisplayName("알람을 정상적으로 확인한다.")
+    @Test
+    void checkAlarm() throws Exception {
+        // given
+        savePost();
+        Alarm alarm = alarmRepository.findAll().get(0);
+        Member receiver = alarm.getReceiver();
+
+        // when
+        alarmService.checkAlarm(
+                Accessor.member(receiver.getId()),
+                alarm.getId()
+        );
+
+        // then
+        Alarm checkedAlarm = alarmRepository.findById(alarm.getId()).orElseThrow();
+        assertTrue(checkedAlarm.getIsChecked());
     }
 
     private Post savePost() throws Exception {
