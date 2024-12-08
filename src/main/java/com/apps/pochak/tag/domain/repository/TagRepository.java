@@ -12,6 +12,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -104,4 +106,17 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     and (t1.member = :loginMember and t2.member = :member)
     """)
     Long countByMember(@Param("loginMember") Member loginMember, @Param("member")Member member);
+
+    @Query("""
+    select t from Tag t
+    join fetch t.member m
+    join fetch t.post p
+    where p.postStatus = 'PUBLIC'
+    and p.status = 'ACTIVE'
+    and ((m = :member and p.owner = :loginMember)
+    or (m = :loginMember and p.owner = :member))
+    and (p.allowedDate >= :startDay and p.allowedDate < :endDay)
+    order by p.allowedDate desc
+    """)
+    Page<Tag>  findTaggedByDate(@Param("loginMember")Member loginMember, @Param("member")Member member, LocalDateTime startDay, LocalDateTime endDay, Pageable pageable);
 }

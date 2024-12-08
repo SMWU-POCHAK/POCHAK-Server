@@ -4,6 +4,7 @@ import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.global.ControllerTest;
 import com.apps.pochak.member.domain.Member;
+import com.apps.pochak.memories.domain.MemoriesType;
 import com.apps.pochak.memories.dto.response.MemoriesPostResponse;
 import com.apps.pochak.memories.dto.response.MemoriesPreviewResponse;
 import com.apps.pochak.memories.service.MemoriesService;
@@ -17,7 +18,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.apps.pochak.follow.fixture.FollowFixture.STATIC_RECEIVE_FOLLOW;
 import static com.apps.pochak.follow.fixture.FollowFixture.STATIC_SEND_FOLLOW;
@@ -49,6 +52,7 @@ class MemoriesControllerTest extends ControllerTest {
     private static final Follow SEND_FOLLOW = STATIC_SEND_FOLLOW;
     private static final Follow RECEIVE_FOLLOW = STATIC_RECEIVE_FOLLOW;
     private static final Tag APPROVED_TAG = STATIC_APPROVED_TAG;
+    private final Map<MemoriesType, Tag> tags = new HashMap<>();
 
     @MockBean
     MemoriesService memoriesService;
@@ -62,6 +66,12 @@ class MemoriesControllerTest extends ControllerTest {
 
         SEND_FOLLOW.updateLastModifiedDate();
         RECEIVE_FOLLOW.updateLastModifiedDate();
+
+        tags.put(MemoriesType.FirstPochaked, APPROVED_TAG);
+        tags.put(MemoriesType.FirstPochak, APPROVED_TAG);
+        tags.put(MemoriesType.FirstBonded, APPROVED_TAG);
+        tags.put(MemoriesType.LatestPost, APPROVED_TAG);
+        tags.put(MemoriesType.Post1YearAgo, APPROVED_TAG);
     }
 
     @Test
@@ -76,10 +86,7 @@ class MemoriesControllerTest extends ControllerTest {
                         .countTag(20L)
                         .countTaggedWith(15L)
                         .countTagged(30L)
-                        .firstTagged(APPROVED_TAG)
-                        .firstTag(APPROVED_TAG)
-                        .firstTaggedWith(APPROVED_TAG)
-                        .latestTag(APPROVED_TAG)
+                        .tags(tags)
                         .build()
                 );
 
@@ -114,22 +121,28 @@ class MemoriesControllerTest extends ControllerTest {
                                         fieldWithPath("result.pochakCount").type(NUMBER).description("POCHAK 게시물 수"),
                                         fieldWithPath("result.bondedCount").type(NUMBER).description("BONDED 게시물 수"),
                                         fieldWithPath("result.pochakedCount").type(NUMBER).description("POCHAKED 게시물 수"),
-                                        fieldWithPath("result.firstPochaked").type(OBJECT).description("처음 포착된 순간"),
-                                        fieldWithPath("result.firstPochak").type(OBJECT).description("처음 포착한 순간"),
-                                        fieldWithPath("result.firstBonded").type(OBJECT).description("처음 함께 포착된 순간"),
-                                        fieldWithPath("result.latestPost").type(OBJECT).description("최근 포착 순간"),
-                                        fieldWithPath("result.firstPochaked.postId").type(NUMBER).description("처음 포착된 순간의 게시물 아이디"),
-                                        fieldWithPath("result.firstPochaked.postImage").type(STRING).description("처음 포착된 순간의 게시물 이미지"),
-                                        fieldWithPath("result.firstPochaked.postDate").type(STRING).description("처음 포착된 순간의 게시물 날짜"),
-                                        fieldWithPath("result.firstPochak.postId").type(NUMBER).description("처음 포착한 순간의 게시물 아이디"),
-                                        fieldWithPath("result.firstPochak.postImage").type(STRING).description("처음 포착한 순간의 게시물 이미지"),
-                                        fieldWithPath("result.firstPochak.postDate").type(STRING).description("처음 포착한 순간의 게시물 날짜"),
-                                        fieldWithPath("result.firstBonded.postId").type(NUMBER).description("처음 함께 포착된 순간의 게시물 아이디"),
-                                        fieldWithPath("result.firstBonded.postImage").type(STRING).description("처음 함께 포착된 순간의 게시물 이미지"),
-                                        fieldWithPath("result.firstBonded.postDate").type(STRING).description("처음 함께 포착된 순간의 게시물 날짜"),
-                                        fieldWithPath("result.latestPost.postId").type(NUMBER).description("최근 포착 순간의 게시물 아이디"),
-                                        fieldWithPath("result.latestPost.postImage").type(STRING).description("최근 포착 순간의 게시물 이미지"),
-                                        fieldWithPath("result.latestPost.postDate").type(STRING).description("최근 포착 순간의 게시물 날짜")
+                                        fieldWithPath("result.memories").type(OBJECT).description("추억 갤러리 프리뷰"),
+                                        fieldWithPath("result.memories.FirstPochaked").type(OBJECT).description("처음 포착된 순간"),
+                                        fieldWithPath("result.memories.FirstPochak").type(OBJECT).description("처음 포착한 순간"),
+                                        fieldWithPath("result.memories.FirstBonded").type(OBJECT).description("처음 함께 포착된 순간"),
+                                        fieldWithPath("result.memories.LatestPost").type(OBJECT).description("최근 포착 순간"),
+                                        fieldWithPath("result.memories.FirstPochaked.postId").type(NUMBER).description("처음 포착된 순간의 게시물 아이디"),
+                                        fieldWithPath("result.memories.FirstPochaked.postImage").type(STRING).description("처음 포착된 순간의 게시물 이미지"),
+                                        fieldWithPath("result.memories.FirstPochaked.postDate").type(STRING).description("처음 포착된 순간의 게시물 날짜"),
+                                        fieldWithPath("result.memories.FirstPochak.postId").type(NUMBER).description("처음 포착한 순간의 게시물 아이디"),
+                                        fieldWithPath("result.memories.FirstPochak.postImage").type(STRING).description("처음 포착한 순간의 게시물 이미지"),
+                                        fieldWithPath("result.memories.FirstPochak.postDate").type(STRING).description("처음 포착한 순간의 게시물 날짜"),
+                                        fieldWithPath("result.memories.FirstBonded.postId").type(NUMBER).description("처음 함께 포착된 순간의 게시물 아이디"),
+                                        fieldWithPath("result.memories.FirstBonded.postImage").type(STRING).description("처음 함께 포착된 순간의 게시물 이미지"),
+                                        fieldWithPath("result.memories.FirstBonded.postDate").type(STRING).description("처음 함께 포착된 순간의 게시물 날짜"),
+                                        fieldWithPath("result.memories.LatestPost.postId").type(NUMBER).description("최근 포착 순간의 게시물 아이디"),
+                                        fieldWithPath("result.memories.LatestPost.postImage").type(STRING).description("최근 포착 순간의 게시물 이미지"),
+                                        fieldWithPath("result.memories.LatestPost.postDate").type(STRING).description("최근 포착 순간의 게시물 날짜"),
+                                        fieldWithPath("result.memories.Post1YearAgo.postId").type(NUMBER).description("1년전 포착 순간의 게시물 아이디"),
+                                        fieldWithPath("result.memories.Post1YearAgo.postImage").type(STRING).description("1년전 포착 순간의 게시물 이미지"),
+                                        fieldWithPath("result.memories.Post1YearAgo.postDate").type(STRING).description("1년전 포착 순간의 게시물 날짜"),
+                                        fieldWithPath("result.timeLine").type(OBJECT).description("추억 타임라인"),
+                                        fieldWithPath("result.timeLine.*").type(STRING).description("추억 타임라인 날짜")
                                 )
                         )
                 );
