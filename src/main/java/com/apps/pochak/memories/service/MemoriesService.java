@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.apps.pochak.global.util.PageUtil.getFirstContentFromPage;
+import static com.apps.pochak.global.util.TimeUtil.atMidnight;
 
 @Service
 @Transactional(readOnly = true)
@@ -47,6 +48,8 @@ public class MemoriesService {
         final Page<Tag> taggedWithDesc = tagRepository.findTaggedWith(loginMember, member, PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "post.allowedDate")));
         final Page<Tag> tagOrTagged = tagRepository.findLatestTagged(loginMember, member, PageRequest.of(0, 1));
 
+        final Page<Tag> tag1YearAgo = tagRepository.findTaggedByDate(loginMember, member, atMidnight(1), atMidnight(1).plusDays(1), PageRequest.of(0, 1));
+
         final Tag latestTaggedWith = getFirstContentFromPage(taggedWithDesc);
         final Tag latestTagOrTagged = getFirstContentFromPage(tagOrTagged);
 
@@ -55,6 +58,7 @@ public class MemoriesService {
         tags.put(MemoriesType.FirstPochak, getFirstContentFromPage(tag));
         tags.put(MemoriesType.FirstBonded, getFirstContentFromPage(taggedWithAsc));
         tags.put(MemoriesType.LatestPost, findLatestTag(latestTaggedWith, latestTagOrTagged));
+        tags.put(MemoriesType.Post1YearAgo, getFirstContentFromPage(tag1YearAgo));
 
         return MemoriesPreviewResponse.of()
                 .loginMember(loginMember)

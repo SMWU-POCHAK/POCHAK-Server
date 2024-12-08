@@ -6,5 +6,6 @@ public enum MemoriesType {
     FirstPochaked,
     FirstPochak,
     FirstBonded,
-    LatestPost
+    LatestPost,
+    Post1YearAgo
 }
