@@ -6,7 +6,6 @@ import com.apps.pochak.fcm.dto.FCMToken;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.MulticastMessage;
 import jakarta.transaction.Transactional;
@@ -40,11 +39,8 @@ public class FCMService {
         try {
             Message message = makeMessage(alarm);
             firebaseMessaging.send(message);
-        } catch (FirebaseMessagingException e) {
-            // TODO: 로깅 수정
-            log.error(
-                    String.format("[FCM Error] Token: %s \n Msg: %s", alarm.getReceiver().getFcmToken(), e.getMessage())
-            );
+        } catch (Exception e) {
+            log.error("[FCM] token = {}, msg = {}", alarm.getReceiver().getFcmToken(), e.getMessage());
         }
     }
 
@@ -53,8 +49,8 @@ public class FCMService {
         try {
             MulticastMessage multicastMessage = makeMessages(alarmList);
             firebaseMessaging.sendEachForMulticast(multicastMessage);
-        } catch (FirebaseMessagingException e) {
-            log.error(String.format("[FCM Error]\n Msg: %s", e.getMessage()));
+        } catch (Exception e) {
+            log.error("[FCM] msg = {}", e.getMessage());
         }
     }
 
