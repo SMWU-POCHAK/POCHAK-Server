@@ -71,6 +71,7 @@ class MemoriesControllerTest extends ControllerTest {
         tags.put(MemoriesType.FirstPochak, APPROVED_TAG);
         tags.put(MemoriesType.FirstBonded, APPROVED_TAG);
         tags.put(MemoriesType.LatestPost, APPROVED_TAG);
+        tags.put(MemoriesType.Post1YearAgo, APPROVED_TAG);
     }
 
     @Test
@@ -137,6 +138,9 @@ class MemoriesControllerTest extends ControllerTest {
                                         fieldWithPath("result.memories.LatestPost.postId").type(NUMBER).description("최근 포착 순간의 게시물 아이디"),
                                         fieldWithPath("result.memories.LatestPost.postImage").type(STRING).description("최근 포착 순간의 게시물 이미지"),
                                         fieldWithPath("result.memories.LatestPost.postDate").type(STRING).description("최근 포착 순간의 게시물 날짜"),
+                                        fieldWithPath("result.memories.Post1YearAgo.postId").type(NUMBER).description("1년전 포착 순간의 게시물 아이디"),
+                                        fieldWithPath("result.memories.Post1YearAgo.postImage").type(STRING).description("1년전 포착 순간의 게시물 이미지"),
+                                        fieldWithPath("result.memories.Post1YearAgo.postDate").type(STRING).description("1년전 포착 순간의 게시물 날짜"),
                                         fieldWithPath("result.timeLine").type(OBJECT).description("추억 타임라인"),
                                         fieldWithPath("result.timeLine.*").type(STRING).description("추억 타임라인 날짜")
                                 )
