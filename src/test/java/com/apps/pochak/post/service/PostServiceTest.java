@@ -32,7 +32,7 @@ import java.util.List;
 import static com.apps.pochak.global.BaseEntityStatus.DELETED;
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.global.MockMultipartFileConverter.getMockMultipartFileOfPost;
-import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.NOT_YOUR_POST;
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.NO_DELETE_PERMISSION;
 import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -195,7 +195,7 @@ class PostServiceTest {
                 )
         );
 
-        assertEquals(NOT_YOUR_POST, exception.getCode());
+        assertEquals(NO_DELETE_PERMISSION, exception.getCode());
     }
 
     @DisplayName("탐색탭을 조회한다.")
