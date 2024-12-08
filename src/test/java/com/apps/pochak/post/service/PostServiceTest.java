@@ -3,13 +3,11 @@ package com.apps.pochak.post.service;
 import com.apps.pochak.alarm.domain.TagAlarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.auth.domain.Accessor;
-import com.apps.pochak.comment.domain.repository.CommentRepository;
 import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
+import com.apps.pochak.follow.service.FollowService;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.global.image.CloudStorageService;
-import com.apps.pochak.like.domain.repository.LikeRepository;
-import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
@@ -20,6 +18,7 @@ import com.apps.pochak.post.dto.response.PostDetailResponse;
 import com.apps.pochak.post.dto.response.PostPreviewResponse;
 import com.apps.pochak.tag.domain.Tag;
 import com.apps.pochak.tag.domain.repository.TagRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +35,6 @@ import static com.apps.pochak.global.MockMultipartFileConverter.getMockMultipart
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.NOT_YOUR_POST;
 import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
-import static com.apps.pochak.post.fixture.PostFixture.CAPTION;
-import static com.apps.pochak.post.fixture.PostFixture.POST_IMAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,7 +48,10 @@ class PostServiceTest {
     PostService postService;
 
     @Autowired
-    JwtProvider jwtProvider;
+    FollowService followService;
+
+    @MockBean
+    CloudStorageService cloudStorageService;
 
     @Autowired
     PostRepository postRepository;
@@ -63,31 +63,31 @@ class PostServiceTest {
     TagRepository tagRepository;
 
     @Autowired
-    FollowRepository followRepository;
+    AlarmRepository alarmRepository;
 
+    private Member owner;
+    private Member taggedMember1;
+    private Member taggedMember2;
+    private Member loginMember;
     @Autowired
-    LikeRepository likeRepository;
+    private FollowRepository followRepository;
 
-    @Autowired
-    CommentRepository commentRepository;
-
-    @MockBean
-    CloudStorageService cloudStorageService;
-
-    @Autowired
-    private AlarmRepository alarmRepository;
+    @BeforeEach
+    void setUp() {
+        owner = memberRepository.save(OWNER);
+        taggedMember1 = memberRepository.save(TAGGED_MEMBER1);
+        taggedMember2 = memberRepository.save(TAGGED_MEMBER2);
+        loginMember = memberRepository.save(LOGIN_MEMBER);
+    }
 
     @DisplayName("홈 탭을 조회한다")
     @Test
     void getHomeTab() throws Exception {
         // given
-        Member owner = memberRepository.save(OWNER);
-        Member taggedMember1 = memberRepository.save(TAGGED_MEMBER1);
-        Member taggedMember2 = memberRepository.save(TAGGED_MEMBER2);
-        Member loginMember = memberRepository.save(LOGIN_MEMBER);
-
-        Post post = savePost(owner, taggedMember1, taggedMember2);
+        Post post = savePublicPost();
         follow(loginMember, owner);
+
+        List<Follow> all = followRepository.findAll();
 
         PostElements expected = PostElements.from(toPage(List.of(post)));
 
@@ -107,12 +107,7 @@ class PostServiceTest {
     @Test
     void getPostDetail() throws Exception {
         // given
-        Member owner = memberRepository.save(OWNER);
-        Member taggedMember1 = memberRepository.save(TAGGED_MEMBER1);
-        Member taggedMember2 = memberRepository.save(TAGGED_MEMBER2);
-        Member loginMember = memberRepository.save(LOGIN_MEMBER);
-
-        Post post = savePost(owner, taggedMember1, taggedMember2);
+        Post post = savePublicPost();
 
         List<Tag> tagList = tagRepository.findTagsByPost(post);
         PostDetailResponse expected = PostDetailResponse.of()
@@ -137,14 +132,10 @@ class PostServiceTest {
 
     @DisplayName("게시물을 저장한다.")
     @Test
-    void savePost() throws Exception {
+    void savePostTest() throws Exception {
         // given
         when(cloudStorageService.upload(any(), any()))
                 .thenReturn("");
-
-        Member owner = memberRepository.save(OWNER);
-        Member taggedMember1 = memberRepository.save(TAGGED_MEMBER1);
-        Member taggedMember2 = memberRepository.save(TAGGED_MEMBER2);
 
         PostUploadRequest request = new PostUploadRequest(
                 getMockMultipartFileOfPost(),
@@ -175,11 +166,7 @@ class PostServiceTest {
     @Test
     void deletePost() throws Exception {
         // given
-        Member owner = memberRepository.save(OWNER);
-        Member taggedMember1 = memberRepository.save(TAGGED_MEMBER1);
-        Member taggedMember2 = memberRepository.save(TAGGED_MEMBER2);
-
-        Post post = savePost(owner, taggedMember1, taggedMember2);
+        Post post = savePublicPost();
 
         // when
         postService.deletePost(
@@ -197,12 +184,7 @@ class PostServiceTest {
     @Test
     void deletePost_WithoutAuthority() throws Exception {
         // given
-        Member owner = memberRepository.save(OWNER);
-        Member taggedMember1 = memberRepository.save(TAGGED_MEMBER1);
-        Member taggedMember2 = memberRepository.save(TAGGED_MEMBER2);
-        Member loginMember = memberRepository.save(LOGIN_MEMBER);
-
-        Post post = savePost(owner, taggedMember1, taggedMember2);
+        Post post = savePublicPost();
 
         // when, then
         GeneralException exception = assertThrows(
@@ -220,13 +202,7 @@ class PostServiceTest {
     @Test
     void getSearchTab() throws Exception {
         // given
-        Member owner = memberRepository.save(OWNER);
-        Member taggedMember1 = memberRepository.save(TAGGED_MEMBER1);
-        Member taggedMember2 = memberRepository.save(TAGGED_MEMBER2);
-        Member loginMember = memberRepository.save(LOGIN_MEMBER);
-
-        Post post = savePost(owner, taggedMember1, taggedMember2);
-
+        Post post = savePublicPost();
         PostElements expected = PostElements.from(toPage(List.of(post)));
 
         // when
@@ -245,12 +221,24 @@ class PostServiceTest {
     @Test
     void getPreviewPost() throws Exception {
         // given
+        Post post = savePost();
+        List<Tag> tagList = tagRepository.findTagsByPost(post);
+        PostPreviewResponse expected = new PostPreviewResponse(post, tagList);
+
+        // when
+        TagAlarm alarm = (TagAlarm) alarmRepository.findAll().get(0);
+        PostPreviewResponse actual = postService.getPreviewPost(
+                Accessor.member(alarm.getReceiver().getId()),
+                alarm.getId()
+        );
+
+        // then
+        assertEquals(expected, actual);
+    }
+
+    private Post savePost() throws Exception {
         when(cloudStorageService.upload(any(), any()))
                 .thenReturn("");
-
-        Member owner = memberRepository.save(OWNER);
-        Member taggedMember1 = memberRepository.save(TAGGED_MEMBER1);
-        Member taggedMember2 = memberRepository.save(TAGGED_MEMBER2);
 
         PostUploadRequest request = new PostUploadRequest(
                 getMockMultipartFileOfPost(),
@@ -263,40 +251,16 @@ class PostServiceTest {
                 request
         );
 
-        Post post = postRepository.findAll().get(0);
-        List<Tag> tagList = tagRepository.findTagsByPost(post);
-        PostPreviewResponse expected = new PostPreviewResponse(post, tagList);
-
-        TagAlarm alarm = (TagAlarm) alarmRepository.findAll().get(0);
-
-        // when
-        PostPreviewResponse actual = postService.getPreviewPost(
-                Accessor.member(alarm.getReceiver().getId()),
-                alarm.getId()
-        );
-
-        // then
-        assertEquals(expected, actual);
+        return postRepository.findAll().get(0);
     }
 
-    private Post savePost(Member owner, Member... taggedMemberList) {
-        Post post = postRepository.save(new Post(owner, POST_IMAGE, CAPTION));
-        saveTags(post, taggedMemberList);
+    private Post savePublicPost() throws Exception {
+        Post post = savePost();
         post.makePublic();
         return post;
     }
 
-    private void saveTags(Post post, Member... tagMemberList) {
-        for (Member member : tagMemberList) {
-            tagRepository.save(new Tag(post, member));
-        }
-    }
-
     private void follow(Member sender, Member receiver) {
-        Follow follow = Follow.of()
-                .sender(sender)
-                .receiver(receiver)
-                .build();
-        followRepository.save(follow);
+        followService.follow(Accessor.member(sender.getId()), receiver.getHandle());
     }
 }
