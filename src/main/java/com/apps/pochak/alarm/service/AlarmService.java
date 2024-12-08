@@ -28,12 +28,11 @@ public class AlarmService {
         return new AlarmElements(alarmPage);
     }
 
-    public BaseCode checkAlarm(
+    public void checkAlarm(
             final Accessor accessor,
             final Long alarmId
     ) {
         final Alarm alarm = alarmRepository.findAlarmById(alarmId, accessor.getMemberId());
         alarm.setIsChecked(true);
-        return SUCCESS_CHECK_ALARM;
     }
 }
