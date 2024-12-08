@@ -74,10 +74,10 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // Post
     INVALID_POST_ID(BAD_REQUEST, "POST4001", "유효하지 않은 게시물 아이디입니다."),
-    NOT_YOUR_POST(UNAUTHORIZED, "POST4002", "해당 게시물의 삭제 권한이 없습니다."),
+    NO_DELETE_PERMISSION(UNAUTHORIZED, "POST4002", "해당 게시물의 삭제 권한이 없습니다."),
     PRIVATE_POST(UNAUTHORIZED, "POST4003", "공개되지 않은 게시물입니다."),
     EXCEED_TAG_LIMIT(BAD_REQUEST, "POST4004", "최대 멤버 태그 수를 초과하였습니다."),
-    TAGGED_ONESELF(BAD_REQUEST, "POST4005", "자기 자신을 태그하였습니다."),
+    TAG_INVALID_MEMBER(BAD_REQUEST, "POST4005", "자기 자신을 혹은 유효하지 않은 멤버를 태그하였습니다."),
     INVALID_TAG_INFO(BAD_REQUEST, "POST4006", "태그된 멤버의 정보가 확인되지 않습니다."),
     BLOCKED_POST(BAD_REQUEST, "POST4007", "확인할 수 없는 게시물입니다."),
 
