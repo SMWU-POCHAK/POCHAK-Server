@@ -35,7 +35,7 @@ public class LoginArgumentResolver implements HandlerMethodArgumentResolver {
         try {
             final Long memberId = Long.valueOf(principal.toString());
             return Accessor.member(memberId);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | NullPointerException e) {
             throw new AuthenticationException(_INVALID_AUTHORITY);
         }
     }
