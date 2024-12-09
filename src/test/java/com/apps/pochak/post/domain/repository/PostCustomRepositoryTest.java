@@ -468,7 +468,7 @@ class PostCustomRepositoryTest {
 
     @DisplayName("[프로필 POCHAKED 탭 조회] 차단 없이 태그된 게시물이 정상적으로 조회된다.")
     @Test
-    void findTaggedPost_WhenNoBlock() throws Exception {
+    void findTaggedPost() throws Exception {
         //given
         Member loginMember = memberRepository.save(LOGIN_MEMBER);
         Member owner = memberRepository.save(OWNER);
@@ -477,7 +477,7 @@ class PostCustomRepositoryTest {
 
         //when
         Page<Post> postPage = postCustomRepository.findTaggedPostPage(
-                taggedMember, // 태그된 멤버
+                taggedMember,
                 loginMember.getId(),
                 PageRequest.of(0, DEFAULT_PAGING_SIZE)
         );
@@ -485,7 +485,6 @@ class PostCustomRepositoryTest {
         //then
         assertEquals(1, postPage.getTotalElements());
         assertEquals(1, postPage.getTotalPages());
-        assertFalse(postPage.getContent().isEmpty());
         assertEquals(post.getId(), postPage.getContent().get(0).getId());
     }
 
@@ -518,8 +517,8 @@ class PostCustomRepositoryTest {
         Member loginMember = memberRepository.save(LOGIN_MEMBER);
         Member owner = memberRepository.save(OWNER);
         Member taggedMember = memberRepository.save(TAGGED_MEMBER1);
-        Post post = savePost(owner, taggedMember);  // 게시글을 저장
-        block(taggedMember, loginMember);  // 태그된 멤버에게 차단당함
+        Post post = savePost(owner, taggedMember);
+        block(taggedMember, loginMember);
 
         //when
         Page<Post> postPage = postCustomRepository.findTaggedPostPage(
@@ -540,8 +539,8 @@ class PostCustomRepositoryTest {
         //given
         Member loginMember = memberRepository.save(LOGIN_MEMBER);
         Member owner = memberRepository.save(OWNER);
-        Post post = savePost(owner);  // 게시글을 저장
-        block(loginMember, owner);  // 주인을 차단함
+        Post post = savePost(owner, loginMember);
+        block(loginMember, owner);
 
         //when
         Page<Post> postPage = postCustomRepository.findTaggedPostPage(
@@ -563,8 +562,8 @@ class PostCustomRepositoryTest {
         Member loginMember = memberRepository.save(LOGIN_MEMBER);
         Member owner = memberRepository.save(OWNER);
         Member taggedMember = memberRepository.save(TAGGED_MEMBER1);
-        Post post = savePost(owner, taggedMember);  // 게시글을 저장
-        block(loginMember, taggedMember);  // 태그된 멤버를 차단함
+        Post post = savePost(owner, taggedMember);
+        block(loginMember, taggedMember);
 
         //when
         Page<Post> postPage = postCustomRepository.findTaggedPostPage(
