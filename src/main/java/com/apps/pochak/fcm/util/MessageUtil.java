@@ -1,9 +1,7 @@
 package com.apps.pochak.fcm.util;
 
 import com.apps.pochak.alarm.domain.Alarm;
-import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.MulticastMessage;
-import com.google.firebase.messaging.Notification;
+import com.google.firebase.messaging.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,9 +47,10 @@ public class MessageUtil {
                 .setImage(image)
                 .build();
 
-        return Message
-                .builder()
+        return Message.builder()
                 .setNotification(notification)
+                .setApnsConfig(iOSConfig())
+                .setAndroidConfig(androidConfig())
                 .setToken(targetToken)
                 .build();
     }
@@ -70,7 +69,29 @@ public class MessageUtil {
 
         return MulticastMessage.builder()
                 .setNotification(notification)
+                .setApnsConfig(iOSConfig())
+                .setAndroidConfig(androidConfig())
                 .addAllTokens(targetTokens)
+                .build();
+    }
+
+    private static ApnsConfig iOSConfig() {
+        Aps aps = Aps.builder()
+                .setSound("default")
+                .build();
+
+        return ApnsConfig.builder()
+                .setAps(aps)
+                .build();
+    }
+
+    private static AndroidConfig androidConfig() {
+        AndroidNotification androidNotification = AndroidNotification.builder()
+                .setSound("default")
+                .build();
+
+        return AndroidConfig.builder()
+                .setNotification(androidNotification)
                 .build();
     }
 }
