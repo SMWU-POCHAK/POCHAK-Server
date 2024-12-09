@@ -1,5 +1,8 @@
 name: dev server
 
+env:
+  JASYPT_KEY: ${{ secrets.JASYPT_KEY }}
+
 on:
   push:
     branches: [ develop ]
@@ -16,14 +19,6 @@ jobs:
         with:
           java-version: 17
           distribution: "corretto"
-
-      - name: Set up COMMON file
-        run: echo "${{ secrets.COMMON }}" > ./src/main/resources/application-COMMON.properties
-        shell: bash
-
-      - name: Set up DEV file
-        run: echo "${{ secrets.DEV }}" > ./src/main/resources/application-DEV.properties
-        shell: bash
 
       - name: Set up GCS Key file
         id: gcs-key-file
@@ -68,6 +63,7 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_DEV_USERNAME }}/pochak-dev
           build-args: |
             SPRING_PROFILES_ACTIVE=DEV
+            JASYPT_KEY=${{ secrets.JASYPT_KEY }}
 
       - name: Execute remote ssh & Deploy Dev server
         uses: appleboy/ssh-action@master

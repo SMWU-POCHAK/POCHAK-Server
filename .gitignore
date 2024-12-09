@@ -12,6 +12,7 @@ dists
 caches
 daemon
 native
+logs
 
 # ignore html files
 src/main/resources/static/docs/
@@ -21,11 +22,6 @@ AuthKey_D5ZQTHUQ4K.p8
 AuthKey_ZJ4VQZNW7D.p8
 firebase-adminsdk.json
 gcp-img-role.json
-
-# ignore properties file
-application-COMMON.properties
-application-DEV.properties
-application-PROD.properties
 
 # deploy
 .tar

@@ -42,17 +42,14 @@ public class PostDetailResponse {
         this.ownerId = owner.getId();
         this.ownerHandle = owner.getHandle();
         this.ownerProfileImage = owner.getProfileImage();
-
         this.tagList = tagList.stream().map(
                 TagElement::new
         ).collect(Collectors.toList());
-
         this.isFollow = isFollow;
         this.postImage = post.getPostImage();
         this.isLike = isLike;
         this.likeCount = likeCount;
         this.caption = post.getCaption();
-
         if (recentComment != null) {
             this.recentComment = CommentElement.from()
                     .comment(recentComment)
