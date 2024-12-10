@@ -59,23 +59,18 @@ class AlarmServiceTest {
     private Member owner;
     private Member taggedMember1;
     private Member taggedMember2;
-    private Member loginMember;
 
     @BeforeEach
     void setUp() {
         owner = memberRepository.save(OWNER);
         taggedMember1 = memberRepository.save(TAGGED_MEMBER1);
         taggedMember2 = memberRepository.save(TAGGED_MEMBER2);
-        loginMember = memberRepository.save(LOGIN_MEMBER);
     }
 
     @DisplayName("알람이 정상적으로 조회된다.")
     @Test
     void getAllAlarms() throws Exception {
         // given
-        when(cloudStorageService.upload(any(), any()))
-                .thenReturn("");
-
         savePost();
 
         AlarmElements expected = new AlarmElements(
@@ -114,6 +109,9 @@ class AlarmServiceTest {
     }
 
     private Post savePost() throws Exception {
+        when(cloudStorageService.upload(any(), any()))
+                .thenReturn("");
+
         PostUploadRequest request = new PostUploadRequest(
                 getMockMultipartFileOfPost(),
                 "test caption",
