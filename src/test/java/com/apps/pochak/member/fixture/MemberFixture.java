@@ -54,6 +54,18 @@ public class MemberFixture {
             null
     );
 
+    public static final Member MEMBER = Member.signupMember()
+            .name("멤버")
+            .email("member@pochak.com")
+            .handle("memberhandle")
+            .message("한 줄 소개")
+            .socialId("SOCIAL_ID")
+            .profileImage(PROFILE_IMAGE)
+            .refreshToken("REFRESH_TOKEN")
+            .socialType(SocialType.GOOGLE)
+            .socialRefreshToken("SOCIAL_REFRESH_TOKEN")
+            .build();
+
     public static final Member OWNER = Member.signupMember()
             .name("게시물 업로드한 사람")
             .email("aaa@pochak.com")
@@ -101,5 +113,4 @@ public class MemberFixture {
             .socialType(SocialType.GOOGLE)
             .socialRefreshToken("SOCIAL_REFRESH_TOKEN")
             .build();
-
 }
