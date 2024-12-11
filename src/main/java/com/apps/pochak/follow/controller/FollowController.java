@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_DELETE_FOLLOWER;
+import static com.apps.pochak.global.api_payload.code.status.SuccessStatus._OK;
 
 @RestController
 @RequiredArgsConstructor
@@ -59,7 +60,8 @@ public class FollowController {
             @Auth final Accessor accessor,
             @PathVariable("handle") final String handle
     ) {
-        return ApiResponse.of(followService.follow(accessor, handle));
+        followService.follow(accessor, handle);
+        return ApiResponse.of(_OK);
     }
 
     @DeleteMapping("/{handle}/follower")
