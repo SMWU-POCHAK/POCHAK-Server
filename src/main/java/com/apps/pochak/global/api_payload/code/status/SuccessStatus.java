@@ -13,6 +13,7 @@ import static org.springframework.http.HttpStatus.*;
 public enum SuccessStatus implements BaseCode {
     // common
     _OK(OK, "COMMON200", "성공입니다."),
+    _CREATED(CREATED, "COMMON201", "성공입니다."),
 
     // Alarm
     SUCCESS_CHECK_ALARM(NO_CONTENT, "ALARM2001", "성공적으로 알람을 확인하였습니다."),
