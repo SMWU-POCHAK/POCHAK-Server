@@ -283,6 +283,45 @@ class CommentAlarmServiceTest {
         );
     }
 
+    @DisplayName("댓글이 삭제될 때 댓글 알림도 삭제한다.")
+    @Test
+    void deleteCommentAlarm() throws Exception{
+        // given
+        Post post = savePublicPost();
+        Comment comment = saveParentComment(post, Accessor.member(loginMember.getId()));
+
+        // when
+        commentService.deleteComment(
+                Accessor.member(loginMember.getId()),
+                post.getId(),
+                comment.getId()
+        );
+
+        // then
+        List<Alarm> alarmList = alarmRepository.findAll();
+        assertEquals(0, alarmList.size());
+    }
+
+    @DisplayName("부모 댓글이 삭제될 때 자식 댓글과 알림도 전부 삭제된다.")
+    @Test
+    void deleteParentCommentAlarm() throws Exception{
+        // given
+        Post post = savePublicPost();
+        Comment parentComment = saveParentComment(post, Accessor.member(loginMember.getId()));
+        Comment childComment = saveChildComment(post, parentComment, Accessor.member(member.getId()));
+
+        // when
+        commentService.deleteComment(
+                Accessor.member(loginMember.getId()),
+                post.getId(),
+                parentComment.getId()
+        );
+
+        // then
+        List<Alarm> alarmList = alarmRepository.findAll();
+        assertEquals(0, alarmList.size());
+    }
+
     private Post savePublicPost() throws Exception {
         PostUploadRequest request = new PostUploadRequest(
                 getMockMultipartFileOfPost(),
