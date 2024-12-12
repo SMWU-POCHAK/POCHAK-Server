@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
+import java.util.List;
 
 @Configuration
 public class FCMConfig {
@@ -18,11 +19,22 @@ public class FCMConfig {
         String fileResourceURL = "static/firebase-adminsdk.json";
         ClassPathResource resource = new ClassPathResource(fileResourceURL);
 
-        FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.fromStream(resource.getInputStream()))
-                .build();
+        FirebaseApp firebaseApp = null;
+        List<FirebaseApp> firebaseApps = FirebaseApp.getApps();
+        if (firebaseApps != null && !firebaseApps.isEmpty()) {
+            for (FirebaseApp app : firebaseApps) {
+                if (app.getName().equals(FirebaseApp.DEFAULT_APP_NAME)) {
+                    firebaseApp = app;
+                }
+            }
+        } else {
+            FirebaseOptions options = FirebaseOptions.builder()
+                    .setCredentials(GoogleCredentials.fromStream(resource.getInputStream()))
+                    .build();
+            firebaseApp = FirebaseApp.initializeApp(options);
+        }
 
-        return FirebaseApp.initializeApp(options);
+        return firebaseApp;
     }
 
     @Bean
