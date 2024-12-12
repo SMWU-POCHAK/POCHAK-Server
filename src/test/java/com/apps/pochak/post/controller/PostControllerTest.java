@@ -263,6 +263,7 @@ class PostControllerTest extends ControllerTest {
                                                                 ": 만약 로그인한 유저가 게시자라면 null로 전달됨."
                                                 ),
                                         fieldWithPath("result.postImage").type(STRING).description("게시물 이미지 URL"),
+                                        fieldWithPath("result.allowedDate").type(STRING).description("게시 날짜 및 시간"),
                                         fieldWithPath("result.isLike").type(BOOLEAN)
                                                 .description(
                                                         "현재 로그인한 유저가 해당 게시물의 좋아요를 눌렀는지 여부"
