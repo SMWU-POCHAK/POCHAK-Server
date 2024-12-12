@@ -3,8 +3,8 @@ package com.apps.pochak.alarm.service;
 import com.apps.pochak.alarm.domain.Alarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.auth.domain.Accessor;
-import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.follow.service.FollowService;
+import com.apps.pochak.global.ServiceTest;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,17 +23,14 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Transactional
-@SpringBootTest
-class FollowAlarmServiceTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+class FollowAlarmServiceTest extends ServiceTest {
 
     @Autowired
     FollowService followService;
 
     @Autowired
     MemberRepository memberRepository;
-
-    @Autowired
-    FollowRepository followRepository;
 
     @Autowired
     AlarmRepository alarmRepository;
@@ -64,7 +61,7 @@ class FollowAlarmServiceTest {
 
     @DisplayName("팔로우를 취소할 경우 알림이 삭제된다.")
     @Test
-    void deleteFollowAlarm() throws Exception{
+    void deleteFollowAlarm() throws Exception {
         // when
         follow(loginMember, member);
         follow(loginMember, member);

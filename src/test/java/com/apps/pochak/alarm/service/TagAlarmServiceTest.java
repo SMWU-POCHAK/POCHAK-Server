@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Transactional
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class TagAlarmServiceTest extends ServiceTest {
 
     @Autowired
@@ -48,11 +48,12 @@ class TagAlarmServiceTest extends ServiceTest {
     @Autowired
     AlarmRepository alarmRepository;
 
+    @Autowired
+    TagRepository tagRepository;
+
     private Member owner;
     private Member taggedMember1;
     private Member taggedMember2;
-    @Autowired
-    private TagRepository tagRepository;
 
     @BeforeEach
     void setUp() {

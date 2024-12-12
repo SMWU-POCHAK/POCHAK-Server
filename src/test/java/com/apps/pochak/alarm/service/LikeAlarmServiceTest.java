@@ -3,6 +3,7 @@ package com.apps.pochak.alarm.service;
 import com.apps.pochak.alarm.domain.Alarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.auth.domain.Accessor;
+import com.apps.pochak.global.ServiceTest;
 import com.apps.pochak.like.service.LikeService;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
@@ -28,8 +29,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Transactional
-@SpringBootTest
-class LikeAlarmServiceTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+class LikeAlarmServiceTest extends ServiceTest {
 
     @Autowired
     LikeService likeService;
@@ -92,7 +93,7 @@ class LikeAlarmServiceTest {
 
     @DisplayName("게시물 주인이 좋아요를 눌렀을 경우 알람을 전송하지 않는다.")
     @Test
-    void saveLikeAlarm_WhenOwnerLike() throws Exception{
+    void saveLikeAlarm_WhenOwnerLike() throws Exception {
         // given
         Post post = savePublicPost();
 
@@ -115,7 +116,7 @@ class LikeAlarmServiceTest {
 
     @DisplayName("게시물 주인이 좋아요를 눌렀을 경우 알람을 전송하지 않는다.")
     @Test
-    void saveLikeAlarm_WhenTaggedMemberLike() throws Exception{
+    void saveLikeAlarm_WhenTaggedMemberLike() throws Exception {
         // given
         Post post = savePublicPost();
 
@@ -146,7 +147,7 @@ class LikeAlarmServiceTest {
 
     @DisplayName("좋아요를 취소할 경우, 알람이 삭제된다.")
     @Test
-    void deleteLikeAlarm() throws Exception{
+    void deleteLikeAlarm() throws Exception {
         // given
         Post post = savePublicPost();
 

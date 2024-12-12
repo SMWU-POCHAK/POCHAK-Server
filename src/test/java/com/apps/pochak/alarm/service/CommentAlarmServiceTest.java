@@ -7,6 +7,7 @@ import com.apps.pochak.comment.domain.Comment;
 import com.apps.pochak.comment.domain.repository.CommentRepository;
 import com.apps.pochak.comment.dto.request.CommentUploadRequest;
 import com.apps.pochak.comment.service.CommentService;
+import com.apps.pochak.global.ServiceTest;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
@@ -29,8 +30,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
-@SpringBootTest
-class CommentAlarmServiceTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+class CommentAlarmServiceTest extends ServiceTest {
 
     @Autowired
     CommentService commentService;
@@ -285,7 +286,7 @@ class CommentAlarmServiceTest {
 
     @DisplayName("댓글이 삭제될 때 댓글 알림도 삭제한다.")
     @Test
-    void deleteCommentAlarm() throws Exception{
+    void deleteCommentAlarm() throws Exception {
         // given
         Post post = savePublicPost();
         Comment comment = saveParentComment(post, Accessor.member(loginMember.getId()));
@@ -304,7 +305,7 @@ class CommentAlarmServiceTest {
 
     @DisplayName("부모 댓글이 삭제될 때 자식 댓글과 알림도 전부 삭제된다.")
     @Test
-    void deleteParentCommentAlarm() throws Exception{
+    void deleteParentCommentAlarm() throws Exception {
         // given
         Post post = savePublicPost();
         Comment parentComment = saveParentComment(post, Accessor.member(loginMember.getId()));

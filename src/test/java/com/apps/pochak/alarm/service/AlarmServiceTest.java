@@ -4,20 +4,18 @@ import com.apps.pochak.alarm.domain.Alarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.alarm.dto.response.AlarmElements;
 import com.apps.pochak.auth.domain.Accessor;
-import com.apps.pochak.global.image.CloudStorageService;
+import com.apps.pochak.global.ServiceTest;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.post.dto.request.PostUploadRequest;
 import com.apps.pochak.post.service.PostService;
-import com.apps.pochak.tag.domain.repository.TagRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,12 +26,10 @@ import static com.apps.pochak.global.MockMultipartFileConverter.getMockMultipart
 import static com.apps.pochak.member.fixture.MemberFixture.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
-@SpringBootTest
 @Transactional
-class AlarmServiceTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+class AlarmServiceTest extends ServiceTest {
 
     @Autowired
     AlarmService alarmService;
@@ -48,13 +44,7 @@ class AlarmServiceTest {
     MemberRepository memberRepository;
 
     @Autowired
-    TagRepository tagRepository;
-
-    @Autowired
     PostRepository postRepository;
-
-    @MockBean
-    CloudStorageService cloudStorageService;
 
     private Member owner;
     private Member taggedMember1;
@@ -109,9 +99,6 @@ class AlarmServiceTest {
     }
 
     private Post savePost() throws Exception {
-        when(cloudStorageService.upload(any(), any()))
-                .thenReturn("");
-
         PostUploadRequest request = new PostUploadRequest(
                 getMockMultipartFileOfPost(),
                 "test caption",
