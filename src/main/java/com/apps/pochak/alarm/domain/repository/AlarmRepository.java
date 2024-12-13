@@ -139,11 +139,14 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     void deleteByPost(@Param("postId") final Long postId);
 
     @Modifying
-    @Query(value = """
-            UPDATE alarm a
-            SET a.status = 'DELETED'
-            WHERE a.created_date < :expirationDate
-              AND a.status = 'ACTIVE'
-            """, nativeQuery = true)
+    @Query("""
+        UPDATE Alarm a
+        SET a.status = 'DELETED'
+        WHERE a.createdDate < :expirationDate
+          AND a.status = 'ACTIVE'
+          AND a.alarmType != 'TAG_APPROVAL'
+          AND a.isChecked = true
+        """)
     void deleteExpiredAlarms(@Param("expirationDate") LocalDateTime expirationDate);
+
 }
