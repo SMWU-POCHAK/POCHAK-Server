@@ -55,7 +55,9 @@ public class MemoriesPreviewResponse {
         this.pochakedCount = countTagged;
         for (MemoriesType memoriesType : tags.keySet()) {
             this.memories.put(memoriesType, MemoriesElement.from(tags.get(memoriesType)));
-            this.timeLine.put(tags.get(memoriesType).getPost().getAllowedDate(), memoriesType);
+            if (tags.get(memoriesType) != null) {
+                this.timeLine.put(tags.get(memoriesType).getPost().getAllowedDate(), memoriesType);
+            }
         }
     }
 
