@@ -30,6 +30,6 @@ public class AlarmService {
             final Long alarmId
     ) {
         final Alarm alarm = alarmRepository.findAlarmById(alarmId, accessor.getMemberId());
-        alarm.setIsChecked(true);
+        alarm.check();
     }
 }

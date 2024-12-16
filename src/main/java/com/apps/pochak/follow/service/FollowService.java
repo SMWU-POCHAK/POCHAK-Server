@@ -55,11 +55,10 @@ public class FollowService {
     }
 
     private void toggleFollowStatus(Follow follow) {
+        follow.toggleCurrentStatus();
         if (follow.getStatus().equals(ACTIVE)) {
-            follow.setStatus(DELETED);
             followAlarmService.deleteFollowAlarm(follow);
         } else {
-            follow.setStatus(ACTIVE);
             followAlarmService.sendFollowAlarm(follow, follow.getReceiver());
         }
     }
