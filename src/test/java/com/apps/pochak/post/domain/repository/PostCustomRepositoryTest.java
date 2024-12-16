@@ -488,28 +488,6 @@ class PostCustomRepositoryTest {
         assertEquals(post.getId(), postPage.getContent().get(0).getId());
     }
 
-    @DisplayName("[프로필 POCHAKED 탭 조회] 게시글의 주인에게 차단 당하였다면 해당 게시물은 제외되어 조회된다.")
-    @Test
-    void findTaggedPost_WhenBlockedByPostOwner() throws Exception {
-        //given
-        Member loginMember = memberRepository.save(LOGIN_MEMBER);
-        Member owner = memberRepository.save(OWNER);
-        Post post = savePost(owner, loginMember);
-        block(owner, loginMember);
-
-        //when
-        Page<Post> postPage = postCustomRepository.findTaggedPostPage(
-                owner,
-                loginMember.getId(),
-                PageRequest.of(0, DEFAULT_PAGING_SIZE)
-        );
-
-        //then
-        assertEquals(0, postPage.getTotalElements());
-        assertEquals(0, postPage.getTotalPages());
-        assertTrue(postPage.getContent().isEmpty());
-    }
-
     @DisplayName("[프로필 POCHAKED 탭 조회] 게시글에 태그된 멤버에게 차단 당하였다면 해당 게시물은 제외되어 조회된다.")
     @Test
     void findTaggedPost_WhenBlockedByTaggedMember() throws Exception {
@@ -522,29 +500,7 @@ class PostCustomRepositoryTest {
 
         //when
         Page<Post> postPage = postCustomRepository.findTaggedPostPage(
-                owner,
-                loginMember.getId(),
-                PageRequest.of(0, DEFAULT_PAGING_SIZE)
-        );
-
-        //then
-        assertEquals(0, postPage.getTotalElements());
-        assertEquals(0, postPage.getTotalPages());
-        assertTrue(postPage.getContent().isEmpty());
-    }
-
-    @DisplayName("[프로필 POCHAKED 탭 조회] 게시글의 주인을 차단하였다면 해당 게시물은 제외되어 조회된다.")
-    @Test
-    void findTaggedPost_WhenBlockingPostOwner() throws Exception {
-        //given
-        Member loginMember = memberRepository.save(LOGIN_MEMBER);
-        Member owner = memberRepository.save(OWNER);
-        Post post = savePost(owner, loginMember);
-        block(loginMember, owner);
-
-        //when
-        Page<Post> postPage = postCustomRepository.findTaggedPostPage(
-                owner,
+                taggedMember,
                 loginMember.getId(),
                 PageRequest.of(0, DEFAULT_PAGING_SIZE)
         );
@@ -567,7 +523,7 @@ class PostCustomRepositoryTest {
 
         //when
         Page<Post> postPage = postCustomRepository.findTaggedPostPage(
-                owner,
+                taggedMember,
                 loginMember.getId(),
                 PageRequest.of(0, DEFAULT_PAGING_SIZE)
         );
