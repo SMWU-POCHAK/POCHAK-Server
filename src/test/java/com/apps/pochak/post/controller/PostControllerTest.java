@@ -111,7 +111,9 @@ class PostControllerTest extends ControllerTest {
                                         fieldWithPath("result.postList[].postId").type(NUMBER)
                                                 .description("게시물 리스트: 게시물 아이디").optional(),
                                         fieldWithPath("result.postList[].postImage").type(STRING)
-                                                .description("게시물 리스트: 게시물 이미지").optional()
+                                                .description("게시물 리스트: 게시물 이미지").optional(),
+                                        fieldWithPath("result.postList[].postDate").type(null)
+                                                .description("게시물 리스트: 게시 날짜")
                                 )
                         )
                 );
@@ -165,7 +167,9 @@ class PostControllerTest extends ControllerTest {
                                         fieldWithPath("result.postList[].postId").type(NUMBER)
                                                 .description("게시물 리스트: 게시물 아이디"),
                                         fieldWithPath("result.postList[].postImage").type(STRING)
-                                                .description("게시물 리스트: 게시물 이미지")
+                                                .description("게시물 리스트: 게시물 이미지"),
+                                        fieldWithPath("result.postList[].postDate").type(null)
+                                                .description("게시물 리스트: 게시 날짜")
                                 )
                         )
                 );
