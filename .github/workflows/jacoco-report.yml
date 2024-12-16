@@ -1,0 +1,89 @@
+name: PR Test Coverage
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+env:
+  JASYPT_KEY: ${{ secrets.JASYPT_KEY }}
+
+permissions:
+  pull-requests: write
+
+jobs:
+  test-coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+      - name: Set up GCS Key file
+        id: gcs-key-file
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "gcp-img-role.json"
+          json: ${{ secrets.GCS_KEY }}
+          dir: './src/main/resources/static/'
+
+      - name: Set up Firebase Key file
+        id: firebase-key-file
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "firebase-adminsdk.json"
+          json: ${{ secrets.FIREBASE_KEY }}
+          dir: './src/main/resources/static/'
+
+      - name: Set up Apple Key file
+        run: echo "${{ secrets.APPLE_AUTH_KEY }}" > ./src/main/resources/static/AuthKey_ZJ4VQZNW7D.p8
+        shell: bash
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Build and run tests with JaCoCo
+        run: ./gradlew clean test jacocoTestReport
+
+      - name: Check build success
+        id: build-status
+        run: |
+          if [ $? -eq 0 ]; then
+            echo "Build Successful"
+            echo "build_status=success" >> $GITHUB_ENV
+          else
+            echo "Build Failed"
+            echo "build_status=failure" >> $GITHUB_ENV
+          fi
+      - name: Generate JaCoCo coverage report
+        run: ./gradlew jacocoTestReport
+
+      - name: Post coverage and build status report on PR
+        uses: madrapps/jacoco-report@v1.7.1
+        with:
+          paths: |
+            ${{ github.workspace }}/**/build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 40
+          min-coverage-changed-files: 60
+          comment: true
+          extra-comment: |
+            Build Status: ${{ env.build_status }}
+            
+      - name: Fail the build if coverage is below the required minimum
+        run: |
+          if [ $(./gradlew jacocoTestReport --quiet | grep 'Total' | awk '{print $4}' | cut -d% -f1) -lt 40 ]; then
+            echo "Coverage is below the minimum threshold" && exit 1;
+          fi
