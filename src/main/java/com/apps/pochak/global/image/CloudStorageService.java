@@ -15,8 +15,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.IO_EXCEPTION;
-import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.NULL_FILE;
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -56,7 +55,11 @@ public class CloudStorageService {
         if (blob == null) return;
 
         BlobId idWithGeneration = blob.getBlobId();
-        storage.delete(idWithGeneration);
+        try {
+            storage.delete(idWithGeneration);
+        } catch (Exception e) {
+            throw new GeneralException(DELETE_FILE_ERROR);
+        }
     }
 
     private String getObjectNameFromUrl(final String fileUrl) {
