@@ -16,12 +16,11 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
-import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_ACCEPT;
 import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
 import static com.apps.pochak.tag.fixture.TagFixture.STATIC_WAITING_TAG;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -54,11 +53,8 @@ class TagControllerTest extends ControllerTest {
     @Test
     @DisplayName("태그를 수락한다.")
     void approveTagTest() throws Exception {
-
         Boolean isAccept = true;
-
-        when(tagService.approveOrRejectTagRequest(any(), any(), any()))
-                .thenReturn(SUCCESS_ACCEPT);
+        doNothing().when(tagService).approveOrRejectTagRequest(any(), any(), any());
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders

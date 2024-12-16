@@ -27,7 +27,6 @@ public abstract class Alarm extends BaseEntity {
     @JoinColumn(name = "receiver_id")
     private Member receiver;
 
-    @Setter
     private Boolean isChecked;
 
     @Enumerated(EnumType.STRING)
@@ -68,5 +67,9 @@ public abstract class Alarm extends BaseEntity {
 
     public String getPushNotificationImage() {
         return String.format(this.getAlarmType().getImage(), this.getSender().getProfileImage());
+    }
+
+    public void check() {
+        this.isChecked = true;
     }
 }
