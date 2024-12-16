@@ -58,7 +58,7 @@ public class MemoriesPreviewResponse {
             this.memories.put(memoriesType, MemoriesElement.from(tags.get(memoriesType)));
             if (tags.get(memoriesType) != null) {
                 this.timeLine.put(tags.get(memoriesType).getPost().getAllowedDate(),
-                        TimeLineElement.from(MemoriesType.Follow, tags.get(memoriesType).getPost().getOwner().getHandle()));
+                        TimeLineElement.from(memoriesType, tags.get(memoriesType).getPost().getOwner().getHandle()));
             }
         }
     }
