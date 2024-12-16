@@ -114,7 +114,7 @@ class LikeAlarmServiceTest extends ServiceTest {
         );
     }
 
-    @DisplayName("게시물 주인이 좋아요를 눌렀을 경우 알람을 전송하지 않는다.")
+    @DisplayName("태그된 사람이 좋아요를 눌렀을 경우 알람을 전송하지 않는다.")
     @Test
     void saveLikeAlarm_WhenTaggedMemberLike() throws Exception {
         // given
