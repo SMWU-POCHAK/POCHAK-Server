@@ -142,7 +142,9 @@ class MemoriesControllerTest extends ControllerTest {
                                         fieldWithPath("result.memories.Post1YearAgo.postImage").type(STRING).description("1년전 포착 순간의 게시물 이미지"),
                                         fieldWithPath("result.memories.Post1YearAgo.postDate").type(STRING).description("1년전 포착 순간의 게시물 날짜"),
                                         fieldWithPath("result.timeLine").type(OBJECT).description("추억 타임라인"),
-                                        fieldWithPath("result.timeLine.*").type(STRING).description("추억 타임라인 날짜")
+                                        fieldWithPath("result.timeLine.*").type(OBJECT).description("추억 타임라인 날짜"),
+                                        fieldWithPath("result.timeLine.*.memoriesType").type(STRING).description("추억 타임라인 타입"),
+                                        fieldWithPath("result.timeLine.*.postOwner").type(STRING).description("추억 타임라인 게시글 작성자 아이디").optional()
                                 )
                         )
                 );
