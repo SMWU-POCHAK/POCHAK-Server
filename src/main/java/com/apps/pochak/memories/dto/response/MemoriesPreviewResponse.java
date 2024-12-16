@@ -49,7 +49,7 @@ public class MemoriesPreviewResponse {
         this.followDate = follow.getLastModifiedDate();
         this.timeLine.put(this.followDate, TimeLineElement.from(MemoriesType.Follow, null));
         this.followedDate = followed.getLastModifiedDate();
-        this.timeLine.put(this.followedDate, TimeLineElement.from(MemoriesType.Follow, null));
+        this.timeLine.put(this.followedDate, TimeLineElement.from(MemoriesType.Followed, null));
         this.followDay = findFollowDay(followDate, followedDate);
         this.pochakCount = countTag;
         this.bondedCount = countTaggedWith;
