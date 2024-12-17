@@ -466,6 +466,75 @@ class PostCustomRepositoryTest {
         assertTrue(postPage.getContent().isEmpty());
     }
 
+    @DisplayName("[프로필 POCHAKED 탭 조회] 차단 없이 태그된 게시물이 정상적으로 조회된다.")
+    @Test
+    void findTaggedPost() throws Exception {
+        //given
+        Member loginMember = memberRepository.save(LOGIN_MEMBER);
+        Member owner = memberRepository.save(OWNER);
+        Member taggedMember = memberRepository.save(TAGGED_MEMBER1);
+        Post post = savePost(owner, taggedMember);
+
+        //when
+        Page<Post> postPage = postCustomRepository.findTaggedPostPage(
+                taggedMember,
+                loginMember.getId(),
+                PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
+
+        //then
+        assertEquals(1, postPage.getTotalElements());
+        assertEquals(1, postPage.getTotalPages());
+        assertEquals(post.getId(), postPage.getContent().get(0).getId());
+    }
+
+    @DisplayName("[프로필 POCHAKED 탭 조회] 게시글에 태그된 멤버에게 차단 당하였다면 해당 게시물은 제외되어 조회된다.")
+    @Test
+    void findTaggedPost_WhenBlockedByTaggedMember() throws Exception {
+        //given
+        Member loginMember = memberRepository.save(LOGIN_MEMBER);
+        Member owner = memberRepository.save(OWNER);
+        Member taggedMember = memberRepository.save(TAGGED_MEMBER1);
+        Post post = savePost(owner, taggedMember);
+        block(taggedMember, loginMember);
+
+        //when
+        Page<Post> postPage = postCustomRepository.findTaggedPostPage(
+                taggedMember,
+                loginMember.getId(),
+                PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
+
+        //then
+        assertEquals(0, postPage.getTotalElements());
+        assertEquals(0, postPage.getTotalPages());
+        assertTrue(postPage.getContent().isEmpty());
+    }
+
+    @DisplayName("[프로필 POCHAKED 탭 조회] 게시글에 태그된 멤버를 차단하였다면 해당 게시물은 제외되어 조회된다.")
+    @Test
+    void findTaggedPost_WhenBlockingTaggedMember() throws Exception {
+        //given
+        Member loginMember = memberRepository.save(LOGIN_MEMBER);
+        Member owner = memberRepository.save(OWNER);
+        Member taggedMember = memberRepository.save(TAGGED_MEMBER1);
+        Post post = savePost(owner, taggedMember);
+        block(loginMember, taggedMember);
+
+        //when
+        Page<Post> postPage = postCustomRepository.findTaggedPostPage(
+                taggedMember,
+                loginMember.getId(),
+                PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
+
+        //then
+        assertEquals(0, postPage.getTotalElements());
+        assertEquals(0, postPage.getTotalPages());
+        assertTrue(postPage.getContent().isEmpty());
+    }
+
+
     private Post savePost(Member owner, Member... taggedMemberList) {
         Post post = postRepository.save(new Post(owner, POST_IMAGE, CAPTION));
         saveTags(post, taggedMemberList);
