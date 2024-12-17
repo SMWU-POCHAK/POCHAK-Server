@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -136,4 +137,16 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
             """,
             nativeQuery = true)
     void deleteByPost(@Param("postId") final Long postId);
+
+    @Modifying
+    @Query("""
+        UPDATE Alarm a
+        SET a.status = 'DELETED'
+        WHERE a.createdDate < :expirationDate
+          AND a.status = 'ACTIVE'
+          AND a.alarmType != 'TAG_APPROVAL'
+          AND a.isChecked = true
+        """)
+    void deleteExpiredAlarms(@Param("expirationDate") LocalDateTime expirationDate);
+
 }
