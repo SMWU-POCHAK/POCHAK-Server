@@ -42,7 +42,7 @@
                     <maxFileSize>5MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
                 <!-- 일자별 로그파일 최대 보관주기(~일), 해당 설정일 이상된 파일은 자동으로 제거-->
-                <maxHistory>2</maxHistory>
+                <maxHistory>1</maxHistory>
                 <!--<MinIndex>1</MinIndex> <MaxIndex>10</MaxIndex>-->
             </rollingPolicy>
         </appender>
@@ -66,7 +66,7 @@
                     <maxFileSize>5MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
 
-                <maxHistory>2</maxHistory>
+                <maxHistory>1</maxHistory>
             </rollingPolicy>
         </appender>
 
@@ -107,12 +107,12 @@
                     <maxFileSize>5MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
                 <!-- 일자별 로그파일 최대 보관주기(~일), 해당 설정일 이상된 파일은 자동으로 제거-->
-                <maxHistory>2</maxHistory>
+                <maxHistory>1</maxHistory>
                 <!--<MinIndex>1</MinIndex> <MaxIndex>10</MaxIndex>-->
             </rollingPolicy>
         </appender>
 
-        <appender name="Error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <filter class="ch.qos.logback.classic.filter.LevelFilter">
                 <!-- 에러로그를 설정하고 로그의 레벨이 맞으면 onMatch, 아니라면 onMismatch  -->
                 <level>error</level>
@@ -131,13 +131,13 @@
                     <maxFileSize>5MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
 
-                <maxHistory>2</maxHistory>
+                <maxHistory>1</maxHistory>
             </rollingPolicy>
         </appender>
 
         <root>
             <appender-ref ref="FILE"/>
-            <appender-ref ref="Error"/>
+            <appender-ref ref="ERROR"/>
         </root>
     </springProfile>
 </configuration>
