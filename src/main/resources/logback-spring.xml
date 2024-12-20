@@ -4,9 +4,16 @@
     <!-- Server Log Config -->
     <springProfile name="DEV">
         <property resource="application-DEV.properties"/>
+        <!-- log file path -->
+        <property name="LOG_PATH" value="${log.config.path}"/>
+        <!-- log file name -->
+        <property name="LOG_FILE_NAME" value="${log.config.filename}"/>
+        <!-- err log file name -->
+        <property name="ERR_LOG_FILE_NAME" value="${error.log.config.filename}"/>
         <!-- log pattern -->
         <property name="CONSOLE_LOG_PATTERN"
                   value="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%thread] %cyan(%logger) - %msg%n"/>
+        <property name="FILE_LOG_PATTERN" value="%d{yy-MM-dd HH:mm:ss} %-5level [%thread] [%logger{0}-%M:%line] - %msg%n "/>
 
         <appender name="DEV_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -16,21 +23,6 @@
                 <pattern>${CONSOLE_LOG_PATTERN}</pattern>
             </encoder>
         </appender>
-        <root>
-            <appender-ref ref="DEV_CONSOLE"/>
-        </root>
-    </springProfile>
-    <!-- Server Log Config -->
-    <springProfile name="DEV">
-        <property resource="application-DEV.properties"/>
-        <!-- log file path -->
-        <property name="LOG_PATH" value="${log.config.path}"/>
-        <!-- log file name -->
-        <property name="LOG_FILE_NAME" value="${log.config.filename}"/>
-        <!-- err log file name -->
-        <property name="ERR_LOG_FILE_NAME" value="${error.log.config.filename}"/>
-        <!-- log pattern -->
-        <property name="FILE_LOG_PATTERN" value="%d{yy-MM-dd HH:mm:ss} %-5level [%thread] [%logger{0}-%M:%line] - %msg%n "/>
 
         <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -55,7 +47,7 @@
             </rollingPolicy>
         </appender>
 
-        <appender name="Error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <filter class="ch.qos.logback.classic.filter.LevelFilter">
                 <!-- 에러로그를 설정하고 로그의 레벨이 맞으면 onMatch, 아니라면 onMismatch  -->
                 <level>error</level>
@@ -79,10 +71,12 @@
         </appender>
 
         <root>
+            <appender-ref ref="DEV_CONSOLE"/>
             <appender-ref ref="FILE"/>
-            <appender-ref ref="Error"/>
+            <appender-ref ref="ERROR"/>
         </root>
     </springProfile>
+
     <!-- Server Log Config -->
     <springProfile name="PROD">
         <property resource="application-PROD.properties"/>
