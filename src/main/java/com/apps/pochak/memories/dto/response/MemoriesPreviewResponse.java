@@ -4,6 +4,7 @@ import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.memories.domain.MemoriesType;
 import com.apps.pochak.memories.dto.MemoriesElement;
+import com.apps.pochak.memories.dto.TimeLineElement;
 import com.apps.pochak.tag.domain.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,7 +30,7 @@ public class MemoriesPreviewResponse {
     private Long bondedCount;
     private Long pochakedCount;
     private Map<MemoriesType, MemoriesElement> memories = new HashMap<>();
-    private Map<LocalDateTime, MemoriesType> timeLine = new TreeMap<>(Comparator.reverseOrder());
+    private Map<LocalDateTime, TimeLineElement> timeLine = new TreeMap<>(Comparator.reverseOrder());
 
     @Builder(builderMethodName = "of")
     public MemoriesPreviewResponse(
@@ -46,16 +47,19 @@ public class MemoriesPreviewResponse {
         this.loginMemberProfileImage = loginMember.getProfileImage();
         this.memberProfileImage = member.getProfileImage();
         this.followDate = follow.getLastModifiedDate();
-        this.timeLine.put(this.followDate, MemoriesType.Follow);
+        this.timeLine.put(this.followDate, TimeLineElement.of(MemoriesType.Follow));
         this.followedDate = followed.getLastModifiedDate();
-        this.timeLine.put(this.followedDate, MemoriesType.Followed);
+        this.timeLine.put(this.followedDate, TimeLineElement.of(MemoriesType.Followed));
         this.followDay = findFollowDay(followDate, followedDate);
         this.pochakCount = countTag;
         this.bondedCount = countTaggedWith;
         this.pochakedCount = countTagged;
         for (MemoriesType memoriesType : tags.keySet()) {
             this.memories.put(memoriesType, MemoriesElement.from(tags.get(memoriesType)));
-            this.timeLine.put(tags.get(memoriesType).getPost().getAllowedDate(), memoriesType);
+            if (tags.get(memoriesType) != null) {
+                this.timeLine.put(tags.get(memoriesType).getPost().getAllowedDate(),
+                        TimeLineElement.of(memoriesType, tags.get(memoriesType).getPost().getOwner()));
+            }
         }
     }
 
