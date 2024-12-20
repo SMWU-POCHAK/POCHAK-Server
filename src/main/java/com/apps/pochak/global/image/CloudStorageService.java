@@ -80,4 +80,10 @@ public class CloudStorageService {
         String encodedFileName = fileUrl.substring(fileUrl.indexOf(splitStr) + splitStr.length());
         return URLDecoder.decode(encodedFileName, StandardCharsets.UTF_8);
     }
+
+    public boolean isObjectDeleted(final String fileUrl) {
+        String objectName = getObjectNameFromUrl(fileUrl);
+        Blob blob = storage.get(bucketName, objectName);
+        return blob == null;
+    }
 }

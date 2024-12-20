@@ -16,11 +16,12 @@ import java.time.LocalDateTime;
 public class PostImageDeletionScheduler {
     private final PostRepository postRepository;
     private final CloudStorageService storageService;
+    public static final int EXPIRE_PERIOD = 30;
     public static final int DEFAULT_DELETION_SIZE = 100;
 
     @Scheduled(cron = "0 0 0 * * ?")
     public void deleteExpiredAlarms() {
-        final LocalDateTime expirationDate = LocalDateTime.now().minusDays(30);
+        final LocalDateTime expirationDate = LocalDateTime.now().minusDays(EXPIRE_PERIOD);
         PageRequest pageRequest = PageRequest.of(0, DEFAULT_DELETION_SIZE);
         Page<Post> deletedPost;
         do {
