@@ -77,38 +77,15 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             """)
     Optional<Post> findPostByTag(@Param("tag") final Tag tag);
 
-    @Query("select p from Post p " +
-            "where p.postStatus = 'PUBLIC' and p.status = 'ACTIVE' and p.lastModifiedDate > :nowMinusOneHour ")
-    List<Post> findModifiedPostWithinOneHour(@Param("nowMinusOneHour") final LocalDateTime nowMinusOneHour);
-
-    @Query(value = "select * from post as p " +
-            "where p.id in :postIdList and p.status = 'ACTIVE' " +
-            "   and p.owner_id not in (select b.blocked_id from block b where b.blocker_id = :loginMemberId) " +
-            "   and :loginMemberId not in (select b.blocked_id from block b where b.blocker_id = p.owner_id) " +
-            "   and not exists (select t.member_id from tag t where t.post_id = p.id intersect select b.blocked_id from block b where b.blocker_id = :loginMemberId) " +
-            "   and :loginMemberId not in (select b.blocked_id from block b where b.blocker_id in (select t.member_id from tag t where t.post_id = p.id)) " +
-            "order by find_in_set(id, :postIdStrList) ",
-            nativeQuery = true)
-    Page<Post> findPostsIn(
-            @Param("postIdList") final List<Long> postIdList,
-            @Param("postIdStrList") final String postIdStrList,
-            @Param("loginMemberId") final Long loginMemberId,
+    @Query("""
+        select p from Post p
+        where p.lastModifiedDate < :expiredDate
+        and p.status = 'DELETED'
+        """)
+    Page<Post> findAllByDeletedAtBefore(
+            @Param("expiredDate") final LocalDateTime expiredDate,
             final Pageable pageable
     );
-
-    default Page<Post> findPostsInIdList(
-            @Param("postIdList") final List<Long> postIdList,
-            final Long loginMemberId,
-            final Pageable pageable
-    ) {
-        final String postIdStrList = convertLongListToString(postIdList);
-        return findPostsIn(
-                postIdList,
-                postIdStrList,
-                loginMemberId,
-                pageable
-        );
-    }
 
     @Query("""
             select p.id from Post p
