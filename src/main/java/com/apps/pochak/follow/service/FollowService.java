@@ -34,7 +34,7 @@ public class FollowService {
     private final MemberFollowCustomRepository memberFollowCustomRepository;
     private final FollowAlarmService followAlarmService;
 
-    public BaseCode follow(
+    public void follow(
             final Accessor accessor,
             final String handle
     ) {
@@ -48,25 +48,22 @@ public class FollowService {
         final Optional<Follow> followOptional = followRepository.findFollowBySenderAndReceiver(loginMember, member);
         if (followOptional.isPresent()) {
             final Follow follow = followOptional.get();
-            return toggleFollowStatus(follow);
+            toggleFollowStatus(follow);
         } else {
-            return createAndSaveFollow(loginMember, member);
+            createAndSaveFollow(loginMember, member);
         }
     }
 
-    private BaseCode toggleFollowStatus(Follow follow) {
+    private void toggleFollowStatus(Follow follow) {
+        follow.toggleCurrentStatus();
         if (follow.getStatus().equals(ACTIVE)) {
-            follow.setStatus(DELETED);
             followAlarmService.deleteFollowAlarm(follow);
-            return SUCCESS_UNFOLLOW;
         } else {
-            follow.setStatus(ACTIVE);
             followAlarmService.sendFollowAlarm(follow, follow.getReceiver());
-            return SUCCESS_FOLLOW;
         }
     }
 
-    private BaseCode createAndSaveFollow(
+    private void createAndSaveFollow(
             final Member sender,
             final Member receiver
     ) {
@@ -76,7 +73,6 @@ public class FollowService {
                 .build();
         final Follow follow = followRepository.save(newFollow);
         followAlarmService.sendFollowAlarm(follow, receiver);
-        return SUCCESS_FOLLOW;
     }
 
     public void deleteFollower(

@@ -8,6 +8,8 @@ import com.apps.pochak.tag.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import static com.apps.pochak.global.api_payload.code.status.SuccessStatus._OK;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/tags")
@@ -21,11 +23,7 @@ public class TagController {
             @PathVariable("tagId") final Long tagId,
             @RequestParam("isAccept") final Boolean isAccept
     ) {
-        return ApiResponse.of(
-                tagService.approveOrRejectTagRequest(
-                        accessor,
-                        tagId,
-                        isAccept
-                ));
+        tagService.approveOrRejectTagRequest(accessor, tagId, isAccept);
+        return ApiResponse.of(_OK);
     }
 }

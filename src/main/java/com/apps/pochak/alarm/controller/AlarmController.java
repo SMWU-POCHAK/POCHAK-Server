@@ -14,6 +14,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
+import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_CHECK_ALARM;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,6 +47,7 @@ public class AlarmController {
             @Auth final Accessor accessor,
             @PathVariable("alarmId") Long alarmId
     ) {
-        return ApiResponse.of(alarmService.checkAlarm(accessor, alarmId));
+        alarmService.checkAlarm(accessor, alarmId);
+        return ApiResponse.of(SUCCESS_CHECK_ALARM);
     }
 }

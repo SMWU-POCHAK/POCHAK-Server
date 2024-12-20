@@ -30,6 +30,7 @@ import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
 import static com.apps.pochak.tag.fixture.TagFixture.STATIC_WAITING_TAG;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -235,8 +236,7 @@ class AlarmControllerTest extends ControllerTest {
     @Test
     @DisplayName("알람을 확인하고 비공개 처리한다.")
     void checkAlarmTest() throws Exception {
-
-        when(alarmService.checkAlarm(any(), any())).thenReturn(SUCCESS_CHECK_ALARM);
+        doNothing().when(alarmService).checkAlarm(any(), any());
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
