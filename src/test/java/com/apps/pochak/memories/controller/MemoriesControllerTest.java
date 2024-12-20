@@ -144,7 +144,7 @@ class MemoriesControllerTest extends ControllerTest {
                                         fieldWithPath("result.timeLine").type(OBJECT).description("추억 타임라인"),
                                         fieldWithPath("result.timeLine.*").type(OBJECT).description("추억 타임라인 날짜"),
                                         fieldWithPath("result.timeLine.*.memoriesType").type(STRING).description("추억 타임라인 타입"),
-                                        fieldWithPath("result.timeLine.*.postOwner").type(STRING).description("추억 타임라인 게시글 작성자 아이디").optional()
+                                        fieldWithPath("result.timeLine.*.postOwnerHandle").type(STRING).description("추억 타임라인 게시글 작성자 아이디").optional()
                                 )
                         )
                 );

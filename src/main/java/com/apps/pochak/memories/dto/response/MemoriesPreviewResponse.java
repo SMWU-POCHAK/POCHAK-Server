@@ -47,9 +47,9 @@ public class MemoriesPreviewResponse {
         this.loginMemberProfileImage = loginMember.getProfileImage();
         this.memberProfileImage = member.getProfileImage();
         this.followDate = follow.getLastModifiedDate();
-        this.timeLine.put(this.followDate, TimeLineElement.of(MemoriesType.Follow, null));
+        this.timeLine.put(this.followDate, TimeLineElement.of(MemoriesType.Follow));
         this.followedDate = followed.getLastModifiedDate();
-        this.timeLine.put(this.followedDate, TimeLineElement.of(MemoriesType.Followed, null));
+        this.timeLine.put(this.followedDate, TimeLineElement.of(MemoriesType.Followed));
         this.followDay = findFollowDay(followDate, followedDate);
         this.pochakCount = countTag;
         this.bondedCount = countTaggedWith;
