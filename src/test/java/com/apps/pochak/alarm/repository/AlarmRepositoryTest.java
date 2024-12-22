@@ -7,6 +7,7 @@ import com.apps.pochak.alarm.domain.TagAlarm;
 import com.apps.pochak.alarm.domain.repository.AlarmRepository;
 import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
+import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.like.domain.LikeEntity;
 import com.apps.pochak.like.domain.repository.LikeRepository;
 import com.apps.pochak.member.domain.Member;
@@ -25,12 +26,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import com.apps.pochak.global.api_payload.code.BaseErrorCode;
+
 
 import static com.apps.pochak.alarm.domain.AlarmType.OWNER_LIKE;
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.NOT_YOUR_ALARM;
 import static com.apps.pochak.post.fixture.PostFixture.CAPTION;
 import static com.apps.pochak.post.fixture.PostFixture.POST_IMAGE;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
@@ -97,4 +100,26 @@ class AlarmRepositoryTest {
                 () -> assertEquals(likeAlarmToOwner.getId(), taggedMemberAlarms.getContent().get(0).getId())
         );
     }
+
+    @DisplayName("[알람 조회] 수신자의 알람을 조회한다. (권한 확인)")
+    @Test
+    void findAlarmById() {
+        // given
+        Member loginMember = memberRepository.save(MemberFixture.LOGIN_MEMBER);
+        Member owner = memberRepository.save(MemberFixture.OWNER);
+
+        Follow follow = followRepository.save(new Follow(owner, loginMember));
+        FollowAlarm followAlarmToLoginMember = alarmRepository.save(new FollowAlarm(follow, loginMember));
+
+        // when
+        Alarm foundAlarm = alarmRepository.findAlarmById(followAlarmToLoginMember.getId(), loginMember.getId());
+
+        // then
+        assertEquals(followAlarmToLoginMember.getId(), foundAlarm.getId());
+        GeneralException exception = assertThrows(GeneralException.class, () -> {
+            alarmRepository.findAlarmById(followAlarmToLoginMember.getId(), owner.getId());
+        });
+        assertEquals(NOT_YOUR_ALARM.getMessage(), exception.getErrorReason().getMessage());
+    }
+
 }
