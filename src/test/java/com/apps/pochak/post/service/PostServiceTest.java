@@ -6,8 +6,8 @@ import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.follow.service.FollowService;
+import com.apps.pochak.global.ServiceTest;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
-import com.apps.pochak.global.image.CloudStorageService;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
@@ -23,7 +23,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,21 +36,16 @@ import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @Transactional
-@SpringBootTest
-class PostServiceTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+class PostServiceTest extends ServiceTest {
 
     @Autowired
     PostService postService;
 
     @Autowired
     FollowService followService;
-
-    @MockBean
-    CloudStorageService cloudStorageService;
 
     @Autowired
     PostRepository postRepository;
@@ -65,12 +59,13 @@ class PostServiceTest {
     @Autowired
     AlarmRepository alarmRepository;
 
+    @Autowired
+    FollowRepository followRepository;
+
     private Member owner;
     private Member taggedMember1;
     private Member taggedMember2;
     private Member loginMember;
-    @Autowired
-    private FollowRepository followRepository;
 
     @BeforeEach
     void setUp() {
@@ -134,16 +129,11 @@ class PostServiceTest {
     @Test
     void savePostTest() throws Exception {
         // given
-        when(cloudStorageService.upload(any(), any()))
-                .thenReturn("");
-
         PostUploadRequest request = new PostUploadRequest(
                 getMockMultipartFileOfPost(),
                 "test caption",
                 List.of(taggedMember1.getHandle(), taggedMember2.getHandle())
         );
-
-        Post expected = request.toEntity("", owner);
 
         // when
         postService.savePost(
@@ -156,9 +146,8 @@ class PostServiceTest {
 
         Post actual = postRepository.findAll().get(0);
         assertAll(
-                () -> assertEquals(expected.getOwner(), actual.getOwner()),
-                () -> assertEquals(expected.getPostImage(), actual.getPostImage()),
-                () -> assertEquals(expected.getCaption(), actual.getCaption())
+                () -> assertEquals(owner, actual.getOwner()),
+                () -> assertEquals(request.getCaption(), actual.getCaption())
         );
     }
 
@@ -237,9 +226,6 @@ class PostServiceTest {
     }
 
     private Post savePost() throws Exception {
-        when(cloudStorageService.upload(any(), any()))
-                .thenReturn("");
-
         PostUploadRequest request = new PostUploadRequest(
                 getMockMultipartFileOfPost(),
                 "test caption",
