@@ -4,7 +4,6 @@ import com.apps.pochak.alarm.service.FollowAlarmService;
 import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
-import com.apps.pochak.global.api_payload.code.BaseCode;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberFollowCustomRepository;
@@ -19,11 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.apps.pochak.global.BaseEntityStatus.ACTIVE;
-import static com.apps.pochak.global.BaseEntityStatus.DELETED;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
-import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_FOLLOW;
-import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_UNFOLLOW;
 
 @Service
 @Transactional
@@ -56,10 +51,10 @@ public class FollowService {
 
     private void toggleFollowStatus(Follow follow) {
         follow.toggleCurrentStatus();
-        if (follow.getStatus().equals(ACTIVE)) {
-            followAlarmService.deleteFollowAlarm(follow);
-        } else {
+        if (follow.isActive()) {
             followAlarmService.sendFollowAlarm(follow, follow.getReceiver());
+        } else {
+            followAlarmService.deleteFollowAlarm(follow);
         }
     }
 
