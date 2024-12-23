@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -28,12 +29,13 @@ public class PostImageDeletionScheduler {
         PageRequest pageRequest = PageRequest.of(0, DEFAULT_DELETION_SIZE);
         Page<Post> deletedPost;
         do {
+            List<Post> postList = postRepository.findAll();
             deletedPost = postRepository.findAllByDeletedAtBefore(
                     expirationDate,
                     pageRequest
             );
             storageService.delete(deletedPost.stream().map(Post::getPostImage).toList());
-            pageRequest.next();
+            pageRequest = pageRequest.next();
         } while (deletedPost.hasNext());
     }
 }

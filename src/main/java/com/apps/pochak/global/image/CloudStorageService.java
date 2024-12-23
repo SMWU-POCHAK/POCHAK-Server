@@ -72,18 +72,33 @@ public class CloudStorageService {
                 ).filter(Objects::nonNull)
                 .toList();
 
-        storage.delete(blobIdList);
-    }
-
-    private String getObjectNameFromUrl(final String fileUrl) {
-        String splitStr = bucketName + "/";
-        String encodedFileName = fileUrl.substring(fileUrl.indexOf(splitStr) + splitStr.length());
-        return URLDecoder.decode(encodedFileName, StandardCharsets.UTF_8);
+        if (!blobIdList.isEmpty())
+            storage.delete(blobIdList);
     }
 
     public boolean isObjectDeleted(final String fileUrl) {
         String objectName = getObjectNameFromUrl(fileUrl);
         Blob blob = storage.get(bucketName, objectName);
         return blob == null;
+    }
+
+    public boolean isObjectDeleted(final List<String> fileUrlList) {
+        List<BlobId> blobIdList = fileUrlList.stream().map(
+                        url -> {
+                            String objectName = getObjectNameFromUrl(url);
+                            Blob blob = storage.get(bucketName, objectName);
+                            if (blob == null) return null;
+                            return blob.getBlobId();
+                        }
+                ).filter(Objects::nonNull)
+                .toList();
+
+        return blobIdList.isEmpty();
+    }
+
+    private String getObjectNameFromUrl(final String fileUrl) {
+        String splitStr = bucketName + "/";
+        String encodedFileName = fileUrl.substring(fileUrl.indexOf(splitStr) + splitStr.length());
+        return URLDecoder.decode(encodedFileName, StandardCharsets.UTF_8);
     }
 }

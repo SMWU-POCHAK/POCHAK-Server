@@ -79,7 +79,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("""
         select p from Post p
-        where p.lastModifiedDate < :expiredDate
+        where p.lastModifiedDate <= :expiredDate
         and p.status = 'DELETED'
         """)
     Page<Post> findAllByDeletedAtBefore(

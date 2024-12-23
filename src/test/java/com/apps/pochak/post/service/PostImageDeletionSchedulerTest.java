@@ -7,12 +7,13 @@ import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.post.dto.request.PostUploadRequest;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
@@ -22,11 +23,13 @@ import java.util.List;
 
 import static com.apps.pochak.global.MockMultipartFileConverter.getMockMultipartFileOfPost;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
+import static com.apps.pochak.post.service.PostImageDeletionScheduler.DEFAULT_DELETION_SIZE;
 import static com.apps.pochak.post.service.PostImageDeletionScheduler.EXPIRE_PERIOD;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 @Transactional
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest
 class PostImageDeletionSchedulerTest {
 
     @Autowired
@@ -40,6 +43,15 @@ class PostImageDeletionSchedulerTest {
 
     @Autowired
     CloudStorageService storageService;
+
+    @Autowired
+    PostImageDeletionScheduler postImageDeletionScheduler;
+
+    @Autowired
+    EntityManager em;
+
+    @MockBean
+    Clock clock;
 
     private Member owner;
     private Member taggedMember1;
@@ -59,21 +71,16 @@ class PostImageDeletionSchedulerTest {
         Post post = savePublicPost();
         deletePost(post);
 
+        LocalDateTime expiredDate = LocalDateTime.now().plusDays(EXPIRE_PERIOD);
+        Clock fixedClock = Clock.fixed(
+                expiredDate.atZone(ZoneId.of("Asia/Seoul")).toInstant(),
+                ZoneId.of("Asia/Seoul")
+        );
+        when(clock.instant()).thenReturn(fixedClock.instant());
+        when(clock.getZone()).thenReturn(fixedClock.getZone());
+
         // when
-        LocalDateTime expiredDate = LocalDateTime.now().plusDays(EXPIRE_PERIOD)
-                .withHour(0)
-                .withMinute(0)
-                .withSecond(0)
-                .withNano(0);
-
-        Clock clock = Mockito.mock(Clock.class);
-        Mockito.when(clock.instant())
-                .thenReturn(expiredDate
-                        .atZone(ZoneId.of("Asia/Seoul"))
-                        .toInstant()
-                );
-
-        Thread.sleep(5000);
+        postImageDeletionScheduler.deleteExpiredAlarms();
 
         // then
         assertTrue(storageService.isObjectDeleted(post.getPostImage()));
@@ -83,10 +90,26 @@ class PostImageDeletionSchedulerTest {
     @Test
     void deletePostImage_WithMoreThan100Posts() throws Exception {
         // given
+        for (int i = 0; i <= DEFAULT_DELETION_SIZE; i++) {
+            savePublicPost();
+        }
+        postRepository.deleteAll();
+
+        List<Post> postList = postRepository.findAll();
+
+        LocalDateTime expiredDate = LocalDateTime.now().plusDays(EXPIRE_PERIOD);
+        Clock fixedClock = Clock.fixed(
+                expiredDate.atZone(ZoneId.of("Asia/Seoul")).toInstant(),
+                ZoneId.of("Asia/Seoul")
+        );
+        when(clock.instant()).thenReturn(fixedClock.instant());
+        when(clock.getZone()).thenReturn(fixedClock.getZone());
 
         // when
+        postImageDeletionScheduler.deleteExpiredAlarms();
 
         // then
+        assertTrue(storageService.isObjectDeleted(postList.stream().map(Post::getPostImage).toList()));
     }
 
     private Post savePublicPost() throws Exception {
