@@ -2,7 +2,6 @@ package com.apps.pochak.tag.service;
 
 import com.apps.pochak.alarm.service.TagAlarmService;
 import com.apps.pochak.auth.domain.Accessor;
-import com.apps.pochak.global.api_payload.code.BaseCode;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
@@ -15,8 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.*;
-
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -27,20 +24,18 @@ public class TagService {
 
     private final TagAlarmService tagAlarmService;
 
-    public BaseCode approveOrRejectTagRequest(
+    public void approveOrRejectTagRequest(
             final Accessor accessor,
             final Long tagId,
             final Boolean isAccept
     ) {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Tag tag = tagRepository.findTagByIdAndMember(tagId, loginMember);
-        if (isAccept) {
-            return acceptPost(tag);
-        } else
-            return rejectPost(tag);
+        if (isAccept) acceptPost(tag);
+        else rejectPost(tag);
     }
 
-    private BaseCode acceptPost(final Tag tag) {
+    private void acceptPost(final Tag tag) {
         tag.setIsAccepted(true);
         tagAlarmService.deleteAlarmByTag(tag);
 
@@ -50,19 +45,15 @@ public class TagService {
         final boolean currentTagApprovalStatus = tagList.stream().allMatch(Tag::getIsAccepted);
         if (currentTagApprovalStatus) {
             post.makePublic();
-            return SUCCESS_POST_ACCEPT;
         }
-        return SUCCESS_ACCEPT;
     }
 
-    private BaseCode rejectPost(final Tag tag) {
+    private void rejectPost(final Tag tag) {
         final Post post = tag.getPost();
         final List<Tag> tagList = tagRepository.findTagsByPost(post);
 
         tagAlarmService.deleteAlarmByTagList(tagList);
         tagRepository.deleteAll(tagList);
         postRepository.delete(post);
-
-        return SUCCESS_REJECT;
     }
 }
