@@ -44,6 +44,10 @@ public abstract class BaseEntity {
         }
     }
 
+    public boolean isActive() {
+        return this.status.equals(ACTIVE);
+    }
+
     public void updateLastModifiedDate() {
         this.lastModifiedDate = LocalDateTime.now();
     }
