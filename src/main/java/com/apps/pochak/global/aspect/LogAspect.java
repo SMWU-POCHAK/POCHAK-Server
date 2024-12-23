@@ -22,7 +22,7 @@ import static com.apps.pochak.global.util.RequestInfo.createRequestFullPath;
 @Slf4j
 public class LogAspect {
 
-    @Around("execution(* com.apps.pochak..*Controller.*(..))")
+    @Around("execution(* com.apps.pochak..*Controller.*(..)) && !execution(* com.apps.pochak..HomeController.*(..))")
     public Object apiLogging(ProceedingJoinPoint joinPoint) throws Throwable {
         long startAt = System.currentTimeMillis();
 

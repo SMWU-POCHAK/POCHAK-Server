@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.apps.pochak.global.util.PageUtil.getFirstContentFromPage;
@@ -142,5 +143,21 @@ class TagRepositoryTest {
         Page<Tag> tag = tagRepository.findTagByOwnerAndMember(owner, member, PageRequest.of(0, 1));
         Long count = tagRepository.countByPost_PostStatusAndPost_OwnerAndMember(PostStatus.PUBLIC, owner, member);
         assertThat(count).isEqualTo(tag.getTotalElements());
+    }
+
+    @Test
+    @DisplayName("[추억 페이지] 1년 전, 내가 태그하거나 태그된 게시물을 조회한다.")
+    void findTagByLocalDate() {
+        Member owner = memberRepository.findByHandleWithoutLogin("owner");
+        Member member = memberRepository.findByHandleWithoutLogin("tagged_member1");
+
+        Page<Tag> tag1YearAgo = tagRepository.findTaggedByDate(owner, member, LocalDate.now().atStartOfDay(),
+                LocalDate.now().atStartOfDay().plusDays(1), PageRequest.of(0, 1));
+        System.out.println(tag1YearAgo.getContent().get(0).getPost().getAllowedDate());
+
+        assertThat(tag1YearAgo.getContent().get(0).getPost().getAllowedDate())
+                .isAfter(LocalDate.now().atStartOfDay())
+                .isBefore(LocalDate.now().atStartOfDay().plusDays(1));
+        assertThat(tag1YearAgo).isNotNull();
     }
 }

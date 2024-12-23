@@ -5,6 +5,7 @@ import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
+import com.apps.pochak.memories.domain.MemoriesType;
 import com.apps.pochak.memories.dto.response.MemoriesPostResponse;
 import com.apps.pochak.memories.dto.response.MemoriesPreviewResponse;
 import com.apps.pochak.post.domain.repository.PostRepository;
@@ -18,7 +19,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.apps.pochak.global.util.PageUtil.getFirstContentFromPage;
+import static com.apps.pochak.global.util.TimeUtil.atMidnight;
 
 @Service
 @Transactional(readOnly = true)
@@ -43,13 +48,17 @@ public class MemoriesService {
         final Page<Tag> taggedWithDesc = tagRepository.findTaggedWith(loginMember, member, PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "post.allowedDate")));
         final Page<Tag> tagOrTagged = tagRepository.findLatestTagged(loginMember, member, PageRequest.of(0, 1));
 
-        final Tag firstTagged = getFirstContentFromPage(tagged);
-        final Tag firstTag = getFirstContentFromPage(tag);
-        final Tag firstTaggedWith = getFirstContentFromPage(taggedWithAsc);
+        final Page<Tag> tag1YearAgo = tagRepository.findTaggedByDate(loginMember, member, atMidnight(1), atMidnight(1).plusDays(1), PageRequest.of(0, 1));
+
         final Tag latestTaggedWith = getFirstContentFromPage(taggedWithDesc);
         final Tag latestTagOrTagged = getFirstContentFromPage(tagOrTagged);
 
-        final Tag latestTag = findLatestTag(latestTaggedWith, latestTagOrTagged);
+        final Map<MemoriesType, Tag> tags = new HashMap<>();
+        tags.put(MemoriesType.FirstPochaked, getFirstContentFromPage(tagged));
+        tags.put(MemoriesType.FirstPochak, getFirstContentFromPage(tag));
+        tags.put(MemoriesType.FirstBonded, getFirstContentFromPage(taggedWithAsc));
+        tags.put(MemoriesType.LatestPost, findLatestTag(latestTaggedWith, latestTagOrTagged));
+        tags.put(MemoriesType.Post1YearAgo, getFirstContentFromPage(tag1YearAgo));
 
         return MemoriesPreviewResponse.of()
                 .loginMember(loginMember)
@@ -59,10 +68,7 @@ public class MemoriesService {
                 .countTag(countTag)
                 .countTaggedWith(countTaggedWith)
                 .countTagged(countTagged)
-                .firstTagged(firstTagged)
-                .firstTag(firstTag)
-                .firstTaggedWith(firstTaggedWith)
-                .latestTag(latestTag)
+                .tags(tags)
                 .build();
     }
 
