@@ -60,6 +60,16 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             @Param("loginMember") final Member loginMember
     );
 
+    @Query("""
+    select c from Comment c
+    join fetch c.member
+    where c.parentComment = :parentComment
+    and c.member not in (select b.blockedMember from Block b where b.blocker = :loginMember)
+    and :loginMember not in (select b.blockedMember from Block b where b.blocker = c.member)
+    """)
+    List<Comment> findChildCommentByParentComment(@Param("parentComment") Comment parentComment,
+                                                  @Param("loginMember") Member loginMember);
+
     @Modifying
     @Query("update Comment c set c.status = 'DELETED' " +
             "where c.post = :post ")
