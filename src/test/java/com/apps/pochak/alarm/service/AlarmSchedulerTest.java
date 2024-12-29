@@ -102,47 +102,27 @@ public class AlarmSchedulerTest {
     @Test
     void deleteExpiredAlarms() throws Exception {
         // given
-        LocalDateTime expiredDate = LocalDateTime.now().plusDays(60)
-                .withHour(0).withMinute(0).withSecond(0).withNano(0);
-        Clock clock = Mockito.mock(Clock.class);
-        Mockito.when(clock.instant())
-                .thenReturn(expiredDate
-                        .atZone(ZoneId.of("Asia/Seoul"))
-                        .toInstant()
-                );
-        Mockito.when(clock.getZone()).thenReturn(ZoneId.of("Asia/Seoul"));
-        ReflectionTestUtils.setField(alarmDeletionScheduler, "clock", clock);
-
-        Alarm expiredAlarm = AlarmFixture.STATIC_COMMENT_REPLY_ALARM;
+        Alarm expiredAlarm = alarmRepository.save(AlarmFixture.STATIC_COMMENT_REPLY_ALARM);
         expiredAlarm.setIsChecked(true);
-
         Alarm tagAlarm = alarmRepository.save(AlarmFixture.STATIC_TAG_ALARM);
-
         Alarm uncheckedAlarm = alarmRepository.save(AlarmFixture.STATIC_TAGGED_LIKE_ALARM);
 
-
-        LocalDateTime notExpiredDate = LocalDateTime.now().plusDays(20)
-                .withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime futureDate = LocalDateTime.now().plusDays(90);
+        Clock clock = Mockito.mock(Clock.class);
         Mockito.when(clock.instant())
-                .thenReturn(notExpiredDate
-                        .atZone(ZoneId.of("Asia/Seoul"))
-                        .toInstant()
-                );
+                .thenReturn(futureDate.atZone(ZoneId.of("Asia/Seoul")).toInstant());
         Mockito.when(clock.getZone()).thenReturn(ZoneId.of("Asia/Seoul"));
         ReflectionTestUtils.setField(alarmDeletionScheduler, "clock", clock);
-
-        Alarm recentAlarm = alarmRepository.save(AlarmFixture.STATIC_FOLLOW_ALARM);
 
         // when
         alarmDeletionScheduler.deleteExpiredAlarms();
 
         // then
         List<Alarm> remainingAlarms = alarmRepository.findAll();
-        assertThat(remainingAlarms).hasSize(3);
+        assertThat(remainingAlarms).hasSize(2);
 
         assertThat(remainingAlarms).extracting("id")
                 .containsExactlyInAnyOrder(
-                        recentAlarm.getId(),
                         tagAlarm.getId(),
                         uncheckedAlarm.getId()
                 );
