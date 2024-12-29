@@ -35,8 +35,22 @@ public class MemberFixture {
             null
     );
 
-    public static final Member WRONG_MEMBER = new Member(
+    public static final Member STATIC_MEMBER3 = new Member(
             3L,
+            "static_member3",
+            "3번 회원의 이름",
+            "한 줄 소개",
+            "aaa@pochak.com",
+            PROFILE_IMAGE,
+            "REFRESH_TOKEN",
+            "SOCIAL_ID",
+            SocialType.GOOGLE,
+            "SOCIAL_REFRESH_TOKEN",
+            null
+    );
+
+    public static final Member WRONG_MEMBER = new Member(
+            4L,
             ".wrong_member#",
             "공백이 아닌 열다섯자 이내인 회원의 이름",
             """
