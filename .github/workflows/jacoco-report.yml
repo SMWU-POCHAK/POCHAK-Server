@@ -78,9 +78,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 40
           min-coverage-changed-files: 60
-          comment: true
-          extra-comment: |
-            Build Status: ${{ env.build_status }}
             
       - name: Fail the build if coverage is below the required minimum
         run: |
