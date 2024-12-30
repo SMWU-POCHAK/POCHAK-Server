@@ -57,6 +57,12 @@ jobs:
       - name: Build and run tests with JaCoCo
         run: ./gradlew clean test jacocoTestReport
 
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+
       - name: Check build success
         id: build-status
         run: |
