@@ -34,9 +34,12 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     }
 
     @Modifying
-    @Query("update Follow f " +
-            "set f.status = 'DELETED' " +
-            "where (f.sender = :memberA and f.receiver = :memberB) or (f.sender = :memberB and f.receiver = :memberA)")
+    @Query("""
+            update Follow f
+            set f.status = 'DELETED'
+            where (f.sender = :memberA and f.receiver = :memberB)
+                or (f.receiver = :memberA and f.sender = :memberB)
+            """)
     void deleteFollowsBetweenMembers(
             @Param("memberA") final Member memberA,
             @Param("memberB") final Member memberB

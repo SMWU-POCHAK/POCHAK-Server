@@ -1,6 +1,5 @@
 package com.apps.pochak.block.service;
 
-import com.apps.pochak.auth.Auth;
 import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.block.domain.Block;
 import com.apps.pochak.block.domain.repository.BlockRepository;
@@ -8,7 +7,6 @@ import com.apps.pochak.block.dto.response.BlockElements;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.like.domain.repository.LikeRepository;
-import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.repository.PostRepository;
