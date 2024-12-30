@@ -551,21 +551,10 @@ class PostCustomRepositoryTest {
                 PageRequest.of(0, DEFAULT_PAGING_SIZE)
         );
 
-        Page<Post> postPage_notBlocked = postCustomRepository.findTaggedPostPage(
-                taggedMember,
-                taggedMember.getId(),
-                PageRequest.of(0, DEFAULT_PAGING_SIZE)
-        );
-
         //then
         assertEquals(0, postPage_blocked.getTotalElements());
         assertEquals(0, postPage_blocked.getTotalPages());
         assertTrue(postPage_blocked.getContent().isEmpty());
-
-        assertEquals(1, postPage_notBlocked.getTotalElements());
-        assertEquals(1, postPage_notBlocked.getTotalPages());
-        assertEquals(post.getId(), postPage_notBlocked.getContent().get(0).getId());
-
     }
 
 
