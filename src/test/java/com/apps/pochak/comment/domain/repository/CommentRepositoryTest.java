@@ -13,6 +13,7 @@ import com.apps.pochak.post.fixture.PostFixture;
 import com.apps.pochak.tag.domain.repository.TagRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,14 @@ class CommentRepositoryTest {
     private static final Comment PARENT_COMMENT = CommentFixture.STATIC_PARENT_COMMENT;
     private static final Comment CHILD_COMMENT = CommentFixture.STATIC_CHILD_COMMENT;
 
+    private Member loginMember;
+    private Member parentCommenter;
+    private Member childCommenter;
+    private Post post;
+    private Comment parentComment;
+    private Comment childComment;
+
+
     @Autowired
     EntityManager em;
 
@@ -56,6 +65,17 @@ class CommentRepositoryTest {
     @Autowired
     CommentRepository commentRepository;
 
+    @BeforeEach
+    void setUp() {
+        memberRepository.save(POST_OWNER);
+        parentCommenter = memberRepository.save(PARENT_COMMENTER);
+        childCommenter = memberRepository.save(CHILD_COMMENTER);
+        loginMember = memberRepository.save(LOGIN_MEMBER);
+        post = postRepository.save(POST);
+        parentComment = commentRepository.save(PARENT_COMMENT);
+        childComment = commentRepository.save(CHILD_COMMENT);
+    }
+
     @AfterEach
     void deleteAll() {
         postRepository.deleteAll();
@@ -67,17 +87,9 @@ class CommentRepositoryTest {
     @DisplayName("[부모 댓글 조회]")
     @Test
     void findParentCommentByPost() {
-        //given
-        memberRepository.save(POST_OWNER);
-        memberRepository.save(PARENT_COMMENTER);
-        memberRepository.save(CHILD_COMMENTER);
-        Member loginMember = memberRepository.save(LOGIN_MEMBER);
-
-        Post post = postRepository.save(POST);
-        Comment parentComment = commentRepository.save(PARENT_COMMENT);
-        commentRepository.save(CHILD_COMMENT);
-
+        //when
         Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
+        //then
         assertTrue(parentCommentByPost.hasContent());
         assertEquals(parentCommentByPost.getTotalElements(), 1);
         assertEquals(parentCommentByPost.getContent().get(0), parentComment);
@@ -87,35 +99,19 @@ class CommentRepositoryTest {
     @Test
     void findParentCommentByPostWhenBlocked() {
         //given
-        memberRepository.save(POST_OWNER);
-        Member parentCommenter = memberRepository.save(PARENT_COMMENTER);
-        memberRepository.save(CHILD_COMMENTER);
-        Member loginMember = memberRepository.save(LOGIN_MEMBER);
-
-        Post post = postRepository.save(POST);
-        commentRepository.save(PARENT_COMMENT);
-        commentRepository.save(CHILD_COMMENT);
-
         block(parentCommenter, loginMember);
-
+        //when
         Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
+        //then
         assertEquals(parentCommentByPost.getTotalElements(), 0);
     }
 
     @DisplayName("[자식 댓글 조회]")
     @Test
     void findChildCommentByParentComment() {
-        //given
-        memberRepository.save(POST_OWNER);
-        memberRepository.save(PARENT_COMMENTER);
-        memberRepository.save(CHILD_COMMENTER);
-        Member loginMember = memberRepository.save(LOGIN_MEMBER);
-
-        postRepository.save(POST);
-        Comment parentComment = commentRepository.save(PARENT_COMMENT);
-        Comment childComment = commentRepository.save(CHILD_COMMENT);
-
+        //when
         List<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComment(parentComment, loginMember);
+        //then
         assertEquals(childCommentByParentComment.size(), 1);
         assertEquals(childCommentByParentComment.get(0), childComment);
     }
@@ -124,21 +120,13 @@ class CommentRepositoryTest {
     @Test
     void findChildCommentByParentCommentWhenBlocked() {
         //given
-        memberRepository.save(POST_OWNER);
-        memberRepository.save(PARENT_COMMENTER);
-        Member childCommenter = memberRepository.save(CHILD_COMMENTER);
-        Member loginMember = memberRepository.save(LOGIN_MEMBER);
-
-        Post post = postRepository.save(POST);
-        Comment parentComment = commentRepository.save(PARENT_COMMENT);
-        commentRepository.save(CHILD_COMMENT);
-
         block(childCommenter, loginMember);
-
+        //when
         Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
+        List<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComment(parentCommentByPost.getContent().get(0), loginMember);
+        //then
         assertTrue(parentCommentByPost.hasContent());
         assertEquals(parentCommentByPost.getContent().get(0), parentComment);
-        List<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComment(parentCommentByPost.getContent().get(0), loginMember);
         assertEquals(childCommentByParentComment.size(), 0);
     }
 
