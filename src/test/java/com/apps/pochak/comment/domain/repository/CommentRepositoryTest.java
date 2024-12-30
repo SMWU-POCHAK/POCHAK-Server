@@ -76,14 +76,6 @@ class CommentRepositoryTest {
         childComment = commentRepository.save(CHILD_COMMENT);
     }
 
-    @AfterEach
-    void deleteAll() {
-        postRepository.deleteAll();
-        memberRepository.deleteAll();
-        tagRepository.deleteAll();
-        blockRepository.deleteAll();
-    }
-
     @DisplayName("[부모 댓글 조회]")
     @Test
     void findParentCommentByPost() {
