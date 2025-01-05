@@ -1,7 +1,10 @@
 package com.apps.pochak.block.service;
 
 import com.apps.pochak.auth.domain.Accessor;
+import com.apps.pochak.block.domain.Block;
 import com.apps.pochak.block.domain.repository.BlockRepository;
+import com.apps.pochak.block.dto.response.BlockElement;
+import com.apps.pochak.block.dto.response.BlockElements;
 import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
 import com.apps.pochak.global.ServiceTest;
@@ -11,6 +14,7 @@ import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
+import com.apps.pochak.post.fixture.PostFixture;
 import com.apps.pochak.tag.domain.Tag;
 import com.apps.pochak.tag.domain.repository.TagRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,15 +22,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static com.apps.pochak.global.BaseEntityStatus.DELETED;
 import static com.apps.pochak.global.BaseEntityStatus.INACTIVE;
+import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
-import static com.apps.pochak.post.fixture.PostFixture.CAPTION;
-import static com.apps.pochak.post.fixture.PostFixture.POST_IMAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -107,8 +111,28 @@ class BlockServiceTest extends ServiceTest {
         );
     }
 
+    @DisplayName("차단한 멤버를 조회한다.")
+    @Test
+    void getBlockedMember() throws Exception {
+        // given
+        block(loginMember, taggedMember1);
+        block(loginMember, taggedMember2);
+
+        // when
+        BlockElements blockElements = blockService.getBlockedMember(
+                Accessor.member(loginMember.getId()),
+                loginMember.getHandle(),
+                PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
+
+        // then
+        assertThat(blockElements.getBlockList())
+                .extracting(BlockElement::getMemberId)
+                .containsExactly(taggedMember1.getId(), taggedMember2.getId());
+    }
+
     private Post savePublicPost(Member owner, Member... taggedMemberList) {
-        Post post = postRepository.save(new Post(owner, POST_IMAGE, CAPTION));
+        Post post = postRepository.save(PostFixture.get(owner));
         saveTags(post, taggedMemberList);
         post.makePublic();
         return post;
@@ -121,18 +145,14 @@ class BlockServiceTest extends ServiceTest {
     }
 
     private Follow follow(Member sender, Member receiver) {
-        Follow follow = Follow.of()
-                .sender(sender)
-                .receiver(receiver)
-                .build();
-        return followRepository.save(follow);
+        return followRepository.save(new Follow(sender, receiver));
     }
 
     private LikeEntity like(Member member, Post post) {
-        LikeEntity like = LikeEntity.builder()
-                .member(member)
-                .post(post)
-                .build();
-        return likeRepository.save(like);
+        return likeRepository.save(new LikeEntity(member, post));
+    }
+
+    private Block block(Member blocker, Member blockedMember) {
+        return blockRepository.save(new Block(blocker, blockedMember));
     }
 }
