@@ -67,7 +67,19 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 40
           min-coverage-changed-files: 60
-          
+
+      - name: Get file-level coverage
+        run: |
+          echo "File-level coverage:"
+          xmllint --xpath "//counter[@type='LINE']" build/reports/jacoco/test/jacocoTestReport.xml | \
+            sed 's/<counter.*type="LINE" missed="\([0-9]*\)" covered="\([0-9]*\)".*\/>/File: \1 missed, \2 covered/g'
+
+      - name: Get module-level coverage
+        run: |
+          echo "Module-level coverage:"
+          xmllint --xpath "//package" build/reports/jacoco/test/jacocoTestReport.xml | \
+            sed 's/<package name="\([^"]*\)".*counter.*covered="\([0-9]*\)".*missed="\([0-9]*\)".*/Module: \1, Covered: \2, Missed: \3/g'
+
       - name: Get the Coverage info
         run: |
           echo "Total coverage ${{ steps.jacoco.outputs.coverage-overall }}"
