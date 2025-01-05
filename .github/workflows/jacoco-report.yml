@@ -53,7 +53,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: jacoco-report
-          path: build/reports/jacoco/test
+          path: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
 
       - name: Download JaCoCo Report Artifact
         uses: actions/download-artifact@v3
