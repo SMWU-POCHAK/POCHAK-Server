@@ -1,19 +1,18 @@
 package com.apps.pochak.block.service;
 
 import com.apps.pochak.auth.domain.Accessor;
+import com.apps.pochak.block.domain.repository.BlockRepository;
 import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
-import com.apps.pochak.follow.service.FollowService;
 import com.apps.pochak.global.ServiceTest;
 import com.apps.pochak.like.domain.LikeEntity;
 import com.apps.pochak.like.domain.repository.LikeRepository;
-import com.apps.pochak.like.service.LikeService;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
-import com.apps.pochak.post.dto.request.PostUploadRequest;
-import com.apps.pochak.post.service.PostService;
+import com.apps.pochak.tag.domain.Tag;
+import com.apps.pochak.tag.domain.repository.TagRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,8 +24,10 @@ import java.util.List;
 
 import static com.apps.pochak.global.BaseEntityStatus.DELETED;
 import static com.apps.pochak.global.BaseEntityStatus.INACTIVE;
-import static com.apps.pochak.global.MockMultipartFileConverter.getMockMultipartFileOfPost;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
+import static com.apps.pochak.post.fixture.PostFixture.CAPTION;
+import static com.apps.pochak.post.fixture.PostFixture.POST_IMAGE;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -35,28 +36,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class BlockServiceTest extends ServiceTest {
 
     @Autowired
+    BlockService blockService;
+
+    @Autowired
     MemberRepository memberRepository;
 
     @Autowired
     PostRepository postRepository;
 
     @Autowired
-    PostService postService;
-
-    @Autowired
-    BlockService blockService;
-
-    @Autowired
-    FollowService followService;
-
-    @Autowired
-    LikeService likeService;
-
-    @Autowired
     FollowRepository followRepository;
 
     @Autowired
     LikeRepository likeRepository;
+
+    @Autowired
+    TagRepository tagRepository;
+
+    @Autowired
+    BlockRepository blockRepository;
 
     private Member owner;
     private Member taggedMember1;
@@ -76,7 +74,10 @@ class BlockServiceTest extends ServiceTest {
     void block() throws Exception {
         // given
         follow(taggedMember1, owner);
-        like(taggedMember1, savePublicPost());
+        follow(owner, taggedMember1);
+        Post post = savePublicPost(owner, taggedMember1, taggedMember2);
+        like(taggedMember1, post);
+        like(owner, post);
 
         // when
         blockService.blockMember(
@@ -85,51 +86,53 @@ class BlockServiceTest extends ServiceTest {
         );
 
         // then
-        Follow follow = followRepository.findAll().get(0);
-        LikeEntity like = likeRepository.findAll().get(0);
-        Post findPost = postRepository.findAll().get(0);
+        List<Follow> followList = List.of(
+                followRepository.findBySenderAndReceiver(taggedMember1, owner),
+                followRepository.findBySenderAndReceiver(owner, taggedMember1)
+        );
+        List<LikeEntity> likeList = List.of(
+                likeRepository.findByMemberAndPost(taggedMember1, post).get(),
+                likeRepository.findByMemberAndPost(owner, post).get()
+        );
+        Post findPost = postRepository.findById(post.getId()).get();
 
         assertAll(
-                () -> assertEquals(DELETED, follow.getStatus()),
-                () -> assertEquals(DELETED, like.getStatus()),
+                () -> assertThat(followList)
+                        .extracting(Follow::getStatus)
+                        .containsOnly(DELETED),
+                () -> assertThat(likeList)
+                        .extracting(LikeEntity::getStatus)
+                        .containsOnly(DELETED),
                 () -> assertEquals(INACTIVE, findPost.getStatus())
         );
     }
 
-    private void follow(
-            final Member sender,
-            final Member receiver
-    ) {
-        followService.follow(
-                Accessor.member(sender.getId()),
-                receiver.getHandle()
-        );
-    }
-
-    private void like(
-            final Member sender,
-            final Post post
-    ) {
-        likeService.likePost(
-                Accessor.member(sender.getId()),
-                post.getId()
-        );
-    }
-
-    private Post savePublicPost() throws Exception {
-        PostUploadRequest request = new PostUploadRequest(
-                getMockMultipartFileOfPost(),
-                "test caption",
-                List.of(taggedMember1.getHandle(), taggedMember2.getHandle())
-        );
-
-        postService.savePost(
-                Accessor.member(owner.getId()),
-                request
-        );
-
-        Post post = postRepository.findAll().get(0);
+    private Post savePublicPost(Member owner, Member... taggedMemberList) {
+        Post post = postRepository.save(new Post(owner, POST_IMAGE, CAPTION));
+        saveTags(post, taggedMemberList);
         post.makePublic();
         return post;
+    }
+
+    private void saveTags(Post post, Member... tagMemberList) {
+        for (Member member : tagMemberList) {
+            tagRepository.save(new Tag(post, member));
+        }
+    }
+
+    private Follow follow(Member sender, Member receiver) {
+        Follow follow = Follow.of()
+                .sender(sender)
+                .receiver(receiver)
+                .build();
+        return followRepository.save(follow);
+    }
+
+    private LikeEntity like(Member member, Post post) {
+        LikeEntity like = LikeEntity.builder()
+                .member(member)
+                .post(post)
+                .build();
+        return likeRepository.save(like);
     }
 }
