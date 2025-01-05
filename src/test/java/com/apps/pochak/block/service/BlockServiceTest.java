@@ -27,8 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.apps.pochak.global.BaseEntityStatus.DELETED;
-import static com.apps.pochak.global.BaseEntityStatus.INACTIVE;
+import static com.apps.pochak.global.BaseEntityStatus.*;
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -129,6 +128,80 @@ class BlockServiceTest extends ServiceTest {
         assertThat(blockElements.getBlockList())
                 .extracting(BlockElement::getMemberId)
                 .containsExactly(taggedMember1.getId(), taggedMember2.getId());
+    }
+
+    @DisplayName("차단 해제 시, 비활성화 처리됐던 게시물이 활성화된다.")
+    @Test
+    void cancelBlock() throws Exception {
+        // given
+        Post post = savePublicPost(owner, taggedMember1, taggedMember2);
+        blockService.blockMember(
+                Accessor.member(taggedMember1.getId()),
+                owner.getHandle()
+        );
+
+        // when
+        blockService.cancelBlock(
+                Accessor.member(taggedMember1.getId()),
+                taggedMember1.getHandle(),
+                owner.getHandle()
+        );
+
+        // then
+        Post findPost = postRepository.findById(post.getId()).get();
+        assertEquals(ACTIVE, findPost.getStatus());
+    }
+
+    @DisplayName("차단 해제 시, 다른 멤버를 사이에 차단 상태가 남아있다면 게시물이 활성화되지 않는다.")
+    @Test
+    void cancelBlock_WhenBlockRemainsBetweenOwnerAndTaggedMember() throws Exception {
+        // given
+        Post post = savePublicPost(owner, taggedMember1, taggedMember2);
+        blockService.blockMember(
+                Accessor.member(taggedMember1.getId()),
+                owner.getHandle()
+        );
+        blockService.blockMember(
+                Accessor.member(owner.getId()),
+                taggedMember2.getHandle()
+        );
+
+        // when
+        blockService.cancelBlock(
+                Accessor.member(taggedMember1.getId()),
+                taggedMember1.getHandle(),
+                owner.getHandle()
+        );
+
+        // then
+        Post findPost = postRepository.findById(post.getId()).get();
+        assertEquals(INACTIVE, findPost.getStatus());
+    }
+
+    @DisplayName("차단 해제 시, 다른 멤버를 사이에 차단 상태가 남아있다면 게시물이 활성화되지 않는다.")
+    @Test
+    void cancelBlock_WhenBlockRemainsBetweenTaggedMembers() throws Exception {
+        // given
+        Post post = savePublicPost(owner, taggedMember1, taggedMember2);
+        blockService.blockMember(
+                Accessor.member(taggedMember1.getId()),
+                owner.getHandle()
+        );
+        blockService.blockMember(
+                Accessor.member(taggedMember2.getId()),
+                taggedMember1.getHandle()
+        );
+
+        // when
+        blockService.cancelBlock(
+                Accessor.member(taggedMember1.getId()),
+                taggedMember1.getHandle(),
+                owner.getHandle()
+        );
+
+        // then
+        Post findPost = postRepository.findById(post.getId()).get();
+        assertEquals(INACTIVE, findPost.getStatus());
     }
 
     private Post savePublicPost(Member owner, Member... taggedMemberList) {

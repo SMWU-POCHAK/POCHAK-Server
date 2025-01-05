@@ -135,13 +135,16 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             @Param("memberB") final Member memberB
     );
 
-    @Modifying
-    @Query("update Post p SET p.status = 'ACTIVE' " +
-            "where p.status = 'INACTIVE' " +
-            "   and p.owner not in (select b.blockedMember from Block b where b.blocker in (select t.member from Tag t where t.post = p)) " +
-            "   and not exists (select t.member from Tag t where t.post = p " +
-            "                   intersect " +
-            "                   select b.blockedMember from Block b where b.blocker = p.owner or b.blocker in (select t.member from Tag t where t.post = p))")
+    @Modifying(clearAutomatically = true)
+    @Query("""
+        update Post p SET p.status = 'ACTIVE'
+        where p.status = 'INACTIVE'
+            and p.owner not in
+                (select b.blockedMember from Block b where b.blocker in (select t.member from Tag t where t.post = p))
+            and not exists (select t.member from Tag t where t.post = p
+                            intersect 
+                            select b.blockedMember from Block b where b.blocker = p.owner or b.blocker in (select t.member from Tag t where t.post = p))
+        """)
     void reactivatePostBetweenMembers(
             @Param("memberA") final Member memberA,
             @Param("memberB") final Member memberB
