@@ -68,6 +68,28 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findChildCommentByParentComment(@Param("parentComment") Comment parentComment,
                                                   @Param("loginMember") Member loginMember);
 
+//    @Query("select c from Comment c " +
+//            "join fetch c.member " +
+//            "where c.parentComment in :parentComments " +
+//            "   and c.member not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
+//            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker = c.member) " +
+//            "order by c.createdDate limit 3")
+//    List<Comment> findChildCommentByParentComments(@Param("parentComments") List<Comment> parentComments,
+//                                                  @Param("loginMember") Member loginMember);
+
+    @Query(value = "SELECT filtered.* " +
+            "FROM ( " +
+            "    SELECT c.*, " +
+            "           ROW_NUMBER() OVER (PARTITION BY c.parent_comment_id ORDER BY c.created_date ASC) AS row_num " +
+            "    FROM comment c " +
+            "    JOIN member m ON c.member_id = m.id " +
+            "    WHERE c.parent_comment_id IN ?1 " +
+            "      AND c.member_id NOT IN (SELECT b.blocked_id FROM block b WHERE b.blocker_id = ?2) " +
+            "      AND ?2 NOT IN (SELECT b.blocked_id FROM block b WHERE b.blocker_id = c.member_id) " +
+            ") filtered " +
+            "WHERE filtered.row_num <= 3", nativeQuery = true)
+    List<Comment> findChildCommentByParentComments(List<Long> parentCommentIds, Long loginMemberId);
+
     @Modifying
     @Query("update Comment c set c.status = 'DELETED' " +
             "where c.post = :post ")

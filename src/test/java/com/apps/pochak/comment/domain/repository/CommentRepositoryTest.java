@@ -12,7 +12,6 @@ import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.post.fixture.PostFixture;
 import com.apps.pochak.tag.domain.repository.TagRepository;
 import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Transactional
 @SpringBootTest
@@ -120,6 +120,19 @@ class CommentRepositoryTest {
         assertTrue(parentCommentByPost.hasContent());
         assertEquals(parentCommentByPost.getContent().get(0), parentComment);
         assertEquals(childCommentByParentComment.size(), 0);
+    }
+
+    @DisplayName("[자식 댓글 조회] 여러 부모 댓글의 자식 댓글 한번에 조회")
+    @Test
+    void findChildCommentByParentCommentsWhenBlocked() {
+        //given
+        //when
+        Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
+        List<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComments(parentCommentByPost.stream().map(Comment::getId).toList(), loginMember.getId());
+        //then
+        assertTrue(parentCommentByPost.hasContent());
+        assertEquals(parentCommentByPost.getContent().get(0), parentComment);
+        assertEquals(childCommentByParentComment.size(), 1);
     }
 
     private void block(Member blocker, Member blockedMember) {
