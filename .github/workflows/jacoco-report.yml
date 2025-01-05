@@ -44,39 +44,15 @@ jobs:
         shell: bash
 
       - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
-
-      - name: Cache Gradle packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Build and run tests with JaCoCo
-        run: ./gradlew clean test jacocoTestReport
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          files: build/reports/jacoco/test/jacocoTestReport.xml
-          token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Check build success
-        id: build-status
         run: |
-          if [ $? -eq 0 ]; then
-            echo "Build Successful"
-            echo "build_status=success" >> $GITHUB_ENV
-          else
-            echo "Build Failed"
-            echo "build_status=failure" >> $GITHUB_ENV
-          fi
+            chmod +x ./gradlew
+            ./gradlew testCoverage
+
       - name: Generate JaCoCo coverage report
         run: ./gradlew jacocoTestReport
 
       - name: Post coverage and build status report on PR
+        id: jacoco
         uses: madrapps/jacoco-report@v1.7.1
         with:
           paths: |
@@ -84,9 +60,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 40
           min-coverage-changed-files: 60
-            
-      - name: Fail the build if coverage is below the required minimum
-        run: |
-          if [ $(./gradlew jacocoTestReport --quiet | grep 'Total' | awk '{print $4}' | cut -d% -f1) -lt 40 ]; then
-            echo "Coverage is below the minimum threshold" && exit 1;
-          fi
+      
