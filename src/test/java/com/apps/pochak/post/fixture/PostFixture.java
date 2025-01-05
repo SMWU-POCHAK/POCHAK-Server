@@ -11,8 +11,8 @@ import static com.apps.pochak.post.domain.PostStatus.PRIVATE;
 import static com.apps.pochak.post.domain.PostStatus.PUBLIC;
 
 public class PostFixture {
-    public static final String POST_IMAGE = "https://avatars.githubusercontent.com/u/163827369?s=200&v=4";
-    public static final String CAPTION = "caption test";
+    private static final String POST_IMAGE = "https://avatars.githubusercontent.com/u/163827369?s=200&v=4";
+    private static final String CAPTION = "caption";
 
     public static Post get(final Member owner) {
         return new Post(owner, POST_IMAGE, CAPTION);

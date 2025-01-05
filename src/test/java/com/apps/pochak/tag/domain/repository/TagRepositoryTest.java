@@ -5,6 +5,7 @@ import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.PostStatus;
 import com.apps.pochak.post.domain.repository.PostRepository;
+import com.apps.pochak.post.fixture.PostFixture;
 import com.apps.pochak.tag.domain.Tag;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
@@ -22,8 +23,6 @@ import java.util.List;
 
 import static com.apps.pochak.global.util.PageUtil.getFirstContentFromPage;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
-import static com.apps.pochak.post.fixture.PostFixture.CAPTION;
-import static com.apps.pochak.post.fixture.PostFixture.POST_IMAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
@@ -51,12 +50,12 @@ class TagRepositoryTest {
         Member taggedMember1 = memberRepository.save(TAGGED_MEMBER1);
         Member taggedMember2 = memberRepository.save(TAGGED_MEMBER2);
 
-        Post post = postRepository.save(new Post(owner, POST_IMAGE, CAPTION));
+        Post post = postRepository.save(PostFixture.get(owner));
         post.makePublic();
 
         tagRepository.save(new Tag(post, taggedMember1));
 
-        Post multiTagPost = postRepository.save(new Post(owner, POST_IMAGE, CAPTION));
+        Post multiTagPost = postRepository.save(PostFixture.get(owner));
         multiTagPost.makePublic();
 
         tagRepository.save(new Tag(multiTagPost, taggedMember1));
