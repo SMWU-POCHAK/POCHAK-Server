@@ -101,7 +101,7 @@ class AlarmRepositoryTest {
         );
     }
 
-/*    @DisplayName("[알람 조회] 수신자의 알람을 조회한다. (권한 확인)")
+    @DisplayName("[알람 조회] 수신자의 알람을 조회한다. (권한 확인)")
     @Test
     void findAlarmById() {
         // given
@@ -120,6 +120,6 @@ class AlarmRepositoryTest {
             alarmRepository.findAlarmById(followAlarmToLoginMember.getId(), owner.getId());
         });
         assertEquals(NOT_YOUR_ALARM.getMessage(), exception.getErrorReason().getMessage());
-    }*/
+    }
 
 }
