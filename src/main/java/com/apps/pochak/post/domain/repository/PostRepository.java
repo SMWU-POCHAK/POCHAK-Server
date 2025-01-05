@@ -124,7 +124,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "order by count(l) desc, p.allowedDate desc ")
     Page<Post> findPopularPost(final Pageable pageable);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("update Post p SET p.status = 'INACTIVE' " +
             "where (p.owner = :memberA and p in (select t.post from Tag t where t.post = p and t.member = :memberB)) " +
             "   or (p.owner = :memberB and p in (select t.post from Tag t where t.post = p and t.member = :memberA)) " +

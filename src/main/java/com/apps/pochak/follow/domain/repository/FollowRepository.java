@@ -33,7 +33,7 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
         return findFollowBySenderAndReceiver(sender, receiver).orElseThrow(() -> new GeneralException(NOT_FOLLOW));
     }
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("""
             update Follow f
             set f.status = 'DELETED'

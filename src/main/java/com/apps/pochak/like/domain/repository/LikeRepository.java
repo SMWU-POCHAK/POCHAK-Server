@@ -54,7 +54,7 @@ public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
             @Param("post") final Post post
     );
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("""
             update LikeEntity l
             set l.status = 'DELETED'
