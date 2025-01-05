@@ -46,22 +46,45 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      - name: Generate JaCoCo coverage report
-        run: ./gradlew jacocoTestReport
+      - name: Build and run tests with JaCoCo
+        run: ./gradlew clean test jacocoTestReport
 
       - name: Upload JaCoCo Report as artifact
         uses: actions/upload-artifact@v3
         with:
           name: jacoco-report
-          path: build/reports/jacoco/test/jacocoTestReport.xml
+          path: build/reports/jacoco/test
+
+      - name: Download JaCoCo Report Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: jacoco-report
+          path: ./artifacts
+
 
       - name: Post coverage and build status report on PR
         id: jacoco
         uses: madrapps/jacoco-report@v1.7.1
         with:
-          paths: |
-            ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
+          paths: ./artifacts/build/reports/jacoco/test/jacocoTestReport.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 40
           min-coverage-changed-files: 60
+
+      - name: Get file-level coverage
+        run: |
+          echo "File-level coverage:"
+          xmllint --xpath "//counter[@type='LINE']" build/reports/jacoco/test/jacocoTestReport.xml | \
+            sed 's/<counter.*type="LINE" missed="\([0-9]*\)" covered="\([0-9]*\)".*\/>/File: \1 missed, \2 covered/g'
+
+      - name: Get module-level coverage
+        run: |
+          echo "Module-level coverage:"
+          xmllint --xpath "//package" build/reports/jacoco/test/jacocoTestReport.xml | \
+            sed 's/<package name="\([^"]*\)".*counter.*covered="\([0-9]*\)".*missed="\([0-9]*\)".*/Module: \1, Covered: \2, Missed: \3/g'
+
+      - name: Get the Coverage info
+        run: |
+          echo "Total coverage ${{ steps.jacoco.outputs.coverage-overall }}"
+          echo "Changed Files coverage ${{ steps.jacoco.outputs.coverage-changed-files }}"
       
