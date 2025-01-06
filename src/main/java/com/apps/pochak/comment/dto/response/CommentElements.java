@@ -8,7 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Data
@@ -20,12 +22,25 @@ public class CommentElements {
     private String loginMemberProfileImage;
 
     public CommentElements(
-            final Member loginMember, final Page<Comment> parentCommentPage
+            final Member loginMember, final Page<Comment> parentCommentPage, final List<Comment> childComments
     ) {
         parentCommentPageInfo = new PageInfo(parentCommentPage);
-        parentCommentList = parentCommentPage.getContent().stream().map(
-                ParentCommentElement::new
-        ).collect(Collectors.toList());
+
+//        parentCommentList = parentCommentPage.getContent().stream().map(
+//                ParentCommentElement::new
+//        ).collect(Collectors.toList());
+        parentCommentList = new ArrayList<>();
+
+        for (Comment parentComment : parentCommentPage.getContent()) {
+            List<Comment> childCommentList = new ArrayList<>();
+            for (Comment childComment : childComments) {
+                if (Objects.equals(parentComment.getId(), childComment.getParentComment().getId())) {
+                    childCommentList.add(childComment);
+                }
+            }
+            parentCommentList.add(new ParentCommentElement(parentComment, childCommentList));
+        }
+
         loginMemberProfileImage = loginMember.getProfileImage();
     }
 }

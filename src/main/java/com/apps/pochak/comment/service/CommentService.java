@@ -44,8 +44,10 @@ public class CommentService {
     ) {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Post post = postRepository.findPublicPostById(postId);
-        final Page<Comment> commentList = commentRepository.findParentCommentByPost(post, loginMember, pageable);
-        return new CommentElements(loginMember, commentList);
+        final Page<Comment> parentCommentList = commentRepository.findParentCommentByPost(post, loginMember, pageable);
+        final List<Comment> childCommentList = commentRepository.findChildCommentByParentComments(parentCommentList.stream().map(Comment::getId).toList(), loginMember.getId());
+
+        return new CommentElements(loginMember, parentCommentList, childCommentList);
     }
 
     @Transactional(readOnly = true)
