@@ -22,6 +22,7 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
 import java.util.List;
 
+import static com.apps.pochak.comment.fixture.CommentFixture.STATIC_CHILD_COMMENT;
 import static com.apps.pochak.comment.fixture.CommentFixture.STATIC_PARENT_COMMENT;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
@@ -54,6 +55,10 @@ class CommentControllerTest extends ControllerTest {
             STATIC_PARENT_COMMENT
     );
 
+    private static final List<Comment> CHILD_COMMENT_LIST = List.of(
+            STATIC_CHILD_COMMENT
+    );
+
     @MockBean
     CommentService commentService;
 
@@ -73,7 +78,7 @@ class CommentControllerTest extends ControllerTest {
     void getComments() throws Exception {
 
         when(commentService.getComments(any(), any(), any()))
-                .thenReturn(new CommentElements(MEMBER1, toPage(PARENT_COMMENT_LIST)));
+                .thenReturn(new CommentElements(MEMBER1, toPage(PARENT_COMMENT_LIST), CHILD_COMMENT_LIST));
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -208,7 +213,7 @@ class CommentControllerTest extends ControllerTest {
     void getChildComments() throws Exception {
 
         when(commentService.getChildCommentsByParentCommentId(any(), any(), any(), any()))
-                .thenReturn(new ParentCommentElement(PARENT_COMMENT));
+                .thenReturn(new ParentCommentElement(PARENT_COMMENT, CHILD_COMMENT_LIST));
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
