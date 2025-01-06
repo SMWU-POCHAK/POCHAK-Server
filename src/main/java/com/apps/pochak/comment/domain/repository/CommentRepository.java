@@ -68,17 +68,17 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findChildCommentByParentComment(@Param("parentComment") Comment parentComment,
                                                   @Param("loginMember") Member loginMember);
 
-    @Query(value = "SELECT filtered.* " +
-            "FROM ( " +
-            "    SELECT c.*, " +
-            "           ROW_NUMBER() OVER (PARTITION BY c.parent_comment_id ORDER BY c.created_date ASC) AS row_num " +
-            "    FROM comment c " +
-            "    JOIN member m ON c.member_id = m.id " +
-            "    WHERE c.parent_comment_id IN ?1 " +
-            "      AND c.member_id NOT IN (SELECT b.blocked_id FROM block b WHERE b.blocker_id = ?2) " +
-            "      AND ?2 NOT IN (SELECT b.blocked_id FROM block b WHERE b.blocker_id = c.member_id) " +
-            ") filtered " +
-            "WHERE filtered.row_num <= 30", nativeQuery = true)
+    @Query(value = "select child_comments.* " +
+            "from ( " +
+            "    select c.*, " +
+            "           ROW_NUMBER() OVER (partition by c.parent_comment_id) as row_num " +
+            "    from comment c " +
+            "    join member m on c.member_id = m.id " +
+            "    where c.parent_comment_id in ?1 " +
+            "      and c.member_id not in (select b.blocked_id from block b where b.blocker_id = ?2) " +
+            "      and ?2 not in (select b.blocked_id from block b where b.blocker_id = c.member_id) " +
+            ") child_comments " +
+            "where child_comments.row_num <= 30", nativeQuery = true)
     List<Comment> findChildCommentByParentComments(List<Long> parentCommentIds, Long loginMemberId);
 
     @Modifying
