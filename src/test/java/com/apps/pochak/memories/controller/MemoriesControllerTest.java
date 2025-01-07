@@ -326,4 +326,36 @@ class MemoriesControllerTest extends ControllerTest {
                         )
                 );
     }
+
+    @Test
+    @DisplayName("[추억 페이지] 상대방과의 맞팔 상태를 조회한다.")
+    void getF4FStatus() throws Exception {
+        when(memoriesService.getF4FStatus(any(), any()))
+                .thenReturn(true);
+
+        this.mockMvc.perform(
+                        RestDocumentationRequestBuilders
+                                .get("/api/v1/memories/{handle}/f4f/status", "member2")
+                                .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
+                                .contentType(APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andDo(
+                        document("get-f4f-status",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(
+                                        headerWithName("Authorization").description("Basic auth credentials")
+                                ),
+                                pathParameters(
+                                        parameterWithName("handle").description("친구의 아이디")
+                                ),
+                                responseFields(
+                                        fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),
+                                        fieldWithPath("code").type(STRING).description("결과 코드"),
+                                        fieldWithPath("message").type(STRING).description("결과 메세지"),
+                                        fieldWithPath("result").type(BOOLEAN).description("결과 데이터")
+                                )
+                        )
+                );
+    }
 }

@@ -104,4 +104,14 @@ public class MemoriesService {
         final Page<Tag> tag = tagRepository.findTaggedWith(loginMember, member, pageable);
         return MemoriesPostResponse.from(tag);
     }
+
+    public Boolean getF4FStatus(Accessor accessor, String handle) {
+        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
+        final Member member = memberRepository.findByHandle(handle, loginMember);
+
+        final boolean following = followRepository.existsBySenderAndReceiver(loginMember, member);
+        final boolean follower = followRepository.existsBySenderAndReceiver(member, loginMember);
+
+        return following && follower;
+    }
 }
