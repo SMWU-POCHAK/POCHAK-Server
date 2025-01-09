@@ -9,6 +9,7 @@ import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.member.fixture.MemberFixture;
 import com.apps.pochak.post.domain.Post;
+import com.apps.pochak.post.fixture.PostFixture;
 import com.apps.pochak.tag.domain.Tag;
 import com.apps.pochak.tag.domain.repository.TagRepository;
 import jakarta.transaction.Transactional;
@@ -22,8 +23,6 @@ import org.springframework.data.domain.PageRequest;
 
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.BLOCKED_POST;
-import static com.apps.pochak.post.fixture.PostFixture.CAPTION;
-import static com.apps.pochak.post.fixture.PostFixture.POST_IMAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -467,7 +466,7 @@ class PostCustomRepositoryTest {
     }
 
     private Post savePost(Member owner, Member... taggedMemberList) {
-        Post post = postRepository.save(new Post(owner, POST_IMAGE, CAPTION));
+        Post post = postRepository.save(PostFixture.get(owner));
         saveTags(post, taggedMemberList);
         post.makePublic();
         return post;
