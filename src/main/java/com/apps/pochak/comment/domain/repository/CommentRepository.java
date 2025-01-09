@@ -65,8 +65,9 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "where c.parentComment = :parentComment " +
             "   and c.member not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
             "   and :loginMember not in (select b.blockedMember from Block b where b.blocker = c.member)")
-    List<Comment> findChildCommentByParentComment(@Param("parentComment") Comment parentComment,
-                                                  @Param("loginMember") Member loginMember);
+    Page<Comment> findChildCommentByParentComment(@Param("parentComment") Comment parentComment,
+                                                  @Param("loginMember") Member loginMember,
+                                                  Pageable pageable);
 
     @Query(value = "select child_comments.* " +
             "from ( " +
