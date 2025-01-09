@@ -3,13 +3,10 @@ package com.apps.pochak.comment.domain.repository;
 import com.apps.pochak.block.domain.Block;
 import com.apps.pochak.block.domain.repository.BlockRepository;
 import com.apps.pochak.comment.domain.Comment;
-import com.apps.pochak.comment.fixture.CommentFixture;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
-import com.apps.pochak.member.fixture.MemberFixture;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
-import com.apps.pochak.post.fixture.PostFixture;
 import com.apps.pochak.tag.domain.repository.TagRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,29 +20,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.apps.pochak.comment.fixture.CommentFixture.STATIC_CHILD_COMMENT;
+import static com.apps.pochak.comment.fixture.CommentFixture.STATIC_PARENT_COMMENT;
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
+import static com.apps.pochak.member.fixture.MemberFixture.*;
+import static com.apps.pochak.post.fixture.PostFixture.STATIC_PUBLIC_POST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Transactional
 @SpringBootTest
 class CommentRepositoryTest {
-
-    private static final Member LOGIN_MEMBER = MemberFixture.LOGIN_MEMBER;
-    private static final Member POST_OWNER = MemberFixture.STATIC_MEMBER1;
-    private static final Post POST = PostFixture.STATIC_PUBLIC_POST;
-    private static final Member PARENT_COMMENTER = MemberFixture.STATIC_MEMBER2;
-    private static final Member CHILD_COMMENTER = MemberFixture.STATIC_MEMBER3;
-    private static final Comment PARENT_COMMENT = CommentFixture.STATIC_PARENT_COMMENT;
-    private static final Comment CHILD_COMMENT = CommentFixture.STATIC_CHILD_COMMENT;
-
-    private Member loginMember;
-    private Member parentCommenter;
-    private Member childCommenter;
-    private Post post;
-    private Comment parentComment;
-    private Comment childComment;
-
 
     @Autowired
     EntityManager em;
@@ -65,15 +50,22 @@ class CommentRepositoryTest {
     @Autowired
     CommentRepository commentRepository;
 
+    private Member loginMember;
+    private Member parentCommenter;
+    private Member childCommenter;
+    private Post post;
+    private Comment parentComment;
+    private Comment childComment;
+
     @BeforeEach
     void setUp() {
-        memberRepository.save(POST_OWNER);
-        parentCommenter = memberRepository.save(PARENT_COMMENTER);
-        childCommenter = memberRepository.save(CHILD_COMMENTER);
+        memberRepository.save(STATIC_MEMBER1);
+        parentCommenter = memberRepository.save(STATIC_MEMBER2);
+        childCommenter = memberRepository.save(STATIC_MEMBER3);
         loginMember = memberRepository.save(LOGIN_MEMBER);
-        post = postRepository.save(POST);
-        parentComment = commentRepository.save(PARENT_COMMENT);
-        childComment = commentRepository.save(CHILD_COMMENT);
+        post = postRepository.save(STATIC_PUBLIC_POST);
+        parentComment = commentRepository.save(STATIC_PARENT_COMMENT);
+        childComment = commentRepository.save(STATIC_CHILD_COMMENT);
     }
 
     @DisplayName("[부모 댓글 조회]")
