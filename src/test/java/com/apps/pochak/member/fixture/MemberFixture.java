@@ -35,22 +35,8 @@ public class MemberFixture {
             null
     );
 
-    public static final Member STATIC_MEMBER3 = new Member(
-            3L,
-            "static_member3",
-            "3번 회원의 이름",
-            "한 줄 소개",
-            "aaa@pochak.com",
-            PROFILE_IMAGE,
-            "REFRESH_TOKEN",
-            "SOCIAL_ID",
-            SocialType.GOOGLE,
-            "SOCIAL_REFRESH_TOKEN",
-            null
-    );
-
     public static final Member WRONG_MEMBER = new Member(
-            4L,
+            3L,
             ".wrong_member#",
             "공백이 아닌 열다섯자 이내인 회원의 이름",
             """
@@ -120,6 +106,30 @@ public class MemberFixture {
             .name("로그인한 사람")
             .email("aaa@pochak.com")
             .handle("login_member")
+            .message("한 줄 소개")
+            .socialId("SOCIAL_ID")
+            .profileImage(PROFILE_IMAGE)
+            .refreshToken("REFRESH_TOKEN")
+            .socialType(SocialType.GOOGLE)
+            .socialRefreshToken("SOCIAL_REFRESH_TOKEN")
+            .build();
+
+    public static final Member PARENT_COMMENTER = Member.signupMember()
+            .name("댓글 단 사람")
+            .email("aaa@pochak.com")
+            .handle("parent_commenter")
+            .message("한 줄 소개")
+            .socialId("SOCIAL_ID")
+            .profileImage(PROFILE_IMAGE)
+            .refreshToken("REFRESH_TOKEN")
+            .socialType(SocialType.GOOGLE)
+            .socialRefreshToken("SOCIAL_REFRESH_TOKEN")
+            .build();
+
+    public static final Member CHILD_COMMENTER = Member.signupMember()
+            .name("답글 단 사람")
+            .email("aaa@pochak.com")
+            .handle("child_commenter")
             .message("한 줄 소개")
             .socialId("SOCIAL_ID")
             .profileImage(PROFILE_IMAGE)

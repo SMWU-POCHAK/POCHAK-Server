@@ -10,14 +10,14 @@ public class CommentFixture {
     public static final Comment STATIC_PARENT_COMMENT = new Comment(
             1L,
             "부모 댓글입니다.",
-            STATIC_MEMBER2,
+            STATIC_MEMBER1,
             STATIC_PUBLIC_POST
     );
 
     public static final Comment STATIC_CHILD_COMMENT = new Comment(
             2L,
             "자식 댓글입니다.",
-            STATIC_MEMBER3,
+            STATIC_MEMBER2,
             STATIC_PUBLIC_POST,
             STATIC_PARENT_COMMENT
     );
