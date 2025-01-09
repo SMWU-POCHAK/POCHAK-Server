@@ -64,6 +64,33 @@ class CommentRepositoryTest {
         childComment = commentRepository.save(STATIC_CHILD_COMMENT);
     }
 
+    @DisplayName("[자식 댓글 조회] 여러 부모 댓글의 자식 댓글 한번에 조회")
+    @Test
+    void findChildCommentByParentComments() {
+        //given
+        //when
+        Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
+        List<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComments(parentCommentByPost.stream().map(Comment::getId).toList(), loginMember.getId());
+        //then
+        assertTrue(parentCommentByPost.hasContent());
+        assertEquals(parentCommentByPost.getContent().get(0), parentComment);
+        assertEquals(childCommentByParentComment.size(), 1);
+    }
+
+    @DisplayName("[자식 댓글 조회] 여러 부모 댓글의 일부 자식 댓글 차단시 한번에 조회")
+    @Test
+    void findChildCommentByParentCommentsWhenBlocked() {
+        //given
+        block(childCommenter, loginMember);
+        //when
+        Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
+        List<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComments(parentCommentByPost.stream().map(Comment::getId).toList(), loginMember.getId());
+        //then
+        assertTrue(parentCommentByPost.hasContent());
+        assertEquals(parentCommentByPost.getContent().get(0), parentComment);
+        assertEquals(childCommentByParentComment.size(), 0);
+    }
+
     @DisplayName("[부모 댓글 조회]")
     @Test
     void findParentCommentByPost() {
@@ -90,10 +117,10 @@ class CommentRepositoryTest {
     @Test
     void findChildCommentByParentComment() {
         //when
-        List<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComment(parentComment, loginMember);
+        Page<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComment(parentComment, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
         //then
-        assertEquals(childCommentByParentComment.size(), 1);
-        assertEquals(childCommentByParentComment.get(0), childComment);
+        assertEquals(childCommentByParentComment.getContent().size(), 1);
+        assertEquals(childCommentByParentComment.getContent().get(0), childComment);
     }
 
     @DisplayName("[자식 댓글 조회] 자식 댓글 작성자 차단시")
@@ -103,38 +130,13 @@ class CommentRepositoryTest {
         block(childCommenter, loginMember);
         //when
         Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
-        List<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComment(parentCommentByPost.getContent().get(0), loginMember);
+        Page<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComment(
+                        parentCommentByPost.getContent().get(0), loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE)
+                );
         //then
         assertTrue(parentCommentByPost.hasContent());
         assertEquals(parentCommentByPost.getContent().get(0), parentComment);
-        assertEquals(childCommentByParentComment.size(), 0);
-    }
-
-    @DisplayName("[자식 댓글 조회] 여러 부모 댓글의 자식 댓글 한번에 조회")
-    @Test
-    void findChildCommentByParentComments() {
-        //given
-        //when
-        Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
-        List<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComments(parentCommentByPost.stream().map(Comment::getId).toList(), loginMember.getId());
-        //then
-        assertTrue(parentCommentByPost.hasContent());
-        assertEquals(parentCommentByPost.getContent().get(0), parentComment);
-        assertEquals(childCommentByParentComment.size(), 1);
-    }
-
-    @DisplayName("[자식 댓글 조회] 여러 부모 댓글의 일부 자식 댓글 차단시 한번에 조회")
-    @Test
-    void findChildCommentByParentCommentsWhenBlocked() {
-        //given
-        block(childCommenter, loginMember);
-        //when
-        Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
-        List<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComments(parentCommentByPost.stream().map(Comment::getId).toList(), loginMember.getId());
-        //then
-        assertTrue(parentCommentByPost.hasContent());
-        assertEquals(parentCommentByPost.getContent().get(0), parentComment);
-        assertEquals(childCommentByParentComment.size(), 0);
+        assertEquals(childCommentByParentComment.getContent().size(), 0);
     }
 
     private void block(Member blocker, Member blockedMember) {
