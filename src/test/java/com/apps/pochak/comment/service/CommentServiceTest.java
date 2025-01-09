@@ -19,11 +19,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.apps.pochak.comment.fixture.CommentFixture.STATIC_CHILD_COMMENT;
-import static com.apps.pochak.comment.fixture.CommentFixture.STATIC_PARENT_COMMENT;
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
-import static com.apps.pochak.post.fixture.PostFixture.STATIC_PUBLIC_POST;
+import static com.apps.pochak.post.fixture.PostFixture.CAPTION;
+import static com.apps.pochak.post.fixture.PostFixture.POST_IMAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -58,13 +57,12 @@ class CommentServiceTest {
 
     @BeforeEach
     void setUp() {
-        memberRepository.save(STATIC_MEMBER1);
-        parentCommenter = memberRepository.save(STATIC_MEMBER2);
-        childCommenter = memberRepository.save(STATIC_MEMBER3);
+        post = savePost(memberRepository.save(OWNER));
+        parentCommenter = memberRepository.save(PARENT_COMMENTER);
+        childCommenter = memberRepository.save(CHILD_COMMENTER);
         loginMember = memberRepository.save(LOGIN_MEMBER);
-        post = postRepository.save(STATIC_PUBLIC_POST);
-        parentComment = commentRepository.save(STATIC_PARENT_COMMENT);
-        childComment = commentRepository.save(STATIC_CHILD_COMMENT);
+        parentComment = saveParentComment(parentCommenter, post);
+        childComment = saveChildComment(childCommenter, post, parentComment);
     }
 
     @Test
@@ -113,6 +111,20 @@ class CommentServiceTest {
         assertThat(actual.getParentCommentList()).hasSize(1);
         assertEquals(actual.getParentCommentList().get(0).getCommentId(), parentComment.getId());
         assertThat(actual.getParentCommentList().get(0).getChildCommentList()).hasSize(0);
+    }
+
+    private Post savePost(Member owner) {
+        Post post = postRepository.save(new Post(owner, POST_IMAGE, CAPTION));
+        post.makePublic();
+        return post;
+    }
+
+    private Comment saveParentComment(Member member, Post post) {
+        return commentRepository.save(new Comment("부모 댓글 입니다.", member, post));
+    }
+
+    private Comment saveChildComment(Member member, Post post, Comment parentComment) {
+        return commentRepository.save(new Comment("자식 댓글 입니다.", member, post, parentComment));
     }
 
     private void block(Member blocker, Member blockedMember) {
