@@ -61,8 +61,7 @@ public class CommentService {
         final Comment parentComment = commentRepository.findParentCommentById(parentCommentId, loginMember)
                 .orElseThrow(() -> new GeneralException(INVALID_POST_ID));
         final Page<Comment> childComment = commentRepository.findChildCommentByParentComment(parentComment, loginMember, pageable);
-//        return new ParentCommentElement(parentComment, childComment, toPageRequest(pageable));
-        return new ParentCommentElement(parentComment, childComment.getContent());
+        return new ParentCommentElement(parentComment, childComment.getContent(), toPageRequest(pageable));
     }
 
     public void saveComment(
