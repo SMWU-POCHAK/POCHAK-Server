@@ -98,15 +98,15 @@ include::{snippets}/get-memories-pochak/response-fields.adoc[]
 
 === Request
 
-include::{snippets}/get-F4F-status/http-request.adoc[]
+include::{snippets}/get-f4f-status/http-request.adoc[]
 
 ==== request headers
-include::{snippets}/get-F4F-status/request-headers.adoc[]
+include::{snippets}/get-f4f-status/request-headers.adoc[]
 
 ==== path params
-include::{snippets}/get-F4F-status/path-parameters.adoc[]
+include::{snippets}/get-f4f-status/path-parameters.adoc[]
 
 === Response
 ==== response body
-include::{snippets}/get-F4F-status/response-body.adoc[]
-include::{snippets}/get-F4F-status/response-fields.adoc[]
+include::{snippets}/get-f4f-status/response-body.adoc[]
+include::{snippets}/get-f4f-status/response-fields.adoc[]
