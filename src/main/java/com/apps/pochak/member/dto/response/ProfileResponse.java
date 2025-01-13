@@ -25,6 +25,7 @@ public class ProfileResponse {
     private long followerCount;
     private long followingCount;
     private Boolean isFollow;
+    private Boolean isF4F;
     private PageInfo pageInfo;
     private List<PostElement> postList;
 
@@ -33,6 +34,7 @@ public class ProfileResponse {
                            final long followerCount,
                            final long followingCount,
                            final Boolean isFollow,
+                           final Boolean isF4F,
                            final Page<Post> postPage
     ) {
         this.handle = member.getHandle();
@@ -43,6 +45,7 @@ public class ProfileResponse {
         this.followerCount = followerCount;
         this.followingCount = followingCount;
         this.isFollow = isFollow;
+        this.isF4F = isF4F;
         this.pageInfo = new PageInfo(postPage);
         this.postList = postPage.getContent().stream().map(
                 PostElement::from

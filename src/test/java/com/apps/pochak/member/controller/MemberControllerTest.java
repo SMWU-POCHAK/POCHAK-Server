@@ -80,6 +80,7 @@ class MemberControllerTest extends ControllerTest {
                                 .followerCount(1)
                                 .followingCount(1)
                                 .isFollow(null)
+                                .isF4F(true)
                                 .build()
                 );
 
@@ -116,6 +117,9 @@ class MemberControllerTest extends ControllerTest {
                                         fieldWithPath("result.followingCount").type(NUMBER).description("팔로잉 수"),
                                         fieldWithPath("result.isFollow").type(BOOLEAN)
                                                 .description("현재 로그인한 멤버가 조회한 멤버를 팔로우하고 있는지의 여부 : 만약 본인이라면 null이 전달됩니다.")
+                                                .optional(),
+                                        fieldWithPath("result.isF4F").type(BOOLEAN)
+                                                .description("현재 로그인한 멤버가 조회한 멤버와 맞팔로우하고 있는지의 여부 : 만약 본인이라면 null이 전달됩니다.")
                                                 .optional(),
                                         fieldWithPath("result.pageInfo").type(OBJECT).description("게시물 페이징 정보"),
                                         fieldWithPath("result.pageInfo.lastPage").type(BOOLEAN)
