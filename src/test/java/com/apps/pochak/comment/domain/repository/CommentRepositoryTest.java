@@ -63,7 +63,7 @@ class CommentRepositoryTest {
         childComment = saveChildComment(childCommenter, post, parentComment);
     }
 
-    @DisplayName("[자식 댓글 조회] 여러 부모 댓글의 자식 댓글 한번에 조회")
+    @DisplayName("[전체 댓글 조회] 여러 부모 댓글의 자식 댓글 조회")
     @Test
     void findChildCommentByParentComments() {
         //given
@@ -76,7 +76,7 @@ class CommentRepositoryTest {
         assertEquals(childCommentByParentComment.size(), 1);
     }
 
-    @DisplayName("[자식 댓글 조회] 여러 부모 댓글의 일부 자식 댓글 차단시 한번에 조회")
+    @DisplayName("[전체 댓글 조회] 여러 부모 댓글의 일부 자식 댓글 차단시 조회")
     @Test
     void findChildCommentByParentCommentsWhenBlocked() {
         //given
@@ -90,7 +90,7 @@ class CommentRepositoryTest {
         assertEquals(childCommentByParentComment.size(), 0);
     }
 
-    @DisplayName("[부모 댓글 조회]")
+    @DisplayName("[부모 댓글 조회] 정상 테스트")
     @Test
     void findParentCommentByPost() {
         //when
@@ -112,7 +112,7 @@ class CommentRepositoryTest {
         assertEquals(parentCommentByPost.getTotalElements(), 0);
     }
 
-    @DisplayName("[자식 댓글 조회]")
+    @DisplayName("[자식 댓글 조회] 정상 테스트")
     @Test
     void findChildCommentByParentComment() {
         //when

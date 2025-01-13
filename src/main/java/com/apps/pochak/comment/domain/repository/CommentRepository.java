@@ -69,17 +69,18 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
                                                   @Param("loginMember") Member loginMember,
                                                   Pageable pageable);
 
-    @Query(value = "select child_comments.* " +
-            "from ( " +
-            "    select c.*, " +
-            "           ROW_NUMBER() OVER (partition by c.parent_comment_id) as row_num " +
-            "    from comment c " +
-            "    join member m on c.member_id = m.id " +
-            "    where c.parent_comment_id in ?1 " +
-            "      and c.member_id not in (select b.blocked_id from block b where b.blocker_id = ?2) " +
-            "      and ?2 not in (select b.blocked_id from block b where b.blocker_id = c.member_id) " +
-            ") child_comments " +
-            "where child_comments.row_num <= 30", nativeQuery = true)
+    @Query(value = """
+            select child_comments.*
+            from (
+                select c.*,
+                       ROW_NUMBER() OVER (partition by c.parent_comment_id) as row_num
+                from comment c
+                join member m on c.member_id = m.id
+                where c.parent_comment_id in ?1
+                  and c.member_id not in (select b.blocked_id from block b where b.blocker_id = ?2)
+                  and ?2 not in (select b.blocked_id from block b where b.blocker_id = c.member_id)
+            ) child_comments
+            where child_comments.row_num <= 30""", nativeQuery = true)
     List<Comment> findChildCommentByParentComments(List<Long> parentCommentIds, Long loginMemberId);
 
     @Modifying
