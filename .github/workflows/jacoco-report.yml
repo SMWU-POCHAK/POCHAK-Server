@@ -47,7 +47,9 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build and run tests with JaCoCo
-        run: ./gradlew clean test jacocoTestReport
+        run: |
+          ./gradlew clean test jacocoTestReport
+          ./gradlew jacocoReportAggregate
 
       - name: Upload JaCoCo Report as artifact
         uses: actions/upload-artifact@v3
