@@ -132,6 +132,39 @@ public class PostCustomRepository {
                 .orderBy(post.allowedDate.desc());
     }
 
+    public Page<Post> findTaggedPostPage(
+            final Member taggedMember,
+            final long loginMemberId,
+            final Pageable pageable
+    ) {
+        List<Post> postList = findTaggedPost(taggedMember, loginMemberId)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> postCount = query.select(post.count())
+                .from(post)
+                .where(post.in(findTaggedPost(taggedMember, loginMemberId)));
+
+        return PageableExecutionUtils.getPage(postList, pageable, postCount::fetchOne);
+    }
+
+    private JPAQuery<Post> findTaggedPost(
+            final Member taggedMember,
+            final long loginMemberId
+    ) {
+        return query.selectFrom(post)
+                .join(tag).on(
+                        tag.post.eq(post)
+                        .and(tag.member.eq(taggedMember))
+                        .and(checkPublicPost())
+                )
+                .leftJoin(block).on(checkBlockStatus(loginMemberId))
+                .groupBy(post)
+                .having(block.id.count().eq(0L))
+                .orderBy(post.allowedDate.desc());
+    }
+
     private BooleanExpression checkPublicPost() {
         return post.status.eq(ACTIVE)
                 .and(post.postStatus.eq(PUBLIC));
@@ -177,37 +210,4 @@ public class PostCustomRepository {
         return (block.blocker.id.eq(loginMemberId))
                 .and(block.blockedMember.eq(tag.member));
     }
-
-    private JPAQuery<Post> findTaggedPost(
-            final Member taggedMember,
-            final long loginMemberId
-    ) {
-        return query.selectFrom(post)
-                .join(tag).on(tag.post.eq(post)
-                        .and(tag.member.eq(taggedMember))
-                        .and(checkPublicPost()))
-                .leftJoin(block).on(checkBlockStatus(loginMemberId))
-                .groupBy(post)
-                .having(block.id.count().eq(0L))
-                .orderBy(tag.lastModifiedDate.desc());
-    }
-
-    public Page<Post> findTaggedPostPage(
-            final Member taggedMember,
-            final long loginMemberId,
-            final Pageable pageable
-    ) {
-        List<Post> postList = findTaggedPost(taggedMember, loginMemberId)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        JPAQuery<Long> postCount = query.select(post.count())
-                .from(post)
-                .where(post.in(findTaggedPost(taggedMember, loginMemberId)));
-
-        return PageableExecutionUtils.getPage(postList, pageable, postCount::fetchOne);
-    }
-
-
 }
