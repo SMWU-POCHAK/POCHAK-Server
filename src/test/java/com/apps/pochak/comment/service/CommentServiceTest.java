@@ -13,6 +13,7 @@ import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.tag.domain.repository.TagRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +25,7 @@ import static com.apps.pochak.member.fixture.MemberFixture.*;
 import static com.apps.pochak.post.fixture.PostFixture.CAPTION;
 import static com.apps.pochak.post.fixture.PostFixture.POST_IMAGE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Transactional
@@ -66,51 +68,97 @@ class CommentServiceTest {
     }
 
     @Test
+    @DisplayName("[전체 댓글 조회] 정상 작동")
     void getComments() {
+        // given
         CommentElement expectedChild = CommentElement.from()
                 .comment(childComment)
                 .build();
-
+        // then
         CommentElements actual = commentService
                 .getComments(
                         Accessor.member(loginMember.getId()),
                         post.getId(),
                         PageRequest.of(0, DEFAULT_PAGING_SIZE)
                 );
-
-        assertThat(actual.getParentCommentList()).hasSize(1);
-        assertEquals(actual.getParentCommentList().get(0).getChildCommentList().size(), 1);
-        assertEquals(actual.getParentCommentList().get(0).getChildCommentList().get(0), expectedChild);
+        // then
+        assertAll(
+                () -> assertThat(actual.getParentCommentList()).hasSize(1),
+                () -> assertEquals(actual.getParentCommentList().get(0).getChildCommentList().size(), 1),
+                () -> assertEquals(actual.getParentCommentList().get(0).getChildCommentList().get(0), expectedChild)
+        );
     }
 
     @Test
+    @DisplayName("[전체 댓글 조회] 부모 댓글 작성자 차단시")
     void getCommentsWhenBlockParentCommenter() {
+        //given
         block(loginMember, parentCommenter);
-
+        // when
         CommentElements actual = commentService
                 .getComments(
                         Accessor.member(loginMember.getId()),
                         post.getId(),
                         PageRequest.of(0, DEFAULT_PAGING_SIZE)
                 );
-
+        // then
         assertThat(actual.getParentCommentList()).hasSize(0);
     }
 
     @Test
-    void getCommentsWhenBlockChildCommenter() {
-        block(loginMember, childCommenter);
-
+    @DisplayName("[전체 댓글 조회] 부모 댓글 작성자가 차단시")
+    void getCommentsWhenBlockedByParentCommenter() {
+        //given
+        block(parentCommenter, loginMember);
+        // when
         CommentElements actual = commentService
                 .getComments(
                         Accessor.member(loginMember.getId()),
                         post.getId(),
                         PageRequest.of(0, DEFAULT_PAGING_SIZE)
                 );
+        // then
+        assertThat(actual.getParentCommentList()).hasSize(0);
+    }
 
-        assertThat(actual.getParentCommentList()).hasSize(1);
-        assertEquals(actual.getParentCommentList().get(0).getCommentId(), parentComment.getId());
-        assertThat(actual.getParentCommentList().get(0).getChildCommentList()).hasSize(0);
+    @Test
+    @DisplayName("[전체 댓글 조회] 자식 댓글 작성자 차단시")
+    void getCommentsWhenBlockChildCommenter() {
+        //given
+        block(loginMember, childCommenter);
+        // when
+        CommentElements actual = commentService
+                .getComments(
+                        Accessor.member(loginMember.getId()),
+                        post.getId(),
+                        PageRequest.of(0, DEFAULT_PAGING_SIZE)
+                );
+        // then
+        assertAll(
+                () -> assertThat(actual.getParentCommentList()).hasSize(1),
+                () -> assertEquals(actual.getParentCommentList().get(0).getCommentId(), parentComment.getId()),
+                () -> assertThat(actual.getParentCommentList().get(0).getChildCommentList()).hasSize(0)
+        );
+    }
+
+    @Test
+    @DisplayName("[전체 댓글 조회] 자식 댓글 작성자가 차단시")
+    void getCommentsWhenBlockedByChildCommenter() {
+        //given
+        block(childCommenter, loginMember);
+        // when
+        CommentElements actual = commentService
+                .getComments(
+                        Accessor.member(loginMember.getId()),
+                        post.getId(),
+                        PageRequest.of(0, DEFAULT_PAGING_SIZE)
+                );
+        // then
+        assertAll(
+                () -> assertThat(actual.getParentCommentList()).hasSize(1),
+                () -> assertEquals(actual.getParentCommentList().get(0).getCommentId(), parentComment.getId()),
+                () -> assertThat(actual.getParentCommentList().get(0).getChildCommentList()).hasSize(0)
+        );
     }
 
     private Post savePost(Member owner) {
