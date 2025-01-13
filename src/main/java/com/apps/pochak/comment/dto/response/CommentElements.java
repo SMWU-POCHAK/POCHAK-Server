@@ -22,15 +22,13 @@ public class CommentElements {
     private String loginMemberProfileImage;
 
     public CommentElements(
-            final Member loginMember, final Page<Comment> parentCommentPage, final List<Comment> childComments
+            final Member loginMember,
+            final Page<Comment> parentCommentPage,
+            final List<Comment> childComments
     ) {
         parentCommentPageInfo = new PageInfo(parentCommentPage);
 
-//        parentCommentList = parentCommentPage.getContent().stream().map(
-//                ParentCommentElement::new
-//        ).collect(Collectors.toList());
         parentCommentList = new ArrayList<>();
-
         for (Comment parentComment : parentCommentPage.getContent()) {
             List<Comment> childCommentList = new ArrayList<>();
             for (Comment childComment : childComments) {
