@@ -34,8 +34,7 @@ import static com.apps.pochak.alarm.domain.AlarmType.OWNER_LIKE;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.NOT_YOUR_ALARM;
 import static com.apps.pochak.post.fixture.PostFixture.CAPTION;
 import static com.apps.pochak.post.fixture.PostFixture.POST_IMAGE;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
