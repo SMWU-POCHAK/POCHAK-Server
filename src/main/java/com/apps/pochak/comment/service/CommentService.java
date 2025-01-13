@@ -45,7 +45,10 @@ public class CommentService {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Post post = postRepository.findPublicPostById(postId);
         final Page<Comment> parentCommentList = commentRepository.findParentCommentByPost(post, loginMember, pageable);
-        final List<Comment> childCommentList = commentRepository.findChildCommentByParentComments(parentCommentList.stream().map(Comment::getId).toList(), loginMember.getId());
+        final List<Comment> childCommentList = commentRepository.findChildCommentByParentComments(
+                parentCommentList.stream().map(Comment::getId).toList(),
+                loginMember.getId()
+        );
 
         return new CommentElements(loginMember, parentCommentList, childCommentList);
     }
@@ -60,7 +63,9 @@ public class CommentService {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Comment parentComment = commentRepository.findParentCommentById(parentCommentId, loginMember)
                 .orElseThrow(() -> new GeneralException(INVALID_POST_ID));
-        final Page<Comment> childComment = commentRepository.findChildCommentByParentComment(parentComment, loginMember, pageable);
+        final Page<Comment> childComment = commentRepository.findChildCommentByParentComment(
+                parentComment, loginMember, pageable
+        );
         return new ParentCommentElement(parentComment, childComment.getContent(), toPageRequest(pageable));
     }
 

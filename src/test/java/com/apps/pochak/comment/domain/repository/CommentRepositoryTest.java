@@ -19,11 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.apps.pochak.comment.fixture.CommentFixture.STATIC_CHILD_COMMENT;
-import static com.apps.pochak.comment.fixture.CommentFixture.STATIC_PARENT_COMMENT;
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
-import static com.apps.pochak.post.fixture.PostFixture.*;
+import static com.apps.pochak.post.fixture.PostFixture.CAPTION;
+import static com.apps.pochak.post.fixture.PostFixture.POST_IMAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
