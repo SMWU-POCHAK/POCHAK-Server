@@ -111,7 +111,9 @@ class PostControllerTest extends ControllerTest {
                                         fieldWithPath("result.postList[].postId").type(NUMBER)
                                                 .description("게시물 리스트: 게시물 아이디").optional(),
                                         fieldWithPath("result.postList[].postImage").type(STRING)
-                                                .description("게시물 리스트: 게시물 이미지").optional()
+                                                .description("게시물 리스트: 게시물 이미지").optional(),
+                                        fieldWithPath("result.postList[].postDate").type(null)
+                                                .description("게시물 리스트: 게시 날짜")
                                 )
                         )
                 );
@@ -165,7 +167,9 @@ class PostControllerTest extends ControllerTest {
                                         fieldWithPath("result.postList[].postId").type(NUMBER)
                                                 .description("게시물 리스트: 게시물 아이디"),
                                         fieldWithPath("result.postList[].postImage").type(STRING)
-                                                .description("게시물 리스트: 게시물 이미지")
+                                                .description("게시물 리스트: 게시물 이미지"),
+                                        fieldWithPath("result.postList[].postDate").type(null)
+                                                .description("게시물 리스트: 게시 날짜")
                                 )
                         )
                 );
@@ -173,8 +177,7 @@ class PostControllerTest extends ControllerTest {
 
     @Test
     @DisplayName("게시물을 업로드한다.")
-    void uploadPostTest() throws Exception {
-
+    void uploadPost() throws Exception {
         String caption = "안녕하세요. 게시물 업로드를 테스트해보겠습니다.";
         final List<String> taggedMemberHandles = List.of(MEMBER1.getHandle());
 
@@ -213,7 +216,7 @@ class PostControllerTest extends ControllerTest {
 
     @Test
     @DisplayName("게시물 상세 페이지를 조회한다.")
-    void getPostDetailTest() throws Exception {
+    void getPostDetail() throws Exception {
         when(postService.getPostDetail(any(), any()))
                 .thenReturn(PostDetailResponse.of()
                         .post(PUBLIC_POST)
@@ -264,6 +267,7 @@ class PostControllerTest extends ControllerTest {
                                                                 ": 만약 로그인한 유저가 게시자라면 null로 전달됨."
                                                 ),
                                         fieldWithPath("result.postImage").type(STRING).description("게시물 이미지 URL"),
+                                        fieldWithPath("result.allowedDate").type(STRING).description("게시 날짜 및 시간"),
                                         fieldWithPath("result.isLike").type(BOOLEAN)
                                                 .description(
                                                         "현재 로그인한 유저가 해당 게시물의 좋아요를 눌렀는지 여부"
@@ -336,5 +340,60 @@ class PostControllerTest extends ControllerTest {
                                 )
                         )
                 );
+    }
+
+    @Test
+    @DisplayName("[게시물 업로드] 중복 회원 태그시 유효성 검사를 한다.")
+    void uploadPost_WhenTagDuplicateMember() throws Exception {
+        String caption = "test caption";
+        final List<String> taggedMemberHandles = List.of(
+                MEMBER1.getHandle(),
+                MEMBER1.getHandle()
+        );
+
+        this.mockMvc.perform(
+                multipart("/api/v2/posts")
+                        .file(getMockMultipartFileOfPost())
+                        .queryParam("taggedMemberHandleList", String.join(", ", taggedMemberHandles))
+                        .queryParam("caption", caption)
+                        .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
+        ).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("[게시물 업로드] 최대 태그 가능한 회원 도달시 유효성 검사를 한다.")
+    void uploadPost_WhenTagMaxMember() throws Exception {
+        String caption = "test caption";
+        final List<String> taggedMemberHandles = List.of(
+                "member1",
+                "member2",
+                "member3",
+                "member4",
+                "member5",
+                "member6"
+        );
+
+        this.mockMvc.perform(
+                multipart("/api/v2/posts")
+                        .file(getMockMultipartFileOfPost())
+                        .queryParam("taggedMemberHandleList", String.join(", ", taggedMemberHandles))
+                        .queryParam("caption", caption)
+                        .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
+        ).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("[게시물 업로드] 태그 가능한 회원에 도달하지 않았을 시 유효성 검사를 한다.")
+    void uploadPost_WhenTagMinMember() throws Exception {
+        String caption = "test caption";
+        final List<String> taggedMemberHandles = List.of();
+
+        this.mockMvc.perform(
+                multipart("/api/v2/posts")
+                        .file(getMockMultipartFileOfPost())
+                        .queryParam("taggedMemberHandleList", String.join(", ", taggedMemberHandles))
+                        .queryParam("caption", caption)
+                        .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
+        ).andExpect(status().isBadRequest());
     }
 }

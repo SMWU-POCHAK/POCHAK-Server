@@ -92,3 +92,21 @@ include::{snippets}/get-memories-pochak/query-parameters.adoc[]
 ==== response body
 include::{snippets}/get-memories-pochak/response-body.adoc[]
 include::{snippets}/get-memories-pochak/response-fields.adoc[]
+
+== `GET` F4F Status
+추억 페이지 맞팔 상태 조회 API
+
+=== Request
+
+include::{snippets}/get-f4f-status/http-request.adoc[]
+
+==== request headers
+include::{snippets}/get-f4f-status/request-headers.adoc[]
+
+==== path params
+include::{snippets}/get-f4f-status/path-parameters.adoc[]
+
+=== Response
+==== response body
+include::{snippets}/get-f4f-status/response-body.adoc[]
+include::{snippets}/get-f4f-status/response-fields.adoc[]

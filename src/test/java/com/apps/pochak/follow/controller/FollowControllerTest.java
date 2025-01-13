@@ -20,7 +20,6 @@ import java.util.List;
 
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
-import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_FOLLOW;
 import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
 import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
 import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER2;
@@ -199,9 +198,7 @@ class FollowControllerTest extends ControllerTest {
     @Test
     @DisplayName("다른 멤버를 팔로우한다.")
     void followTest() throws Exception {
-
-        when(followService.follow(any(), any()))
-                .thenReturn(SUCCESS_FOLLOW);
+        doNothing().when(followService).follow(any(), any());
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders

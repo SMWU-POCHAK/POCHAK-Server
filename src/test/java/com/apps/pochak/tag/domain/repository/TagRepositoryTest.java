@@ -5,6 +5,7 @@ import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.PostStatus;
 import com.apps.pochak.post.domain.repository.PostRepository;
+import com.apps.pochak.post.fixture.PostFixture;
 import com.apps.pochak.tag.domain.Tag;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
@@ -17,12 +18,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.apps.pochak.global.util.PageUtil.getFirstContentFromPage;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
-import static com.apps.pochak.post.fixture.PostFixture.CAPTION;
-import static com.apps.pochak.post.fixture.PostFixture.POST_IMAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
@@ -50,12 +50,12 @@ class TagRepositoryTest {
         Member taggedMember1 = memberRepository.save(TAGGED_MEMBER1);
         Member taggedMember2 = memberRepository.save(TAGGED_MEMBER2);
 
-        Post post = postRepository.save(new Post(owner, POST_IMAGE, CAPTION));
+        Post post = postRepository.save(PostFixture.get(owner));
         post.makePublic();
 
         tagRepository.save(new Tag(post, taggedMember1));
 
-        Post multiTagPost = postRepository.save(new Post(owner, POST_IMAGE, CAPTION));
+        Post multiTagPost = postRepository.save(PostFixture.get(owner));
         multiTagPost.makePublic();
 
         tagRepository.save(new Tag(multiTagPost, taggedMember1));
@@ -142,5 +142,21 @@ class TagRepositoryTest {
         Page<Tag> tag = tagRepository.findTagByOwnerAndMember(owner, member, PageRequest.of(0, 1));
         Long count = tagRepository.countByPost_PostStatusAndPost_OwnerAndMember(PostStatus.PUBLIC, owner, member);
         assertThat(count).isEqualTo(tag.getTotalElements());
+    }
+
+    @Test
+    @DisplayName("[추억 페이지] 1년 전, 내가 태그하거나 태그된 게시물을 조회한다.")
+    void findTagByLocalDate() {
+        Member owner = memberRepository.findByHandleWithoutLogin("owner");
+        Member member = memberRepository.findByHandleWithoutLogin("tagged_member1");
+
+        Page<Tag> tag1YearAgo = tagRepository.findTaggedByDate(owner, member, LocalDate.now().atStartOfDay(),
+                LocalDate.now().atStartOfDay().plusDays(1), PageRequest.of(0, 1));
+        System.out.println(tag1YearAgo.getContent().get(0).getPost().getAllowedDate());
+
+        assertThat(tag1YearAgo.getContent().get(0).getPost().getAllowedDate())
+                .isAfter(LocalDate.now().atStartOfDay())
+                .isBefore(LocalDate.now().atStartOfDay().plusDays(1));
+        assertThat(tag1YearAgo).isNotNull();
     }
 }

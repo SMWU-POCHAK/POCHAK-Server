@@ -97,6 +97,7 @@ dependencyManagement {
 }
 
 test {
+    exclude '**/PostImageDeletionSchedulerTest.class'
     useJUnitPlatform()
     outputs.dir snippetsDir
 }

@@ -1,5 +1,8 @@
 name: prod server
 
+env:
+  JASYPT_KEY: ${{ secrets.JASYPT_KEY }}
+
 on:
   push:
     branches: [ main ]

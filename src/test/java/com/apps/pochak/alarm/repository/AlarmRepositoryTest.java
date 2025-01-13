@@ -15,6 +15,7 @@ import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.member.fixture.MemberFixture;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
+import com.apps.pochak.post.fixture.PostFixture;
 import com.apps.pochak.tag.domain.Tag;
 import com.apps.pochak.tag.domain.repository.TagRepository;
 import jakarta.transaction.Transactional;
@@ -33,7 +34,8 @@ import static com.apps.pochak.alarm.domain.AlarmType.OWNER_LIKE;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.NOT_YOUR_ALARM;
 import static com.apps.pochak.post.fixture.PostFixture.CAPTION;
 import static com.apps.pochak.post.fixture.PostFixture.POST_IMAGE;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Transactional
 @SpringBootTest
@@ -77,7 +79,7 @@ class AlarmRepositoryTest {
         Follow follow = followRepository.save(new Follow(owner, loginMember));
         FollowAlarm followAlarmToLoginMember = alarmRepository.save(new FollowAlarm(follow, loginMember));
 
-        Post post = postRepository.save(new Post(owner, POST_IMAGE, CAPTION));
+        Post post = postRepository.save(PostFixture.get(owner));
 
         LikeEntity likeEntity = likeRepository.save(new LikeEntity(loginMember, post));
         LikeAlarm likeAlarmToOwner = alarmRepository.save(new LikeAlarm(likeEntity, owner, OWNER_LIKE));

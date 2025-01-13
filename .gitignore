@@ -12,6 +12,7 @@ dists
 caches
 daemon
 native
+logs
 
 # ignore html files
 src/main/resources/static/docs/

@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,7 @@ public class PostDetailResponse {
     private List<TagElement> tagList;
     private Boolean isFollow;
     private String postImage;
+    private LocalDateTime allowedDate;
     private Boolean isLike;
     private int likeCount;
     private String caption;
@@ -42,17 +44,15 @@ public class PostDetailResponse {
         this.ownerId = owner.getId();
         this.ownerHandle = owner.getHandle();
         this.ownerProfileImage = owner.getProfileImage();
-
         this.tagList = tagList.stream().map(
                 TagElement::new
         ).collect(Collectors.toList());
-
         this.isFollow = isFollow;
         this.postImage = post.getPostImage();
+        this.allowedDate = post.getAllowedDate();
         this.isLike = isLike;
         this.likeCount = likeCount;
         this.caption = post.getCaption();
-
         if (recentComment != null) {
             this.recentComment = CommentElement.from()
                     .comment(recentComment)

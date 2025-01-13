@@ -6,15 +6,18 @@ import org.springframework.web.context.request.WebRequest;
 
 public class RequestInfo {
 
-    public static String createRequestFullPath(final WebRequest webRequest) {
-        HttpServletRequest request = ((ServletWebRequest) webRequest).getRequest();
-        String fullPath = request.getMethod() + " " + request.getRequestURL();
+    public static String createRequestFullPath(final HttpServletRequest httpServletRequest) {
+        String fullPath = httpServletRequest.getMethod() + " " + httpServletRequest.getRequestURL();
 
-        String queryString = request.getQueryString();
+        String queryString = httpServletRequest.getQueryString();
         if (queryString != null) {
             fullPath += "?" + queryString;
         }
-
         return fullPath;
+    }
+
+    public static String createRequestFullPath(final WebRequest webRequest) {
+        HttpServletRequest request = ((ServletWebRequest) webRequest).getRequest();
+        return createRequestFullPath(request);
     }
 }

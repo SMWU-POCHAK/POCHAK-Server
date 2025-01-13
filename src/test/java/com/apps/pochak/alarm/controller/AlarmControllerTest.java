@@ -18,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.apps.pochak.alarm.fixture.AlarmFixture.*;
@@ -29,6 +30,7 @@ import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
 import static com.apps.pochak.tag.fixture.TagFixture.STATIC_WAITING_TAG;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -73,11 +75,15 @@ class AlarmControllerTest extends ControllerTest {
     @Test
     @DisplayName("로그인한 회원의 알람을 전부 조회한다.")
     void getAllAlarmsTest() throws Exception {
+        AlarmElements alarmElements = new AlarmElements(
+                toPage(
+                        ALARM_LIST.stream().map(
+                                alarm -> {
+                                    alarm.updateCreatedDate();
+                                    return alarm;
+                                }).toList()));
 
-        when(alarmService.getAllAlarms(any(), any()))
-                .thenReturn(
-                        new AlarmElements(toPage(ALARM_LIST))
-                );
+        when(alarmService.getAllAlarms(any(), any())).thenReturn(alarmElements);
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
@@ -124,6 +130,8 @@ class AlarmControllerTest extends ControllerTest {
                                                 .description("[공통] 알람 리스트 | 알람 종류").optional(),
                                         fieldWithPath("result.alarmList[].isChecked").type(BOOLEAN)
                                                 .description("[공통] 알람 리스트 | 알람 확인 여부").optional(),
+                                        fieldWithPath("result.alarmList[].createdDate").type(STRING)
+                                                .description("[공통] 알람 리스트 | 알람 생성 시간").optional(),
                                         fieldWithPath("result.alarmList[].tagId").type(NUMBER)
                                                 .description("[태그 알람] 알람 리스트 | 태그 아이디").optional(),
                                         fieldWithPath("result.alarmList[].ownerId").type(NUMBER)
@@ -228,8 +236,7 @@ class AlarmControllerTest extends ControllerTest {
     @Test
     @DisplayName("알람을 확인하고 비공개 처리한다.")
     void checkAlarmTest() throws Exception {
-
-        when(alarmService.checkAlarm(any(), any())).thenReturn(SUCCESS_CHECK_ALARM);
+        doNothing().when(alarmService).checkAlarm(any(), any());
 
         this.mockMvc.perform(
                         RestDocumentationRequestBuilders
