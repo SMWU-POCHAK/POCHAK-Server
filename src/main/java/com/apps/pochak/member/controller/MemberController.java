@@ -9,6 +9,7 @@ import com.apps.pochak.member.dto.response.MemberElements;
 import com.apps.pochak.member.dto.response.ProfileUpdateResponse;
 import com.apps.pochak.member.service.MemberService;
 import com.apps.pochak.post.dto.PostElements;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -70,7 +71,7 @@ public class MemberController {
     public ApiResponse<ProfileUpdateResponse> updateProfile(
             @Auth final Accessor accessor,
             @PathVariable("handle") final String handle,
-            @ModelAttribute final ProfileUpdateRequest profileUpdateRequest) {
+            @ModelAttribute @Valid final ProfileUpdateRequest profileUpdateRequest) {
         return ApiResponse.onSuccess(
                 memberService.updateProfile(
                         accessor,
