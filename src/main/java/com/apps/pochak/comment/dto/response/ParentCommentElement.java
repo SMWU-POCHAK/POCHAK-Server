@@ -36,7 +36,7 @@ public class ParentCommentElement {
         this(
                 parentComment,
                 childCommentList,
-                PageRequest.of(0, Constant.DEFAULT_PAGING_SIZE)
+                PageRequest.of(0, Constant.COMMENT_PAGING_SIZE)
         );
     }
 

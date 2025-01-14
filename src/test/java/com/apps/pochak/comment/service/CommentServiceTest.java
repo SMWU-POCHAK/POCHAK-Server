@@ -20,7 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
+import static com.apps.pochak.global.Constant.COMMENT_PAGING_SIZE;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
 import static com.apps.pochak.post.fixture.PostFixture.CAPTION;
 import static com.apps.pochak.post.fixture.PostFixture.POST_IMAGE;
@@ -79,7 +79,7 @@ class CommentServiceTest {
                 .getComments(
                         Accessor.member(loginMember.getId()),
                         post.getId(),
-                        PageRequest.of(0, DEFAULT_PAGING_SIZE)
+                        PageRequest.of(0, COMMENT_PAGING_SIZE)
                 );
         // then
         assertAll(
@@ -99,7 +99,7 @@ class CommentServiceTest {
                 .getComments(
                         Accessor.member(loginMember.getId()),
                         post.getId(),
-                        PageRequest.of(0, DEFAULT_PAGING_SIZE)
+                        PageRequest.of(0, COMMENT_PAGING_SIZE)
                 );
         // then
         assertThat(actual.getParentCommentList()).hasSize(0);
@@ -115,7 +115,7 @@ class CommentServiceTest {
                 .getComments(
                         Accessor.member(loginMember.getId()),
                         post.getId(),
-                        PageRequest.of(0, DEFAULT_PAGING_SIZE)
+                        PageRequest.of(0, COMMENT_PAGING_SIZE)
                 );
         // then
         assertThat(actual.getParentCommentList()).hasSize(0);
@@ -131,7 +131,7 @@ class CommentServiceTest {
                 .getComments(
                         Accessor.member(loginMember.getId()),
                         post.getId(),
-                        PageRequest.of(0, DEFAULT_PAGING_SIZE)
+                        PageRequest.of(0, COMMENT_PAGING_SIZE)
                 );
         // then
         assertAll(
@@ -151,7 +151,7 @@ class CommentServiceTest {
                 .getComments(
                         Accessor.member(loginMember.getId()),
                         post.getId(),
-                        PageRequest.of(0, DEFAULT_PAGING_SIZE)
+                        PageRequest.of(0, COMMENT_PAGING_SIZE)
                 );
         // then
         assertAll(
