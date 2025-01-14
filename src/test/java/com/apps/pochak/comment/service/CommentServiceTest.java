@@ -68,7 +68,7 @@ class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("[전체 댓글 조회] 정상 작동")
+    @DisplayName("[전체 댓글 조회] 정상 테스트")
     void getComments() {
         // given
         CommentElement expectedChild = CommentElement.from()
