@@ -32,7 +32,8 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
         if (!alarm.getReceiver().getId().equals(memberId)) {
             throw new GeneralException(NOT_YOUR_ALARM);
         }
-        return alarm;
+        else
+            return alarm;
     }
 
     @Query("""
