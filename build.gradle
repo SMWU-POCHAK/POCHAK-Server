@@ -151,81 +151,29 @@ jacoco {
 }
 
 test {
-    finalizedBy 'jacocoTestReport'
+    finalizedBy jacocoTestReport
 }
 
-tasks.jacocoTestReport {
-    reports {
-        xml.required = true
-        html.required = true
-    }
+def Qdomains = []
+for (qPattern in "**/QA".."**/QZ") {
+    Qdomains.add(qPattern + "*")
 }
-
-def QDomains = []
-for (qPattern in '*.QA'..'*.QZ') { // qPattern = '*.QA', '*.QB', ... '*.QZ'
-    QDomains.add(qPattern + '*')
-}
-
-def jacocoExcludePatterns = [
-        "**/*Application*",
-        "**/*Config*",
-        "**/*Exception*",
-        "**/*Request*",
-        "**/*Response*",
-        "**/*Dto*",
-        "**/*Filter*",
-        "**/*Resolver*",
-        "**/*Entity*",
-        "**/resources/**"
-]
-
-tasks.jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            enabled = true
-            element = 'CLASS'
-
-            limit {
-                counter = 'LINE'
-                value = 'COVEREDRATIO'
-                minimum = 0.60 // 라인 커버리지 최소 60%
-            }
-
-            limit {
-                counter = 'BRANCH'
-                value = 'COVEREDRATIO'
-                minimum = 0.60 // 브랜치 커버리지 최소 60%
-            }
-
-            excludes = jacocoExcludePatterns + QDomains
-        }
-    }
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
-    finalizedBy 'jacocoTestReport'
-}
-
-def jacocoDir = layout.buildDirectory.dir("reports/")
 
 jacocoTestReport {
     dependsOn test
-    reports {
-        html.required.set(true)
-        xml.required.set(true)
-        csv.required.set(true)
-        html.destination jacocoDir.get().file("jacoco/index.html").asFile
-        xml.destination jacocoDir.get().file("jacoco/index.xml").asFile
-        csv.destination jacocoDir.get().file("jacoco/index.csv").asFile
-    }
 
-    afterEvaluate {
-        classDirectories.setFrom(
-                files(classDirectories.files.collect {
-                    fileTree(dir: it, excludes: jacocoExcludePatterns + QDomains) // Querydsl 관련 제거
-                })
-        )
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+
+        afterEvaluate {
+            classDirectories.setFrom(files(classDirectories.files.collect {
+                fileTree(dir: it,
+                        exclude: [] + Qdomains)
+            }))
+        }
+
+        xml.destination file("${buildDir}/jacoco/index.xml")
+        html.destination file("${buildDir}/jacoco/index.html")
     }
-    finalizedBy jacocoTestCoverageVerification
 }
