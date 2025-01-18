@@ -32,7 +32,6 @@ public class MemoriesService {
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
     private final TagRepository tagRepository;
-    private final PostRepository postRepository;
 
     public MemoriesPreviewResponse getMemories(final Accessor accessor, final String handle) {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
