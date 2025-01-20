@@ -6,7 +6,7 @@ on:
 
 env:
   JASYPT_KEY: ${{ secrets.JASYPT_KEY }}
-
+a
 permissions:
   pull-requests: write
 
@@ -60,6 +60,19 @@ jobs:
         with:
           name: jacoco-report
           path: ./artifacts
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: SonarCloud scan
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew sonar --info --stacktrace
 
       - name: Post coverage and build status report on PR
         id: jacoco
