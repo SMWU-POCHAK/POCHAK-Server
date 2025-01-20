@@ -71,9 +71,18 @@ jobs:
           min-coverage-changed-files: 60
        
       - name: Fail PR if overall coverage is less than 40%
+        id: coverage-check
         if: ${{ steps.jacoco.outputs.coverage-overall < 40.0 }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            core.setFailed('Overall coverage is less than 80%!')
+        run: |
+          echo "Overall coverage is less than 40%, blocking merge."
+          curl -X PATCH \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d '{"state": "failure", "description": "Coverage is below the minimum threshold of 40%", "context": "CI/coverage"}' \
+            "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
+
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d '{"event": "request_changes", "body": "Coverage is below 40%, please increase test coverage to proceed with the merge."}' \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews"
+          exit 1
   
