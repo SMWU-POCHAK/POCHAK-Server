@@ -80,6 +80,7 @@ class MemberControllerTest extends ControllerTest {
                                 .followerCount(1)
                                 .followingCount(1)
                                 .isFollow(null)
+                                .isF4F(true)
                                 .build()
                 );
 
@@ -117,6 +118,9 @@ class MemberControllerTest extends ControllerTest {
                                         fieldWithPath("result.isFollow").type(BOOLEAN)
                                                 .description("현재 로그인한 멤버가 조회한 멤버를 팔로우하고 있는지의 여부 : 만약 본인이라면 null이 전달됩니다.")
                                                 .optional(),
+                                        fieldWithPath("result.isF4F").type(BOOLEAN)
+                                                .description("현재 로그인한 멤버가 조회한 멤버와 맞팔로우하고 있는지의 여부 : 만약 본인이라면 null이 전달됩니다.")
+                                                .optional(),
                                         fieldWithPath("result.pageInfo").type(OBJECT).description("게시물 페이징 정보"),
                                         fieldWithPath("result.pageInfo.lastPage").type(BOOLEAN)
                                                 .description(
@@ -138,7 +142,9 @@ class MemberControllerTest extends ControllerTest {
                                         fieldWithPath("result.postList[].postId").type(NUMBER)
                                                 .description("태그된 게시물 리스트: 게시물 아이디").optional(),
                                         fieldWithPath("result.postList[].postImage").type(STRING)
-                                                .description("태그된 게시물 리스트: 게시물 이미지").optional()
+                                                .description("태그된 게시물 리스트: 게시물 이미지").optional(),
+                                        fieldWithPath("result.postList[].postDate").type(null)
+                                                .description("게시물 리스트: 게시 날짜")
                                 )
                         )
                 );
@@ -198,7 +204,9 @@ class MemberControllerTest extends ControllerTest {
                                         fieldWithPath("result.postList[].postId").type(NUMBER)
                                                 .description("업로드한 게시물 리스트: 게시물 아이디"),
                                         fieldWithPath("result.postList[].postImage").type(STRING)
-                                                .description("업로드한 게시물 리스트: 게시물 이미지")
+                                                .description("업로드한 게시물 리스트: 게시물 이미지"),
+                                        fieldWithPath("result.postList[].postDate").type(null)
+                                                .description("게시물 리스트: 게시 날짜")
                                 )
                         )
                 );

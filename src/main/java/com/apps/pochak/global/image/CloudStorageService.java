@@ -13,10 +13,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
-import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.IO_EXCEPTION;
-import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.NULL_FILE;
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -56,7 +57,46 @@ public class CloudStorageService {
         if (blob == null) return;
 
         BlobId idWithGeneration = blob.getBlobId();
-        storage.delete(idWithGeneration);
+        try {
+            storage.delete(idWithGeneration);
+        } catch (Exception e) {
+            throw new GeneralException(DELETE_FILE_ERROR);
+        }
+    }
+
+    public void delete(final List<String> fileUrlList) {
+        List<BlobId> blobIdList = fileUrlList.stream().map(
+                        url -> {
+                            String objectName = getObjectNameFromUrl(url);
+                            Blob blob = storage.get(bucketName, objectName);
+                            if (blob == null) return null;
+                            return blob.getBlobId();
+                        }
+                ).filter(Objects::nonNull)
+                .toList();
+
+        if (!blobIdList.isEmpty())
+            storage.delete(blobIdList);
+    }
+
+    public boolean isObjectDeleted(final String fileUrl) {
+        String objectName = getObjectNameFromUrl(fileUrl);
+        Blob blob = storage.get(bucketName, objectName);
+        return blob == null;
+    }
+
+    public boolean isObjectDeleted(final List<String> fileUrlList) {
+        List<BlobId> blobIdList = fileUrlList.stream().map(
+                        url -> {
+                            String objectName = getObjectNameFromUrl(url);
+                            Blob blob = storage.get(bucketName, objectName);
+                            if (blob == null) return null;
+                            return blob.getBlobId();
+                        }
+                ).filter(Objects::nonNull)
+                .toList();
+
+        return blobIdList.isEmpty();
     }
 
     private String getObjectNameFromUrl(final String fileUrl) {

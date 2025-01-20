@@ -19,12 +19,12 @@ import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/memories")
+@RequestMapping("api/v1/memories/{handle}")
 public class MemoriesController {
 
     private final MemoriesService memoriesService;
 
-    @GetMapping("{handle}")
+    @GetMapping("")
     @MemberOnly
     public ApiResponse<MemoriesPreviewResponse> getMemories(
             @Auth final Accessor accessor,
@@ -33,7 +33,7 @@ public class MemoriesController {
         return ApiResponse.onSuccess(memoriesService.getMemories(accessor, handle));
     }
 
-    @GetMapping("{handle}/pochak")
+    @GetMapping("/pochak")
     @MemberOnly
     public ApiResponse<MemoriesPostResponse> getPochak(
             @Auth final Accessor accessor,
@@ -43,7 +43,7 @@ public class MemoriesController {
         return ApiResponse.onSuccess(memoriesService.getPochak(accessor, handle, pageable));
     }
 
-    @GetMapping("{handle}/pochaked")
+    @GetMapping("/pochaked")
     @MemberOnly
     public ApiResponse<MemoriesPostResponse> getPochaked(
             @Auth final Accessor accessor,
@@ -53,7 +53,7 @@ public class MemoriesController {
         return ApiResponse.onSuccess(memoriesService.getPochaked(accessor, handle, pageable));
     }
 
-    @GetMapping("{handle}/bonded")
+    @GetMapping("/bonded")
     @MemberOnly
     public ApiResponse<MemoriesPostResponse> getBonded(
             @Auth final Accessor accessor,
@@ -63,4 +63,12 @@ public class MemoriesController {
         return ApiResponse.onSuccess(memoriesService.getBonded(accessor, handle, pageable));
     }
 
+    @GetMapping("/f4f/status")
+    @MemberOnly
+    public ApiResponse<Boolean> getF4FStatus(
+            @Auth final Accessor accessor,
+            @PathVariable("handle") final String handle
+    ) {
+        return ApiResponse.onSuccess(memoriesService.getF4FStatus(accessor, handle));
+    }
 }

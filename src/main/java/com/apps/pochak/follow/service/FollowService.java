@@ -4,7 +4,6 @@ import com.apps.pochak.alarm.service.FollowAlarmService;
 import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.follow.domain.repository.FollowRepository;
-import com.apps.pochak.global.api_payload.code.BaseCode;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberFollowCustomRepository;
@@ -19,11 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.apps.pochak.global.BaseEntityStatus.ACTIVE;
-import static com.apps.pochak.global.BaseEntityStatus.DELETED;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
-import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_FOLLOW;
-import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_UNFOLLOW;
 
 @Service
 @Transactional
@@ -34,7 +29,7 @@ public class FollowService {
     private final MemberFollowCustomRepository memberFollowCustomRepository;
     private final FollowAlarmService followAlarmService;
 
-    public BaseCode follow(
+    public void follow(
             final Accessor accessor,
             final String handle
     ) {
@@ -48,25 +43,22 @@ public class FollowService {
         final Optional<Follow> followOptional = followRepository.findFollowBySenderAndReceiver(loginMember, member);
         if (followOptional.isPresent()) {
             final Follow follow = followOptional.get();
-            return toggleFollowStatus(follow);
+            toggleFollowStatus(follow);
         } else {
-            return createAndSaveFollow(loginMember, member);
+            createAndSaveFollow(loginMember, member);
         }
     }
 
-    private BaseCode toggleFollowStatus(Follow follow) {
-        if (follow.getStatus().equals(ACTIVE)) {
-            follow.setStatus(DELETED);
-            followAlarmService.deleteFollowAlarm(follow);
-            return SUCCESS_UNFOLLOW;
-        } else {
-            follow.setStatus(ACTIVE);
+    private void toggleFollowStatus(Follow follow) {
+        follow.toggleCurrentStatus();
+        if (follow.isActive()) {
             followAlarmService.sendFollowAlarm(follow, follow.getReceiver());
-            return SUCCESS_FOLLOW;
+        } else {
+            followAlarmService.deleteFollowAlarm(follow);
         }
     }
 
-    private BaseCode createAndSaveFollow(
+    private void createAndSaveFollow(
             final Member sender,
             final Member receiver
     ) {
@@ -76,7 +68,6 @@ public class FollowService {
                 .build();
         final Follow follow = followRepository.save(newFollow);
         followAlarmService.sendFollowAlarm(follow, receiver);
-        return SUCCESS_FOLLOW;
     }
 
     public void deleteFollower(
