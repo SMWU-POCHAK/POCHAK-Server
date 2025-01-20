@@ -119,8 +119,7 @@ class MemoriesServiceTest extends ServiceTest {
         // then
         assertEquals(expected, actual);
         assertAll(
-                () -> assertEquals(follow.getLastModifiedDate(), actual.getFollowDate()),
-                () -> assertEquals(followed.getLastModifiedDate(), actual.getFollowedDate()),
+                () -> assertEquals(followed.getLastModifiedDate(), actual.getF4fDate()),
                 () -> assertEquals(tagPost.getId(), actual.getMemories().get(MemoriesType.FirstPochak).getPostId()),
                 () -> assertEquals(taggedPost.getId(), actual.getMemories().get(MemoriesType.FirstPochaked).getPostId()),
                 () -> assertEquals(multiTagPost.getId(), actual.getMemories().get(MemoriesType.FirstBonded).getPostId()),
