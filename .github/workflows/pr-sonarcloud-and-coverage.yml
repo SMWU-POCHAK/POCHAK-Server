@@ -6,7 +6,7 @@ on:
 
 env:
   JASYPT_KEY: ${{ secrets.JASYPT_KEY }}
-a
+
 permissions:
   pull-requests: write
 
