@@ -37,7 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @Transactional
 @ExtendWith(SpringExtension.class)
-public class AlarmSchedulerTest {
+class AlarmSchedulerTest {
 
     @Autowired
     private EntityManager entityManager;
