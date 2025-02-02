@@ -160,6 +160,8 @@ for (qPattern in "**/QA".."**/QZ") {
     Qdomains.add(qPattern + "*")
 }
 
+Qdomains.add("com/apps/pochak/**/dto/**")
+
 jacocoTestReport {
     dependsOn test
 
