@@ -112,10 +112,17 @@ class AlarmRepositoryTest {
         Alarm foundAlarm = alarmRepository.findAlarmById(followAlarmToLoginMember.getId(), loginMember.getId());
 
         // then
-        assertEquals(followAlarmToLoginMember.getId(), foundAlarm.getId());
-        GeneralException exception = assertThrows(GeneralException.class, () -> {
-            alarmRepository.findAlarmById(followAlarmToLoginMember.getId(), owner.getId());
-        });
-        assertEquals(NOT_YOUR_ALARM.getMessage(), exception.getErrorReason().getMessage());
+        Long alarmId = followAlarmToLoginMember.getId();
+        Long ownerId = owner.getId();
+
+        assertEquals(alarmId, foundAlarm.getId());
+
+        GeneralException exception = assertThrows(GeneralException.class, () ->
+                alarmRepository.findAlarmById(alarmId, ownerId)
+        );
+
+        String actualMessage = exception.getErrorReason().getMessage();
+        assertEquals(NOT_YOUR_ALARM.getMessage(), actualMessage);
     }
+
 }
