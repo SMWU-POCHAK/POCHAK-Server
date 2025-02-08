@@ -108,6 +108,7 @@ public class OAuthControllerTest extends ControllerTest {
                                         fieldWithPath("result").type(OBJECT).description("결과 데이터"),
                                         fieldWithPath("result.id").type(NUMBER).description("멤버 아이디"),
                                         fieldWithPath("result.socialId").type(STRING).description("소셜 아이디"),
+                                        fieldWithPath("result.profileImage").type(STRING).description("프로필 사진"),
                                         fieldWithPath("result.name").type(STRING).description("회원 이름"),
                                         fieldWithPath("result.email").type(STRING).description("회원 이메일"),
                                         fieldWithPath("result.handle").type(STRING).description("회원 아이디 (핸들)"),
