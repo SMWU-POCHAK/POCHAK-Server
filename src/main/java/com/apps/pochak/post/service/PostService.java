@@ -93,14 +93,18 @@ public class PostService {
             request.validateMemberNotTagged(loginMember);
 
             image = cloudStorageService.upload(request.getPostImage(), POST);
-            final Post post = request.toEntity(image, loginMember);
+            Member pinnedMember = null;
+            if (request.getPinnedHandle() != null) {
+                pinnedMember = memberRepository.findByHandleWithoutLogin(request.getPinnedHandle());
+            }
+            Post post = request.toEntity(image, loginMember, pinnedMember);
             postRepository.save(post);
 
-            final List<String> taggedMemberHandleList = request.getTaggedMemberHandleList();
-            final List<Member> taggedMemberList = memberRepository.findMemberByHandleList(taggedMemberHandleList, loginMember);
-            validateInvalidMemberTag(taggedMemberHandleList, taggedMemberList, image);
+            List<String> taggedMemberHandleList = request.getAllTaggedMember();
+            List<Member> taggedMemberList = memberRepository.findMemberByHandleList(taggedMemberHandleList, loginMember);
+            validateInvalidMemberTag(taggedMemberHandleList, taggedMemberList);
 
-            final List<Tag> tagList = saveTags(taggedMemberList, post);
+            List<Tag> tagList = saveTags(taggedMemberList, post);
             tagAlarmService.saveTagApprovalAlarms(tagList, loginMember);
         } catch (Exception e) {
             if (image != null) {
@@ -112,11 +116,9 @@ public class PostService {
 
     private void validateInvalidMemberTag(
             final List<String> requestMemberList,
-            final List<Member> foundMemberList,
-            final String postImage
+            final List<Member> foundMemberList
     ) {
         if (requestMemberList.size() != foundMemberList.size()) {
-//            cloudStorageService.delete(postImage);
             throw new GeneralException(TAG_INVALID_MEMBER);
         }
     }
