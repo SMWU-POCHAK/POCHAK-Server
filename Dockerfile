@@ -2,6 +2,7 @@ FROM openjdk:17-jdk
 WORKDIR /app
 COPY . /app
 
+RUN chmod +x gradlew
 RUN ./gradlew downloadNewrelic
 RUN ./gradlew unzipNewrelic
 
