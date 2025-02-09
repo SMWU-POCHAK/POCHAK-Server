@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProfileUpdateRequest {
-    @NotNull(message = "사용자의 이름은 필수입니다.")
     @NotBlank(message = "이름은 공백이 될 수 없습니다.")
     @Size(max = 15, message = "이름은 최대 15자까지 가능합니다.")
     private String name;

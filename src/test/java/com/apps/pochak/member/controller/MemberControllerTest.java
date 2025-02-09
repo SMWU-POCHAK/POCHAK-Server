@@ -27,8 +27,7 @@ import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
 import static com.apps.pochak.global.MockMultipartFileConverter.getMockMultipartFileOfMember;
 import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
-import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
-import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER2;
+import static com.apps.pochak.member.fixture.MemberFixture.*;
 import static com.apps.pochak.post.fixture.PostFixture.STATIC_PUBLIC_POST;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -42,6 +41,8 @@ import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureRestDocs
@@ -50,6 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class MemberControllerTest extends ControllerTest {
     private static final Member MEMBER1 = STATIC_MEMBER1;
     private static final Member MEMBER2 = STATIC_MEMBER2;
+    private static final Member MEMBER3 = WRONG_MEMBER;
     private static final Post PUBLIC_POST = STATIC_PUBLIC_POST;
 
     private static final List<Member> MEMBER_LIST = List.of(
@@ -272,6 +274,17 @@ class MemberControllerTest extends ControllerTest {
                                 )
                         )
                 );
+    }
+
+    @Test
+    @DisplayName("프로필 수정 유효성 검사를 한다.")
+    void updateProfileValidationTest() throws Exception {
+        this.mockMvc.perform(
+                put("/api/v2/members/{handle}", MEMBER3.getHandle())
+                        .queryParam("name", MEMBER3.getName())
+                        .queryParam("message", MEMBER3.getMessage())
+                        .contentType(APPLICATION_JSON)
+        ).andExpect(status().isBadRequest());
     }
 
     @Test

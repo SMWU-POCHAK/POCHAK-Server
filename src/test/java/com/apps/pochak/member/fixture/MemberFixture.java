@@ -37,13 +37,16 @@ public class MemberFixture {
 
     public static final Member WRONG_MEMBER = new Member(
             3L,
+//            "wrong_member",
             ".wrong_member#",
-            "공백이 아닌 열다섯자 이내인 회원의 이름",
+//            "null",
+            null,
+//            "",
             """
             1
             2
             3
-            3줄 이내
+            4
             """,
             "aaa@pochak.com",
             null,
