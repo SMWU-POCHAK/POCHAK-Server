@@ -2,8 +2,8 @@ FROM openjdk:17-jdk
 WORKDIR /app
 COPY . /app
 
-RUN if [ ! -f "/newrelic/newrelic-java.zip" ]; then ./gradlew downloadNewrelic; fi
-RUN if [ ! -d "/newrelic" ]; then ./gradlew unzipNewrelic; fi
+RUN ./gradlew downloadNewrelic
+RUN ./gradlew unzipNewrelic
 
 COPY build/libs/*.jar app.jar
 

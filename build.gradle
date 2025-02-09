@@ -141,7 +141,6 @@ bootJar {
     dependsOn copyDocument
 }
 
-// -plain.jar 제거
 jar {
     enabled = false
 }
@@ -207,3 +206,9 @@ sonarqube {
         property "sonar.login", "${System.getenv('SONAR_TOKEN')}"
     }
 }
+
+tasks.bootJar.dependsOn unzipNewrelic
+tasks.resolveMainClassName.dependsOn unzipNewrelic
+tasks.jacocoTestReport.dependsOn unzipNewrelic
+tasks.test.dependsOn unzipNewrelic
+tasks.compileTestJava.dependsOn unzipNewrelic
