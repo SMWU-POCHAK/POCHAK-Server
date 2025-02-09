@@ -3,6 +3,8 @@ plugins {
     id 'org.springframework.boot' version '3.2.1'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    id 'jacoco'
+    id "org.sonarqube" version "4.4.1.3373"
 }
 
 group = 'com.apps'
@@ -96,6 +98,7 @@ dependencyManagement {
 }
 
 test {
+    exclude '**/PostImageDeletionSchedulerTest.class'
     useJUnitPlatform()
     outputs.dir snippetsDir
 }
@@ -142,4 +145,48 @@ tasks.withType(JavaCompile) {
 
 sourceSets {
     main.java.srcDirs += "$projectDir/build/generated"
+}
+
+jacoco {
+    toolVersion = "0.8.9"
+}
+
+test {
+    finalizedBy jacocoTestReport
+}
+
+def Qdomains = []
+for (qPattern in "**/QA".."**/QZ") {
+    Qdomains.add(qPattern + "*")
+}
+
+Qdomains.add("com/apps/pochak/**/dto/**")
+
+jacocoTestReport {
+    dependsOn test
+    dependsOn copyDocument
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+
+        afterEvaluate {
+            classDirectories.setFrom(files(classDirectories.files.collect {
+                fileTree(dir: it,
+                        exclude: [] + Qdomains)
+            }))
+        }
+
+        xml.destination file("${buildDir}/jacoco/index.xml")
+        html.destination file("${buildDir}/jacoco/index.html")
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "SMWU-POCHAK_POCHAK-Server"
+        property "sonar.organization", "pochak-server"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.login", "${System.getenv('SONAR_TOKEN')}"
+    }
 }

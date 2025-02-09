@@ -1,5 +1,6 @@
 package com.apps.pochak.post.fixture;
 
+import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
 
 import java.time.LocalDateTime;
@@ -9,9 +10,12 @@ import static com.apps.pochak.post.domain.PostStatus.PRIVATE;
 import static com.apps.pochak.post.domain.PostStatus.PUBLIC;
 
 public class PostFixture {
+    private static final String POST_IMAGE = "https://avatars.githubusercontent.com/u/163827369?s=200&v=4";
+    private static final String CAPTION = "caption";
 
-    public static final String POST_IMAGE = "https://avatars.githubusercontent.com/u/163827369?s=200&v=4";
-    public static final String CAPTION = "caption test";
+    public static Post get(final Member owner) {
+        return new Post(owner, POST_IMAGE, CAPTION);
+    }
 
     public static final Post STATIC_PUBLIC_POST = new Post(
             1L,

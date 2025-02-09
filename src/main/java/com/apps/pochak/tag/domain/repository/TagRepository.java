@@ -40,6 +40,8 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
         return tag;
     }
 
+    Optional<Tag> findTagByMember(final Member member);
+
     @Query("select t from Tag t " +
             "join fetch t.member " +
             "where t.post = :post ")

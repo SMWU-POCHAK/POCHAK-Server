@@ -10,6 +10,7 @@ import lombok.Getter;
 public class OAuthMemberResponse {
     private Long id;
     private String socialId;
+    private String profileImage;
     private String name;
     private String email;
     private String handle;
@@ -17,7 +18,6 @@ public class OAuthMemberResponse {
     private String accessToken;
     private String refreshToken;
     private Boolean isNewMember;
-
 
     @Builder
     public OAuthMemberResponse(
@@ -47,6 +47,7 @@ public class OAuthMemberResponse {
     ) {
         this.id = member.getId();
         this.socialId = member.getSocialId();
+        this.profileImage = member.getProfileImage();
         this.name = member.getName();
         this.email = member.getEmail();
         this.handle = member.getHandle();

@@ -35,19 +35,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         return post;
     }
 
-    @Query("select p from Post p " +
-            "join Tag t on ( t.post = p and t.member = :member and p.postStatus = 'PUBLIC' ) " +
-            "where p.status = 'ACTIVE'" +
-            "   and p.owner not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
-            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker = p.owner) " +
-            "   and not exists (select t.member from Tag t where t.post = p intersect select b.blockedMember from Block b where b.blocker = :loginMember) " +
-            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker in (select t.member from Tag t where t.post = p)) " +
-            "order by t.lastModifiedDate desc ")
-    Page<Post> findTaggedPost(
-            @Param("member") final Member member,
-            @Param("loginMember") final Member loginMember,
-            final Pageable pageable
-    );
 
     @Query("select distinct p from Post p " +
             "join Tag t on p = t.post and p.postStatus = 'PUBLIC' and t.status = 'ACTIVE' and " +
@@ -77,38 +64,15 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             """)
     Optional<Post> findPostByTag(@Param("tag") final Tag tag);
 
-    @Query("select p from Post p " +
-            "where p.postStatus = 'PUBLIC' and p.status = 'ACTIVE' and p.lastModifiedDate > :nowMinusOneHour ")
-    List<Post> findModifiedPostWithinOneHour(@Param("nowMinusOneHour") final LocalDateTime nowMinusOneHour);
-
-    @Query(value = "select * from post as p " +
-            "where p.id in :postIdList and p.status = 'ACTIVE' " +
-            "   and p.owner_id not in (select b.blocked_id from block b where b.blocker_id = :loginMemberId) " +
-            "   and :loginMemberId not in (select b.blocked_id from block b where b.blocker_id = p.owner_id) " +
-            "   and not exists (select t.member_id from tag t where t.post_id = p.id intersect select b.blocked_id from block b where b.blocker_id = :loginMemberId) " +
-            "   and :loginMemberId not in (select b.blocked_id from block b where b.blocker_id in (select t.member_id from tag t where t.post_id = p.id)) " +
-            "order by find_in_set(id, :postIdStrList) ",
-            nativeQuery = true)
-    Page<Post> findPostsIn(
-            @Param("postIdList") final List<Long> postIdList,
-            @Param("postIdStrList") final String postIdStrList,
-            @Param("loginMemberId") final Long loginMemberId,
+    @Query("""
+        select p from Post p
+        where p.lastModifiedDate <= :expiredDate
+        and p.status = 'DELETED'
+        """)
+    Page<Post> findAllByDeletedAtBefore(
+            @Param("expiredDate") final LocalDateTime expiredDate,
             final Pageable pageable
     );
-
-    default Page<Post> findPostsInIdList(
-            @Param("postIdList") final List<Long> postIdList,
-            final Long loginMemberId,
-            final Pageable pageable
-    ) {
-        final String postIdStrList = convertLongListToString(postIdList);
-        return findPostsIn(
-                postIdList,
-                postIdStrList,
-                loginMemberId,
-                pageable
-        );
-    }
 
     @Query("""
             select p.id from Post p
@@ -124,7 +88,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "order by count(l) desc, p.allowedDate desc ")
     Page<Post> findPopularPost(final Pageable pageable);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("update Post p SET p.status = 'INACTIVE' " +
             "where (p.owner = :memberA and p in (select t.post from Tag t where t.post = p and t.member = :memberB)) " +
             "   or (p.owner = :memberB and p in (select t.post from Tag t where t.post = p and t.member = :memberA)) " +
@@ -135,13 +99,16 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             @Param("memberB") final Member memberB
     );
 
-    @Modifying
-    @Query("update Post p SET p.status = 'ACTIVE' " +
-            "where p.status = 'INACTIVE' " +
-            "   and p.owner not in (select b.blockedMember from Block b where b.blocker in (select t.member from Tag t where t.post = p)) " +
-            "   and not exists (select t.member from Tag t where t.post = p " +
-            "                   intersect " +
-            "                   select b.blockedMember from Block b where b.blocker = p.owner or b.blocker in (select t.member from Tag t where t.post = p))")
+    @Modifying(clearAutomatically = true)
+    @Query("""
+        update Post p SET p.status = 'ACTIVE'
+        where p.status = 'INACTIVE'
+            and p.owner not in
+                (select b.blockedMember from Block b where b.blocker in (select t.member from Tag t where t.post = p))
+            and not exists (select t.member from Tag t where t.post = p
+                            intersect 
+                            select b.blockedMember from Block b where b.blocker = p.owner or b.blocker in (select t.member from Tag t where t.post = p))
+        """)
     void reactivatePostBetweenMembers(
             @Param("memberA") final Member memberA,
             @Param("memberB") final Member memberB

@@ -43,9 +43,12 @@ public class MemberService {
         final Member member = memberRepository.findByHandle(handle, loginMember);
         final long followerCount = followRepository.countActiveFollowByReceiver(member);
         final long followingCount = followRepository.countActiveFollowBySender(member);
-        final Page<Post> taggedPost = postRepository.findTaggedPost(member, loginMember, pageable);
+        final Page<Post> taggedPost = postCustomRepository.findTaggedPostPage(member, accessor.getMemberId(), pageable);
         final Boolean isFollow = (handle.equals(loginMember.getHandle())) ?
                 null : followRepository.existsBySenderAndReceiver(loginMember, member);
+        final Boolean isF4F = (handle.equals(loginMember.getHandle())) ?
+                null : followRepository.existsBySenderAndReceiver(loginMember, member)
+                && followRepository.existsBySenderAndReceiver(member, loginMember);
 
         return ProfileResponse.of()
                 .member(member)
@@ -53,6 +56,7 @@ public class MemberService {
                 .followerCount(followerCount)
                 .followingCount(followingCount)
                 .isFollow(isFollow)
+                .isF4F(isF4F)
                 .build();
     }
 
@@ -90,7 +94,7 @@ public class MemberService {
     ) {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Member member = memberRepository.findByHandle(handle, loginMember);
-        final Page<Post> taggedPost = postRepository.findTaggedPost(member, loginMember, pageable);
+        final Page<Post> taggedPost = postCustomRepository.findTaggedPostPage(member, accessor.getMemberId(), pageable);
         return PostElements.from(taggedPost);
     }
 
