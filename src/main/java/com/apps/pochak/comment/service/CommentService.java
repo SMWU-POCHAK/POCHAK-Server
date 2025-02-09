@@ -8,7 +8,6 @@ import com.apps.pochak.comment.dto.request.CommentUploadRequest;
 import com.apps.pochak.comment.dto.response.CommentElements;
 import com.apps.pochak.comment.dto.response.ParentCommentElement;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
-import com.apps.pochak.login.provider.JwtProvider;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
@@ -45,8 +44,13 @@ public class CommentService {
     ) {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Post post = postRepository.findPublicPostById(postId);
-        final Page<Comment> commentList = commentRepository.findParentCommentByPost(post, loginMember, pageable);
-        return new CommentElements(loginMember, commentList);
+        final Page<Comment> parentCommentList = commentRepository.findParentCommentByPost(post, loginMember, pageable);
+        final List<Comment> childCommentList = commentRepository.findChildCommentByParentComments(
+                parentCommentList.stream().map(Comment::getId).toList(),
+                loginMember.getId()
+        );
+
+        return new CommentElements(loginMember, parentCommentList, childCommentList);
     }
 
     @Transactional(readOnly = true)
@@ -57,9 +61,12 @@ public class CommentService {
             final Pageable pageable
     ) {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
-        final Comment comment = commentRepository.findParentCommentById(parentCommentId, loginMember)
+        final Comment parentComment = commentRepository.findParentCommentById(parentCommentId, loginMember)
                 .orElseThrow(() -> new GeneralException(INVALID_POST_ID));
-        return new ParentCommentElement(comment, toPageRequest(pageable));
+        final Page<Comment> childComment = commentRepository.findChildCommentByParentComment(
+                parentComment, loginMember, pageable
+        );
+        return new ParentCommentElement(parentComment, childComment.getContent(), toPageRequest(pageable));
     }
 
     public void saveComment(

@@ -5,8 +5,7 @@ import com.apps.pochak.post.domain.Post;
 
 import java.time.LocalDateTime;
 
-import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
-import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER2;
+import static com.apps.pochak.member.fixture.MemberFixture.*;
 import static com.apps.pochak.post.domain.PostStatus.PRIVATE;
 import static com.apps.pochak.post.domain.PostStatus.PUBLIC;
 

@@ -30,16 +30,19 @@ public class ParentCommentElement {
     private List<CommentElement> childCommentList;
 
     public ParentCommentElement(
-            final Comment parentComment
+            final Comment parentComment,
+            final List<Comment> childCommentList
     ) {
         this(
                 parentComment,
+                childCommentList,
                 PageRequest.of(0, Constant.DEFAULT_PAGING_SIZE)
         );
     }
 
     public ParentCommentElement(
             final Comment parentComment,
+            final List<Comment> childCommentList,
             final PageRequest pageRequest
     ) {
         final Member member = parentComment.getMember();
@@ -50,7 +53,6 @@ public class ParentCommentElement {
         this.createdDate = parentComment.getCreatedDate();
         this.content = parentComment.getContent();
 
-        final List<Comment> childCommentList = parentComment.getChildCommentList();
         final List<CommentElement> commentElementList = childCommentList.stream()
                 .map(
                         CommentElement::new

@@ -113,4 +113,28 @@ public class MemberFixture {
             .socialType(SocialType.GOOGLE)
             .socialRefreshToken("SOCIAL_REFRESH_TOKEN")
             .build();
+
+    public static final Member PARENT_COMMENTER = Member.signupMember()
+            .name("댓글 단 사람")
+            .email("aaa@pochak.com")
+            .handle("parent_commenter")
+            .message("한 줄 소개")
+            .socialId("SOCIAL_ID")
+            .profileImage(PROFILE_IMAGE)
+            .refreshToken("REFRESH_TOKEN")
+            .socialType(SocialType.GOOGLE)
+            .socialRefreshToken("SOCIAL_REFRESH_TOKEN")
+            .build();
+
+    public static final Member CHILD_COMMENTER = Member.signupMember()
+            .name("답글 단 사람")
+            .email("aaa@pochak.com")
+            .handle("child_commenter")
+            .message("한 줄 소개")
+            .socialId("SOCIAL_ID")
+            .profileImage(PROFILE_IMAGE)
+            .refreshToken("REFRESH_TOKEN")
+            .socialType(SocialType.GOOGLE)
+            .socialRefreshToken("SOCIAL_REFRESH_TOKEN")
+            .build();
 }
