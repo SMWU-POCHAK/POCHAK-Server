@@ -67,7 +67,6 @@ class CommentRepositoryTest {
         //when
         Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
         List<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComments(parentCommentByPost.stream().map(Comment::getId).toList(), loginMember.getId());
-
         //then
         assertAll(
                 () -> assertTrue(parentCommentByPost.hasContent()),
@@ -81,7 +80,6 @@ class CommentRepositoryTest {
     void findChildCommentByParentCommentsWhenBlocked() {
         //given
         block(childCommenter, loginMember);
-
         //when
         Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(
                 post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE)
@@ -119,7 +117,7 @@ class CommentRepositoryTest {
     void findParentCommentByPostWhenBlocked() {
         //given
         block(parentCommenter, loginMember);
-
+      
         //when
         Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
 
