@@ -9,4 +9,4 @@ ARG JASYPT_KEY
 ENV SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-DEV}
 ENV JASYPT_KEY=${JASYPT_KEY:-pw}
 
-CMD java -jar -Duser.timezone=Asia/Seoul app.jar
+CMD java -javaagent:/newrelic/newrelic.jar -Duser.timezone=Asia/Seoul -jar app.jar
