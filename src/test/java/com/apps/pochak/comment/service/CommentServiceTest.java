@@ -114,7 +114,7 @@ class CommentServiceTest {
         CommentElements actual = commentService
                 .getComments(
                         Accessor.member(loginMember.getId()),
-                        post.getId(),
+                        post.getId()
                         PageRequest.of(0, COMMENT_PAGING_SIZE)
                 );
         // then
