@@ -3,11 +3,14 @@ package com.apps.pochak.follow.domain.repository;
 import com.apps.pochak.follow.domain.Follow;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.member.domain.Member;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.NOT_FOLLOW;
@@ -32,6 +35,20 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     default Follow findBySenderAndReceiver(final Member sender, final Member receiver) {
         return findFollowBySenderAndReceiver(sender, receiver).orElseThrow(() -> new GeneralException(NOT_FOLLOW));
     }
+
+    @Query("""
+            select f from Follow f
+            join fetch f.sender
+            where f.receiver = :A
+            and f.sender in (
+                select f2.sender from Follow f2
+                where f2.receiver = :B)
+            """)
+    Page<Follow> findCommonFollowers(
+            @Param("A") final Member memberA,
+            @Param("B") final Member memberB,
+            final Pageable pageable
+    );
 
     @Modifying(clearAutomatically = true)
     @Query("""

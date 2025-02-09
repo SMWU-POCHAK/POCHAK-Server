@@ -10,4 +10,5 @@ public class Constant {
 
     public static final int DEFAULT_PAGING_SIZE = 30;
     public static final int COMMENT_PAGING_SIZE = 10;
+    public static final int DEFAULT_DELETION_SIZE = 100;
 }
