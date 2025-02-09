@@ -164,6 +164,7 @@ Qdomains.add("com/apps/pochak/**/dto/**")
 
 jacocoTestReport {
     dependsOn test
+    dependsOn copyDocument
 
     reports {
         xml.required.set(true)
