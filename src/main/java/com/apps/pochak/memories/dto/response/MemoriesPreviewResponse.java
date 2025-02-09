@@ -23,8 +23,7 @@ public class MemoriesPreviewResponse {
     private String handle;
     private String loginMemberProfileImage;
     private String memberProfileImage;
-    private LocalDateTime followDate;
-    private LocalDateTime followedDate;
+    private LocalDateTime f4fDate;
     private int followDay;
     private Long pochakCount;
     private Long bondedCount;
@@ -46,11 +45,12 @@ public class MemoriesPreviewResponse {
         this.handle = member.getHandle();
         this.loginMemberProfileImage = loginMember.getProfileImage();
         this.memberProfileImage = member.getProfileImage();
-        this.followDate = follow.getLastModifiedDate();
-        this.timeLine.put(this.followDate, TimeLineElement.of(MemoriesType.Follow));
-        this.followedDate = followed.getLastModifiedDate();
-        this.timeLine.put(this.followedDate, TimeLineElement.of(MemoriesType.Followed));
-        this.followDay = findFollowDay(followDate, followedDate);
+        LocalDateTime followDate = follow.getLastModifiedDate();
+        LocalDateTime followedDate = followed.getLastModifiedDate();
+        this.timeLine.put(followDate, TimeLineElement.of(MemoriesType.Follow));
+        this.timeLine.put(followedDate, TimeLineElement.of(MemoriesType.Followed));
+        this.f4fDate = (followDate.isAfter(followedDate) ? followDate : followedDate);
+        this.followDay = findFollowDay(follow.getLastModifiedDate(), followed.getLastModifiedDate());
         this.pochakCount = countTag;
         this.bondedCount = countTaggedWith;
         this.pochakedCount = countTagged;
