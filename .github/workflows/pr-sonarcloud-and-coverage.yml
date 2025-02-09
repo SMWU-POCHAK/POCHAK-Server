@@ -1,0 +1,116 @@
+name: PR Test Coverage
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+env:
+  JASYPT_KEY: ${{ secrets.JASYPT_KEY }}
+
+permissions:
+  pull-requests: write
+
+jobs:
+  test-coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+      - name: Set up GCS Key file
+        id: gcs-key-file
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "gcp-img-role.json"
+          json: ${{ secrets.GCS_KEY }}
+          dir: './src/main/resources/static/'
+
+      - name: Set up Firebase Key file
+        id: firebase-key-file
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "firebase-adminsdk.json"
+          json: ${{ secrets.FIREBASE_KEY }}
+          dir: './src/main/resources/static/'
+
+      - name: Set up Apple Key file
+        run: echo "${{ secrets.APPLE_AUTH_KEY }}" > ./src/main/resources/static/AuthKey_ZJ4VQZNW7D.p8
+        shell: bash
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build and run tests with JaCoCo
+        run: ./gradlew clean test jacocoTestReport
+
+      - name: Upload JaCoCo Report as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: ${{ github.workspace }}/build/jacoco/index.xml
+
+      - name: Download JaCoCo Report Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: jacoco-report
+          path: ./artifacts
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: SonarCloud scan
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew sonarqube --info --stacktrace
+
+      - name: Post coverage and build status report on PR
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.7.1
+        with:
+          paths: ${{ github.workspace }}/build/jacoco/index.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 40
+          min-coverage-changed-files: 60
+       
+      - name: Fail PR if overall coverage is less than 40%
+        id: coverage-check
+        if: ${{ steps.jacoco.outputs.coverage-overall < 40.0 }}
+        run: |
+          echo "Overall coverage is less than 40%, blocking merge."
+          curl -X PATCH \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d '{"state": "failure", "description": "Coverage is below the minimum threshold of 40%", "context": "CI/coverage"}' \
+            "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
+
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d '{"event": "request_changes", "body": "Coverage is below 40%, please increase test coverage to proceed with the merge."}' \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews"
+          exit 1
+
+      - name: Fail PR if build fails
+        if: ${{ failure() }}
+        run: |
+          echo "Build failed, blocking merge."
+          curl -X PATCH \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d '{"state": "failure", "description": "Build failed.", "context": "CI/build"}' \
+            "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
+
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d '{"event": "request_changes", "body": "Build failed. Please fix the build issues to proceed with the merge."}' \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews"
+          exit 1
+  
