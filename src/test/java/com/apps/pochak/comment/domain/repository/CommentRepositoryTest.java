@@ -73,7 +73,7 @@ class CommentRepositoryTest {
         assertAll(
                 () -> assertTrue(parentCommentByPost.hasContent()),
                 () -> assertEquals(parentCommentByPost.getContent().get(0), parentComment),
-                () -> assertEquals(childCommentByParentComment.size(), 1)
+                () -> assertEquals(1, childCommentByParentComment.size())
         );
     }
 
@@ -95,7 +95,7 @@ class CommentRepositoryTest {
         assertAll(
                 () -> assertTrue(parentCommentByPost.hasContent()),
                 () -> assertEquals(parentCommentByPost.getContent().get(0), parentComment),
-                () -> assertEquals(childCommentByParentComment.size(), 0)
+                () -> assertEquals(0, childCommentByParentComment.size())
         );
     }
 
@@ -111,7 +111,7 @@ class CommentRepositoryTest {
         assertAll(
                 () -> assertTrue(parentCommentByPost.hasContent()),
                 () -> assertEquals(parentCommentByPost.getTotalElements(), 1),
-                () -> assertEquals(parentCommentByPost.getContent().get(0), parentComment)
+                () -> assertEquals(parentComment, parentCommentByPost.getContent().get(0))
         );
     }
 
@@ -125,7 +125,7 @@ class CommentRepositoryTest {
         Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
 
         //then
-        assertEquals(parentCommentByPost.getTotalElements(), 0);
+        assertEquals(0, parentCommentByPost.getTotalElements());
     }
 
     @DisplayName("[자식 댓글 조회] 정상 테스트")
@@ -137,7 +137,7 @@ class CommentRepositoryTest {
 
         //then
         assertEquals(childCommentByParentComment.getContent().size(), 1);
-        assertEquals(childCommentByParentComment.getContent().get(0), childComment);
+        assertEquals(childComment, childCommentByParentComment.getContent().get(0));
     }
 
     @DisplayName("[자식 댓글 조회] 자식 댓글 작성자 차단시")
@@ -160,7 +160,7 @@ class CommentRepositoryTest {
         assertAll(
                 () -> assertTrue(parentCommentByPost.hasContent()),
                 () -> assertEquals(parentCommentByPost.getContent().get(0), parentComment),
-                () -> assertEquals(childCommentByParentComment.getContent().size(), 0)
+                () -> assertEquals(0, childCommentByParentComment.getContent().size())
         );
     }
 
