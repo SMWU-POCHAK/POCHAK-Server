@@ -1,8 +1,10 @@
 FROM openjdk:17-jdk
 WORKDIR /app
 COPY . /app
-RUN ./gradlew downloadNewrelic
-RUN ./gradlew unzipNewrelic
+
+RUN if [ ! -f "/newrelic/newrelic-java.zip" ]; then ./gradlew downloadNewrelic; fi
+RUN if [ ! -d "/newrelic" ]; then ./gradlew unzipNewrelic; fi
+
 COPY build/libs/*.jar app.jar
 
 ARG SPRING_PROFILES_ACTIVE
