@@ -34,6 +34,7 @@ public class CommentElements {
             for (Comment childComment : childComments) {
                 if (Objects.equals(parentComment.getId(), childComment.getParentComment().getId())) {
                     childCommentList.add(childComment);
+                    break;
                 }
             }
             parentCommentList.add(new ParentCommentElement(parentComment, childCommentList));

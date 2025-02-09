@@ -49,22 +49,28 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             Pageable pageable
     );
 
-    @Query("select c from Comment c " +
-            "join fetch c.member " +
-            "where c.id = :commentId " +
-            "   and c.parentComment is null " +
-            "   and c.member not in (select b.blockedMember from Block b where b.blocker = :loginMember)" +
-            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker = c.member) ")
+    @Query("""
+            select c from Comment c
+            join fetch c.member
+            where c.id = :commentId
+               and c.parentComment is null
+               and c.member not in (select b.blockedMember from Block b where b.blocker = :loginMember)
+               and :loginMember not in (select b.blockedMember from Block b where b.blocker = c.member)
+            order by c.createdDate desc
+            """)
     Optional<Comment> findParentCommentById(
             @Param("commentId") final Long commentId,
             @Param("loginMember") final Member loginMember
     );
 
-    @Query("select c from Comment c " +
-            "join fetch c.member " +
-            "where c.parentComment = :parentComment " +
-            "   and c.member not in (select b.blockedMember from Block b where b.blocker = :loginMember) " +
-            "   and :loginMember not in (select b.blockedMember from Block b where b.blocker = c.member)")
+    @Query("""
+            select c from Comment c
+            join fetch c.member
+            where c.parentComment = :parentComment
+               and c.member not in (select b.blockedMember from Block b where b.blocker = :loginMember)
+               and :loginMember not in (select b.blockedMember from Block b where b.blocker = c.member)
+            order by c.createdDate desc
+            """)
     Page<Comment> findChildCommentByParentComment(@Param("parentComment") Comment parentComment,
                                                   @Param("loginMember") Member loginMember,
                                                   Pageable pageable);
@@ -73,14 +79,14 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             select child_comments.*
             from (
                 select c.*,
-                       ROW_NUMBER() OVER (partition by c.parent_comment_id) as row_num
+                       ROW_NUMBER() OVER (partition by c.parent_comment_id order by c.created_date desc) as row_num
                 from comment c
                 join member m on c.member_id = m.id
                 where c.parent_comment_id in ?1
                   and c.member_id not in (select b.blocked_id from block b where b.blocker_id = ?2)
                   and ?2 not in (select b.blocked_id from block b where b.blocker_id = c.member_id)
             ) child_comments
-            where child_comments.row_num <= 30""", nativeQuery = true)
+            where child_comments.row_num = 1""", nativeQuery = true)
     List<Comment> findChildCommentByParentComments(List<Long> parentCommentIds, Long loginMemberId);
 
     @Modifying

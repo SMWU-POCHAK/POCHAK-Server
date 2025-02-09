@@ -14,7 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
-import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
+import static com.apps.pochak.global.Constant.COMMENT_PAGING_SIZE;
 import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_DELETE_COMMENT;
 import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_UPLOAD_COMMENT;
 
@@ -29,7 +29,7 @@ public class CommentController {
     public ApiResponse<CommentElements> getComments(
             @Auth final Accessor accessor,
             @PathVariable("postId") final Long postId,
-            @PageableDefault(DEFAULT_PAGING_SIZE) final Pageable pageable
+            @PageableDefault(COMMENT_PAGING_SIZE) final Pageable pageable
     ) {
         return ApiResponse.onSuccess(
                 commentService.getComments(
@@ -46,7 +46,7 @@ public class CommentController {
             @Auth final Accessor accessor,
             @PathVariable("postId") final Long postId,
             @PathVariable("parentCommentId") final Long parentCommentId,
-            @PageableDefault(DEFAULT_PAGING_SIZE) final Pageable pageable
+            @PageableDefault(COMMENT_PAGING_SIZE) final Pageable pageable
     ) {
         return ApiResponse.onSuccess(
                 commentService.getChildCommentsByParentCommentId(

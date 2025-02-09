@@ -7,6 +7,7 @@ import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
+import com.apps.pochak.post.fixture.PostFixture;
 import com.apps.pochak.tag.domain.repository.TagRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,10 +22,7 @@ import java.util.List;
 
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
-import static com.apps.pochak.post.fixture.PostFixture.CAPTION;
-import static com.apps.pochak.post.fixture.PostFixture.POST_IMAGE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
@@ -70,9 +68,11 @@ class CommentRepositoryTest {
         Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
         List<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComments(parentCommentByPost.stream().map(Comment::getId).toList(), loginMember.getId());
         //then
-        assertTrue(parentCommentByPost.hasContent());
-        assertEquals(parentCommentByPost.getContent().get(0), parentComment);
-        assertEquals(childCommentByParentComment.size(), 1);
+        assertAll(
+                () -> assertTrue(parentCommentByPost.hasContent()),
+                () -> assertEquals(parentCommentByPost.getContent().get(0), parentComment),
+                () -> assertEquals(1, childCommentByParentComment.size())
+        );
     }
 
     @DisplayName("[전체 댓글 조회] 부모 댓글의 특정 자식 댓글 차단시")
@@ -81,23 +81,35 @@ class CommentRepositoryTest {
         //given
         block(childCommenter, loginMember);
         //when
-        Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
-        List<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComments(parentCommentByPost.stream().map(Comment::getId).toList(), loginMember.getId());
+        Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(
+                post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
+        List<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComments(
+                parentCommentByPost.stream().map(Comment::getId).toList(), loginMember.getId()
+        );
+
         //then
-        assertTrue(parentCommentByPost.hasContent());
-        assertEquals(parentCommentByPost.getContent().get(0), parentComment);
-        assertEquals(childCommentByParentComment.size(), 0);
+        assertAll(
+                () -> assertTrue(parentCommentByPost.hasContent()),
+                () -> assertEquals(parentCommentByPost.getContent().get(0), parentComment),
+                () -> assertEquals(0, childCommentByParentComment.size())
+        );
     }
 
     @DisplayName("[부모 댓글 조회] 정상 테스트")
     @Test
     void findParentCommentByPost() {
         //when
-        Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
+        Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(
+                post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
+
         //then
-        assertTrue(parentCommentByPost.hasContent());
-        assertEquals(parentCommentByPost.getTotalElements(), 1);
-        assertEquals(parentCommentByPost.getContent().get(0), parentComment);
+        assertAll(
+                () -> assertTrue(parentCommentByPost.hasContent()),
+                () -> assertEquals(parentCommentByPost.getTotalElements(), 1),
+                () -> assertEquals(parentComment, parentCommentByPost.getContent().get(0))
+        );
     }
 
     @DisplayName("[부모 댓글 조회] 부모 댓글 작성자 차단시")
@@ -105,20 +117,24 @@ class CommentRepositoryTest {
     void findParentCommentByPostWhenBlocked() {
         //given
         block(parentCommenter, loginMember);
+      
         //when
         Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
+
         //then
-        assertEquals(parentCommentByPost.getTotalElements(), 0);
+        assertEquals(0, parentCommentByPost.getTotalElements());
     }
 
     @DisplayName("[자식 댓글 조회] 정상 테스트")
     @Test
     void findChildCommentByParentComment() {
         //when
-        Page<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComment(parentComment, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
+        Page<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComment(
+                parentComment, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
+
         //then
         assertEquals(childCommentByParentComment.getContent().size(), 1);
-        assertEquals(childCommentByParentComment.getContent().get(0), childComment);
+        assertEquals(childComment, childCommentByParentComment.getContent().get(0));
     }
 
     @DisplayName("[자식 댓글 조회] 자식 댓글 작성자 차단시")
@@ -126,19 +142,27 @@ class CommentRepositoryTest {
     void findChildCommentByParentCommentWhenBlocked() {
         //given
         block(childCommenter, loginMember);
+
         //when
-        Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
+        Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(
+                post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
         Page<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComment(
-                        parentCommentByPost.getContent().get(0), loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE)
-                );
+                parentCommentByPost.getContent().get(0),
+                loginMember,
+                PageRequest.of(0, DEFAULT_PAGING_SIZE)
+        );
+
         //then
-        assertTrue(parentCommentByPost.hasContent());
-        assertEquals(parentCommentByPost.getContent().get(0), parentComment);
-        assertEquals(childCommentByParentComment.getContent().size(), 0);
+        assertAll(
+                () -> assertTrue(parentCommentByPost.hasContent()),
+                () -> assertEquals(parentCommentByPost.getContent().get(0), parentComment),
+                () -> assertEquals(0, childCommentByParentComment.getContent().size())
+        );
     }
 
     private Post savePost(Member owner) {
-        Post post = postRepository.save(new Post(owner, POST_IMAGE, CAPTION));
+        Post post = postRepository.save(PostFixture.get(owner));
         post.makePublic();
         return post;
     }
