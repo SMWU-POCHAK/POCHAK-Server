@@ -44,6 +44,14 @@ jobs:
         run: chmod +x ./gradlew
         shell: bash
 
+      - name: Download New Relic
+        run: ./gradlew downloadNewrelic
+        shell: bash
+
+      - name: Unzip New Relic
+        run: ./gradlew unzipNewrelic
+        shell: bash
+
       - name: Build with Gradle
         run: ./gradlew clean build
         shell: bash

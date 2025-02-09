@@ -206,19 +206,3 @@ sonarqube {
         property "sonar.login", "${System.getenv('SONAR_TOKEN')}"
     }
 }
-
-tasks.named('compileJava') {
-    dependsOn unzipNewrelic
-}
-tasks.named('processResources') {
-    dependsOn unzipNewrelic
-}
-tasks.named('processTestResources') {
-    dependsOn unzipNewrelic
-}
-tasks.named('compileTestJava') {
-    dependsOn unzipNewrelic
-}
-tasks.named('test') {
-    dependsOn unzipNewrelic
-}
