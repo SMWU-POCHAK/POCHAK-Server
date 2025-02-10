@@ -3,7 +3,9 @@ package com.apps.pochak.fcm.util;
 import com.apps.pochak.alarm.domain.Alarm;
 import com.google.firebase.messaging.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MessageUtil {
@@ -13,9 +15,7 @@ public class MessageUtil {
     ) {
         return makeMessage(
                 alarm.getReceiver().getFcmToken(),
-                alarm.getPushNotificationTitle(),
-                alarm.getPushNotificationBody(),
-                alarm.getPushNotificationImage()
+                alarm
         );
     }
 
@@ -28,49 +28,43 @@ public class MessageUtil {
                         .filter(a -> a.getReceiver().hasFcmToken())
                         .map(a -> a.getReceiver().getFcmToken())
                         .collect(Collectors.toList()),
-                alarm.getPushNotificationTitle(),
-                alarm.getPushNotificationBody(),
-                alarm.getPushNotificationImage()
+                alarm
         );
     }
 
     private static Message makeMessage(
             final String targetToken,
-            final String title,
-            final String body,
-            final String image
+            final Alarm alarm
     ) {
         Notification notification = Notification
                 .builder()
-                .setTitle(title)
-                .setBody(body)
-                .setImage(image)
+                .setTitle(alarm.getPushNotificationTitle())
+                .setBody(alarm.getPushNotificationBody())
+                .setImage(alarm.getPushNotificationImage())
                 .build();
 
         return Message.builder()
                 .setNotification(notification)
                 .setApnsConfig(iOSConfig())
-                .setAndroidConfig(androidConfig())
+                .setAndroidConfig(androidConfig(alarm))
                 .setToken(targetToken)
                 .build();
     }
 
     private static MulticastMessage makeMessages(
             final List<String> targetTokens,
-            final String title,
-            final String body,
-            final String image
+            final Alarm alarm
     ) {
         Notification notification = Notification.builder()
-                .setTitle(title)
-                .setBody(body)
-                .setImage(image)
+                .setTitle(alarm.getPushNotificationTitle())
+                .setBody(alarm.getPushNotificationBody())
+                .setImage(alarm.getPushNotificationImage())
                 .build();
 
         return MulticastMessage.builder()
                 .setNotification(notification)
                 .setApnsConfig(iOSConfig())
-                .setAndroidConfig(androidConfig())
+                .setAndroidConfig(androidConfig(alarm))
                 .addAllTokens(targetTokens)
                 .build();
     }
@@ -85,13 +79,31 @@ public class MessageUtil {
                 .build();
     }
 
-    private static AndroidConfig androidConfig() {
+    private static AndroidConfig androidConfig(final Alarm alarm) {
         AndroidNotification androidNotification = AndroidNotification.builder()
                 .setSound("default")
                 .build();
 
         return AndroidConfig.builder()
                 .setNotification(androidNotification)
+                .putAllData(
+                        androidDataPayload(
+                                alarm.getPushNotificationTitle(),
+                                alarm.getPushNotificationBody(),
+                                alarm.getPushNotificationImage()
+                        ))
                 .build();
+    }
+
+    private static Map<String, String> androidDataPayload(
+            final String title,
+            final String body,
+            final String image
+    ) {
+        Map<String, String> data = new HashMap<>();
+        data.put("title", title);
+        data.put("body", body);
+        data.put("image", image);
+        return data;
     }
 }
