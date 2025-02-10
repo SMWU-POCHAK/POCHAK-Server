@@ -26,6 +26,7 @@ import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
 import static com.apps.pochak.global.MockMultipartFileConverter.getMockMultipartFileOfPost;
 import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
 import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER2;
 import static com.apps.pochak.post.fixture.PostFixture.STATIC_PUBLIC_POST;
 import static com.apps.pochak.tag.fixture.TagFixture.STATIC_APPROVED_TAG;
 import static org.mockito.ArgumentMatchers.any;
@@ -48,6 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @MockBean(JpaMetamodelMappingContext.class)
 class PostControllerTest extends ControllerTest {
     private static final Member MEMBER1 = STATIC_MEMBER1;
+    private static final Member MEMBER2 = STATIC_MEMBER2;
     private static final Comment CHILD_COMMENT = STATIC_CHILD_COMMENT;
     private static final Post PUBLIC_POST = STATIC_PUBLIC_POST;
     private static final Tag APPROVED_TAG = STATIC_APPROVED_TAG;
@@ -202,6 +204,47 @@ class PostControllerTest extends ControllerTest {
                                 ),
                                 queryParameters(
                                         parameterWithName("taggedMemberHandleList").description("태그된 멤버들의 아이디(handle) 리스트"),
+                                        parameterWithName("caption").description("게시물 내용")
+                                ),
+                                responseFields(
+                                        fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),
+                                        fieldWithPath("code").type(STRING).description("결과 코드"),
+                                        fieldWithPath("message").type(STRING).description("결과 메세지")
+                                )
+
+                        )
+                );
+    }
+
+    @Test
+    @DisplayName("순간포착 게시물을 업로드한다.")
+    void uploadMomentPost() throws Exception {
+        String caption = "안녕하세요. 순간포착 게시물 업로드를 테스트해보겠습니다.";
+        final List<String> taggedMemberHandles = List.of(MEMBER1.getHandle());
+
+        doNothing().when(postService).savePost(any(), any());
+
+        this.mockMvc.perform(
+                        multipart("/api/v2/posts")
+                                .file(getMockMultipartFileOfPost())
+                                .queryParam("taggedMemberHandleList", String.join(", ", taggedMemberHandles))
+                                .queryParam("pinnedHandle", MEMBER2.getHandle())
+                                .queryParam("caption", caption)
+                                .header(ACCESS_TOKEN_HEADER, ACCESS_TOKEN)
+                ).andExpect(status().isOk())
+                .andDo(
+                        document("upload-moment-post",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(
+                                        headerWithName("Authorization").description("Basic auth credentials")
+                                ),
+                                requestParts(
+                                        partWithName("postImage").description("업로드 할 게시물 사진 파일 : 빈 파일 전달 시 에러 발생")
+                                ),
+                                queryParameters(
+                                        parameterWithName("taggedMemberHandleList").description("태그된 멤버들의 아이디(handle) 리스트"),
+                                        parameterWithName("pinnedHandle").description("고정된 멤버의 아이디(handle)"),
                                         parameterWithName("caption").description("게시물 내용")
                                 ),
                                 responseFields(

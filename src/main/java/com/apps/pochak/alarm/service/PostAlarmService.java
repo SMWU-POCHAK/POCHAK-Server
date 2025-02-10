@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.apps.pochak.global.Constant.DEFAULT_DELETION_SIZE;
-import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 
 @Service
 @RequiredArgsConstructor

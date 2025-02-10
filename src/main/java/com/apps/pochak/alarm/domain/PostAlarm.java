@@ -20,6 +20,16 @@ public class PostAlarm extends Alarm {
     private String memberProfileImage;
 
     public PostAlarm(
+            final Long id,
+            final Post post,
+            final Member receiver,
+            final AlarmType alarmType
+    ) {
+        super(id, receiver, alarmType, post.getOwner());
+        initializeFields(post);
+    }
+
+    public PostAlarm(
             final Post post,
             final Member receiver,
             final AlarmType alarmType
