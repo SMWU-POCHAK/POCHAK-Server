@@ -11,9 +11,9 @@ import com.apps.pochak.post.domain.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.apps.pochak.global.Constant.DEFAULT_DELETION_SIZE;
@@ -25,7 +25,6 @@ public class PostAlarmService {
     private final FollowRepository followRepository;
     private final FCMService fcmService;
 
-    @Async
     public void saveMomentPostAlarm(final Post post) {
         PageRequest pageRequest = PageRequest.of(0, DEFAULT_DELETION_SIZE);
         Page<Follow> commonFollowers;
@@ -39,7 +38,7 @@ public class PostAlarmService {
                     f -> new PostAlarm(post, f.getSender(), AlarmType.MOMENT_POST)
             ).toList();
             alarmRepository.saveAll(alarmList);
-            fcmService.sendPushNotification((Alarm) alarmList);
+            fcmService.sendPushNotification(new ArrayList<Alarm>(alarmList));
             pageRequest = pageRequest.next();
         } while (commonFollowers.hasNext());
     }
