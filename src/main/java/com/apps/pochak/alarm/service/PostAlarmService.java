@@ -34,7 +34,7 @@ public class PostAlarmService {
             commonFollowers = followRepository.findCommonFollowers(
                     post.getOwner(),
                     post.getPinnedMember(),
-                    PageRequest.of(0, DEFAULT_PAGING_SIZE)
+                    pageRequest
             );
             List<PostAlarm> alarmList = commonFollowers.getContent().stream().map(
                     f -> new PostAlarm(post, f.getSender(), AlarmType.MOMENT_POST)
