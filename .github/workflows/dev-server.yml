@@ -74,4 +74,4 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             sudo sh deploy.sh
-            docker run -p 9090:9090 -v /home/ubuntu/prometheus/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml --name prometheus --network pochak-dev_default -d prom/prometheus --config.file=/etc/prometheus/prometheus.yml
+#            docker run -p 9090:9090 -v /home/ubuntu/prometheus/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml --name prometheus --network pochak-dev_default -d prom/prometheus --config.file=/etc/prometheus/prometheus.yml
