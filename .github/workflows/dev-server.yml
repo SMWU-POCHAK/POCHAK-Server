@@ -44,13 +44,12 @@ jobs:
         run: chmod +x ./gradlew
         shell: bash
 
-      - name: Download New Relic
-        run: ./gradlew downloadNewrelic
-        shell: bash
-
-      - name: Unzip New Relic
-        run: ./gradlew unzipNewrelic
-        shell: bash
+      - name: Download and Extract New Relic
+        run: |
+            mkdir -p newrelic
+            curl -o newrelic/newrelic-java.zip https://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic-java.zip
+            unzip newrelic/newrelic-java.zip -d newrelic/
+          shell: bash
 
       - name: Build with Gradle
         run: ./gradlew clean build
