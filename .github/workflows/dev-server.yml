@@ -72,8 +72,6 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          script: sudo sh deploy.sh
-
-      - name: Add Prometheus
-        run: docker run -p 9090:9090 -v /home/ubuntu/prometheus/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml --name prometheus -d prom/prometheus --config.file=/etc/prometheus/prometheus.yml
-        shell: bash
+          script: |
+            sudo sh deploy.sh
+            docker run -p 9090:9090 -v /home/ubuntu/prometheus/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml --name prometheus -d prom/prometheus --config.file=/etc/prometheus/prometheus.yml
