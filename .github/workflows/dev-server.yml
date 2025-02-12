@@ -72,6 +72,8 @@ jobs:
           build-args: |
             SPRING_PROFILES_ACTIVE=DEV
             JASYPT_KEY=${{ secrets.JASYPT_KEY }}
+            NEW_RELIC_LICENSE_KEY=${{ secrets.NEW_RELIC_LICENSE_KEY }}
+
 
       - name: Execute remote ssh & Deploy Dev server
         uses: appleboy/ssh-action@master
