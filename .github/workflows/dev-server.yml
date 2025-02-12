@@ -50,6 +50,13 @@ jobs:
         run: chmod +x ./gradlew
         shell: bash
 
+      - name: Download and Extract New Relic
+        run: |
+            mkdir -p newrelic
+            curl -o newrelic/newrelic-java.zip https://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic-java.zip
+            unzip newrelic/newrelic-java.zip -d newrelic/
+        shell: bash
+
       - name: Build with Gradle
         run: ./gradlew clean build
         shell: bash
@@ -70,6 +77,8 @@ jobs:
           build-args: |
             SPRING_PROFILES_ACTIVE=DEV
             JASYPT_KEY=${{ secrets.JASYPT_KEY }}
+            NEW_RELIC_LICENSE_KEY=${{ secrets.NEW_RELIC_LICENSE_KEY }}
+
 
       - name: Execute remote ssh & Deploy Dev server
         uses: appleboy/ssh-action@master
