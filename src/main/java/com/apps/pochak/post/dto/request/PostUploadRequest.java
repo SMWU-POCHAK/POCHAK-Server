@@ -34,12 +34,10 @@ public class PostUploadRequest {
     private List<String> taggedMemberHandleList;
 
     public Post toEntity(
-            final String postImage,
             final Member owner
     ) {
         return Post.builder()
                 .caption(this.caption)
-                .postImage(postImage)
                 .owner(owner)
                 .build();
     }

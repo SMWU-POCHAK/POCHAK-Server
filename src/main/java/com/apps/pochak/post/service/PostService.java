@@ -92,9 +92,9 @@ public class PostService {
             final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
             request.validateMemberNotTagged(loginMember);
 
-            image = cloudStorageService.upload(request.getPostImage(), POST);
-            final Post post = request.toEntity(image, loginMember);
-            postRepository.save(post);
+            final Post post = postRepository.save(request.toEntity(loginMember));
+            image = cloudStorageService.upload(request.getPostImage(), POST, post.getId().toString());
+            post.updateImage(image);
 
             final List<String> taggedMemberHandleList = request.getTaggedMemberHandleList();
             final List<Member> taggedMemberList = memberRepository.findMemberByHandleList(taggedMemberHandleList, loginMember);
