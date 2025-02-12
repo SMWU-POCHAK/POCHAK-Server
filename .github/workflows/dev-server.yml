@@ -49,7 +49,7 @@ jobs:
             mkdir -p newrelic
             curl -o newrelic/newrelic-java.zip https://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic-java.zip
             unzip newrelic/newrelic-java.zip -d newrelic/
-          shell: bash
+        shell: bash
 
       - name: Build with Gradle
         run: ./gradlew clean build
