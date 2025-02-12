@@ -2,6 +2,7 @@ name: dev server
 
 env:
   JASYPT_KEY: ${{ secrets.JASYPT_KEY }}
+  NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
 
 on:
   push:
