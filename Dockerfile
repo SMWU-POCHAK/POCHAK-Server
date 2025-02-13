@@ -1,7 +1,7 @@
 FROM openjdk:17-jdk
 WORKDIR /app
 COPY build/libs/*.jar app.jar
-EXPOSE 3000
+EXPOSE 5000
 
 ARG SPRING_PROFILES_ACTIVE
 ARG JASYPT_KEY
