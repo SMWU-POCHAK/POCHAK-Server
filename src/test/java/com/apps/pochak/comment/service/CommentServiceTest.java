@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.apps.pochak.global.Constant.COMMENT_PAGING_SIZE;
@@ -55,6 +56,7 @@ class CommentServiceTest {
     private Post post;
     private Comment parentComment;
     private Comment childComment;
+    private Comment childComment2;
 
     @BeforeEach
     void setUp() {
@@ -70,15 +72,17 @@ class CommentServiceTest {
     @DisplayName("[전체 댓글 조회] 정상 테스트")
     void getComments() {
         // given
+        childComment2 = saveChildComment(childCommenter, post, parentComment);
+
         CommentElement expectedChild = CommentElement.from()
-                .comment(childComment)
+                .comment(childComment2)
                 .build();
         // then
         CommentElements actual = commentService
                 .getComments(
                         Accessor.member(loginMember.getId()),
                         post.getId(),
-                        PageRequest.of(0, COMMENT_PAGING_SIZE)
+                        PageRequest.of(0, COMMENT_PAGING_SIZE, Sort.by(Sort.Direction.DESC, "createdDate"))
                 );
         // then
         assertAll(
@@ -98,7 +102,7 @@ class CommentServiceTest {
                 .getComments(
                         Accessor.member(loginMember.getId()),
                         post.getId(),
-                        PageRequest.of(0, COMMENT_PAGING_SIZE)
+                        PageRequest.of(0, COMMENT_PAGING_SIZE, Sort.by(Sort.Direction.ASC, "createdDate"))
                 );
         // then
         assertThat(actual.getParentCommentList()).hasSize(0);
@@ -114,7 +118,7 @@ class CommentServiceTest {
                 .getComments(
                         Accessor.member(loginMember.getId()),
                         post.getId(),
-                        PageRequest.of(0, COMMENT_PAGING_SIZE)
+                        PageRequest.of(0, COMMENT_PAGING_SIZE, Sort.by(Sort.Direction.ASC, "createdDate"))
                 );
         // then
         assertThat(actual.getParentCommentList()).hasSize(0);
@@ -130,7 +134,7 @@ class CommentServiceTest {
                 .getComments(
                         Accessor.member(loginMember.getId()),
                         post.getId(),
-                        PageRequest.of(0, COMMENT_PAGING_SIZE)
+                        PageRequest.of(0, COMMENT_PAGING_SIZE, Sort.by(Sort.Direction.ASC, "createdDate"))
                 );
         // then
         assertAll(
@@ -150,7 +154,7 @@ class CommentServiceTest {
                 .getComments(
                         Accessor.member(loginMember.getId()),
                         post.getId(),
-                        PageRequest.of(0, COMMENT_PAGING_SIZE)
+                        PageRequest.of(0, COMMENT_PAGING_SIZE, Sort.by(Sort.Direction.ASC, "createdDate"))
                 );
         // then
         assertAll(
