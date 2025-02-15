@@ -92,17 +92,20 @@ public class PostService {
             final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
             request.validateMemberNotTagged(loginMember);
 
-            image = cloudStorageService.upload(request.getPostImage(), POST);
-            Member pinnedMember = null;
-            if (request.getPinnedHandle() != null) {
-                pinnedMember = memberRepository.findByHandleWithoutLogin(request.getPinnedHandle());
-            }
-            Post post = request.toEntity(image, loginMember, pinnedMember);
-            postRepository.save(post);
-
             List<String> taggedMemberHandleList = request.getAllTaggedMember();
             List<Member> taggedMemberList = memberRepository.findMemberByHandleList(taggedMemberHandleList, loginMember);
             validateInvalidMemberTag(taggedMemberHandleList, taggedMemberList);
+
+            image = cloudStorageService.upload(request.getPostImage(), POST);
+            Member pinnedMember = null;
+            if (request.getPinnedHandle() != null) {
+                pinnedMember = taggedMemberList.stream()
+                        .filter(m -> m.getHandle().equals(request.getPinnedHandle()))
+                        .findFirst()
+                        .orElseThrow(() -> new GeneralException(TAG_INVALID_MEMBER));
+            }
+            Post post = request.toEntity(image, loginMember, pinnedMember);
+            postRepository.save(post);
 
             List<Tag> tagList = saveTags(taggedMemberList, post);
             tagAlarmService.saveTagApprovalAlarms(tagList, loginMember);
