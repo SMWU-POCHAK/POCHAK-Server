@@ -11,7 +11,7 @@ ifndef::snippets[]
 :snippets: ./build/generated-snippets
 endif::[]
 
-== `GET` Approve Tag API
+== `POST` Approve Tag API
 
 게시물 수락 API
 

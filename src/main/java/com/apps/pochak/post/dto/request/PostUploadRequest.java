@@ -5,14 +5,14 @@ import com.apps.pochak.global.annotation.ValidFile;
 import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.TAG_INVALID_MEMBER;
@@ -27,11 +27,21 @@ public class PostUploadRequest {
 
     private String caption;
 
-    @Valid
+    private String pinnedHandle;
+
     @Size(min = 1, max = 5, message = "유저는 1명 이상, 5명 이하로 태그 가능합니다.")
-    @NotNull(message = "태그된 유저들의 아이디 리스트는 필수로 전달해야 합니다.")
-    @ValidDuplicateList
+    @ValidDuplicateList(message = "유저의 핸들은 중복 전달할 수 없습니다.")
     private List<String> taggedMemberHandleList;
+
+    public PostUploadRequest(
+            final MultipartFile postImage,
+            final String caption,
+            final List<String> taggedMemberHandleList
+    ) {
+        this.postImage = postImage;
+        this.caption = caption;
+        this.taggedMemberHandleList = taggedMemberHandleList;
+    }
 
     public Post toEntity(
             final Member owner
@@ -40,6 +50,32 @@ public class PostUploadRequest {
                 .caption(this.caption)
                 .owner(owner)
                 .build();
+    }
+
+    public Post toEntity(
+            final String postImage,
+            final Member owner,
+            final Member pinnedMember
+    ) {
+        return Post.builder()
+                .caption(this.caption)
+                .postImage(postImage)
+                .owner(owner)
+                .pinnedMember(pinnedMember)
+                .build();
+    }
+
+    @AssertTrue(message = "한 명 이상의 유저를 태그해야 합니다.")
+    public boolean validateTaggedMember() {
+        return pinnedHandle != null || (taggedMemberHandleList != null && !taggedMemberHandleList.isEmpty());
+    }
+
+    public List<String> getAllTaggedMember() {
+        List<String> temp = new ArrayList<>(taggedMemberHandleList);
+        if (pinnedHandle != null) {
+            temp.add(pinnedHandle);
+        }
+        return temp;
     }
 
     public void validateMemberNotTagged(

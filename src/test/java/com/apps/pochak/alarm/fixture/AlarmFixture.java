@@ -1,9 +1,6 @@
 package com.apps.pochak.alarm.fixture;
 
-import com.apps.pochak.alarm.domain.CommentAlarm;
-import com.apps.pochak.alarm.domain.FollowAlarm;
-import com.apps.pochak.alarm.domain.LikeAlarm;
-import com.apps.pochak.alarm.domain.TagAlarm;
+import com.apps.pochak.alarm.domain.*;
 
 import static com.apps.pochak.alarm.domain.AlarmType.COMMENT_REPLY;
 import static com.apps.pochak.alarm.domain.AlarmType.OWNER_LIKE;
@@ -12,6 +9,7 @@ import static com.apps.pochak.follow.fixture.FollowFixture.STATIC_RECEIVE_FOLLOW
 import static com.apps.pochak.like.fixture.LikeFixture.STATIC_LIKE2;
 import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
 import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER2;
+import static com.apps.pochak.post.fixture.PostFixture.STATIC_MOMENT_POST;
 import static com.apps.pochak.tag.fixture.TagFixture.STATIC_WAITING_TAG;
 
 public class AlarmFixture {
@@ -41,5 +39,12 @@ public class AlarmFixture {
             STATIC_WAITING_TAG,
             STATIC_MEMBER2,
             STATIC_MEMBER1
+    );
+
+    public static final PostAlarm STATIC_MOMENT_POST_ALARM = new PostAlarm(
+            5L,
+            STATIC_MOMENT_POST,
+            STATIC_MEMBER2,
+            AlarmType.MOMENT_POST
     );
 }

@@ -5,7 +5,8 @@ import com.apps.pochak.post.domain.Post;
 
 import java.time.LocalDateTime;
 
-import static com.apps.pochak.member.fixture.MemberFixture.*;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
+import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER2;
 import static com.apps.pochak.post.domain.PostStatus.PRIVATE;
 import static com.apps.pochak.post.domain.PostStatus.PUBLIC;
 
@@ -14,7 +15,7 @@ public class PostFixture {
     private static final String CAPTION = "caption";
 
     public static Post get(final Member owner) {
-        return new Post(owner, POST_IMAGE, CAPTION);
+        return new Post(owner, POST_IMAGE, CAPTION, null);
     }
 
     public static final Post STATIC_PUBLIC_POST = new Post(
@@ -22,6 +23,7 @@ public class PostFixture {
             PUBLIC,
             LocalDateTime.now(),
             STATIC_MEMBER1,
+            null,
             POST_IMAGE,
             "공개 게시물 캡션입니다."
     );
@@ -31,7 +33,18 @@ public class PostFixture {
             PRIVATE,
             LocalDateTime.now(),
             STATIC_MEMBER2,
+            null,
             POST_IMAGE,
             "아직 수락되지 않은 게시물의 캡션입니다."
+    );
+
+    public static final Post STATIC_MOMENT_POST = new Post(
+            3L,
+            PUBLIC,
+            LocalDateTime.now(),
+            STATIC_MEMBER1,
+            STATIC_MEMBER2,
+            POST_IMAGE,
+            "공개 게시물 캡션입니다."
     );
 }

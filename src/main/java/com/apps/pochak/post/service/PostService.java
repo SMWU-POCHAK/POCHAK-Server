@@ -92,15 +92,23 @@ public class PostService {
             final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
             request.validateMemberNotTagged(loginMember);
 
-            final Post post = postRepository.save(request.toEntity(loginMember));
+            List<String> taggedMemberHandleList = request.getAllTaggedMember();
+            List<Member> taggedMemberList = memberRepository.findMemberByHandleList(taggedMemberHandleList, loginMember);
+            validateInvalidMemberTag(taggedMemberHandleList, taggedMemberList);
+
+            image = cloudStorageService.upload(request.getPostImage(), POST);
+            Member pinnedMember = null;
+            if (request.getPinnedHandle() != null) {
+                pinnedMember = taggedMemberList.stream()
+                        .filter(m -> m.getHandle().equals(request.getPinnedHandle()))
+                        .findFirst()
+                        .orElseThrow(() -> new GeneralException(TAG_INVALID_MEMBER));
+            }
+            Post post = postRepository.save(request.toEntity(image, loginMember, pinnedMember));
             image = cloudStorageService.upload(request.getPostImage(), POST, post.getId().toString());
             post.updateImage(image);
 
-            final List<String> taggedMemberHandleList = request.getTaggedMemberHandleList();
-            final List<Member> taggedMemberList = memberRepository.findMemberByHandleList(taggedMemberHandleList, loginMember);
-            validateInvalidMemberTag(taggedMemberHandleList, taggedMemberList, image);
-
-            final List<Tag> tagList = saveTags(taggedMemberList, post);
+            List<Tag> tagList = saveTags(taggedMemberList, post);
             tagAlarmService.saveTagApprovalAlarms(tagList, loginMember);
         } catch (Exception e) {
             if (image != null) {
@@ -112,11 +120,9 @@ public class PostService {
 
     private void validateInvalidMemberTag(
             final List<String> requestMemberList,
-            final List<Member> foundMemberList,
-            final String postImage
+            final List<Member> foundMemberList
     ) {
         if (requestMemberList.size() != foundMemberList.size()) {
-//            cloudStorageService.delete(postImage);
             throw new GeneralException(TAG_INVALID_MEMBER);
         }
     }
