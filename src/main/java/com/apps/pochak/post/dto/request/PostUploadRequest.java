@@ -44,22 +44,11 @@ public class PostUploadRequest {
     }
 
     public Post toEntity(
-            final Member owner
-    ) {
-        return Post.builder()
-                .caption(this.caption)
-                .owner(owner)
-                .build();
-    }
-
-    public Post toEntity(
-            final String postImage,
             final Member owner,
             final Member pinnedMember
     ) {
         return Post.builder()
                 .caption(this.caption)
-                .postImage(postImage)
                 .owner(owner)
                 .pinnedMember(pinnedMember)
                 .build();

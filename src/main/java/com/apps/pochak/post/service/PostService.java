@@ -96,7 +96,6 @@ public class PostService {
             List<Member> taggedMemberList = memberRepository.findMemberByHandleList(taggedMemberHandleList, loginMember);
             validateInvalidMemberTag(taggedMemberHandleList, taggedMemberList);
 
-            image = cloudStorageService.upload(request.getPostImage(), POST);
             Member pinnedMember = null;
             if (request.getPinnedHandle() != null) {
                 pinnedMember = taggedMemberList.stream()
@@ -104,7 +103,7 @@ public class PostService {
                         .findFirst()
                         .orElseThrow(() -> new GeneralException(TAG_INVALID_MEMBER));
             }
-            Post post = postRepository.save(request.toEntity(image, loginMember, pinnedMember));
+            Post post = postRepository.save(request.toEntity(loginMember, pinnedMember));
             image = cloudStorageService.upload(request.getPostImage(), POST, post.getId().toString());
             post.updateImage(image);
 
