@@ -21,9 +21,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
+import static com.apps.pochak.global.Constant.DEFAULT_DELETION_SIZE;
 import static com.apps.pochak.global.MockMultipartFileConverter.getMockMultipartFileOfPost;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
-import static com.apps.pochak.post.service.PostImageDeletionScheduler.DEFAULT_DELETION_SIZE;
 import static com.apps.pochak.post.service.PostImageDeletionScheduler.EXPIRE_PERIOD;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;

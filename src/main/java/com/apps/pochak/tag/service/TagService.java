@@ -1,5 +1,6 @@
 package com.apps.pochak.tag.service;
 
+import com.apps.pochak.alarm.service.PostAlarmService;
 import com.apps.pochak.alarm.service.TagAlarmService;
 import com.apps.pochak.auth.domain.Accessor;
 import com.apps.pochak.member.domain.Member;
@@ -23,6 +24,7 @@ public class TagService {
     private final MemberRepository memberRepository;
 
     private final TagAlarmService tagAlarmService;
+    private final PostAlarmService postAlarmService;
 
     public void approveOrRejectTagRequest(
             final Accessor accessor,
@@ -45,6 +47,9 @@ public class TagService {
         final boolean currentTagApprovalStatus = tagList.stream().allMatch(Tag::getIsAccepted);
         if (currentTagApprovalStatus) {
             post.makePublic();
+            if (post.getPinnedMember() != null) {
+                postAlarmService.saveMomentPostAlarm(post);
+            }
         }
     }
 

@@ -57,6 +57,9 @@ include::{snippets}/get-search-tab/response-fields.adoc[]
 
 include::{snippets}/upload-post/curl-request.adoc[]
 
+- 순간 포착 게시물 (pinnedHandle 추가)
+include::{snippets}/upload-moment-post/curl-request.adoc[]
+
 ==== request headers
 include::{snippets}/upload-post/request-headers.adoc[]
 
@@ -65,6 +68,9 @@ include::{snippets}/upload-post/request-parts.adoc[]
 
 ==== query params
 include::{snippets}/upload-post/query-parameters.adoc[]
+
+- 순간포착 게시물의 경우, pinnedHandle 을 추가로 전달하면 됩니닷~
+include::{snippets}/upload-moment-post/query-parameters.adoc[]
 
 === Response
 ==== response body
