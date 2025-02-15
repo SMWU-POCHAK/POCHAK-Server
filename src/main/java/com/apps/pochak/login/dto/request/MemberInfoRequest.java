@@ -40,7 +40,10 @@ public class MemberInfoRequest {
 
     private String socialRefreshToken;
 
-    public Member toEntity(final String refreshToken){
+    public Member toEntity(
+            final String refreshToken,
+            final String imageUrl
+    ){
         return Member.signupMember()
                 .name(name)
                 .email(email)
@@ -49,6 +52,7 @@ public class MemberInfoRequest {
                 .socialId(socialId)
                 .refreshToken(refreshToken)
                 .socialType(SocialType.of(socialType))
+                .profileImage(imageUrl)
                 .socialRefreshToken(socialRefreshToken)
                 .build();
     }

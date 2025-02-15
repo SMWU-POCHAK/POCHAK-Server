@@ -50,17 +50,20 @@ public class OAuthService {
         Optional<Member> memberByHandle = memberRepository.findMemberByHandle(memberInfoRequest.getHandle());
         if (memberByHandle.isPresent()) throw new GeneralException(DUPLICATE_HANDLE);
 
-        String refreshToken = jwtProvider.createRefreshToken();
-        Member member = memberRepository.save(memberInfoRequest.toEntity(refreshToken));
-
+        String imageUrl = null;
         if (memberInfoRequest.getProfileImage() != null) {
-            String profileImageUrl = cloudStorageService.upload(
+            imageUrl = cloudStorageService.upload(
                     memberInfoRequest.getProfileImage(),
                     MEMBER,
-                    member.getHandle()
+                    memberInfoRequest.getHandle()
             );
-            member.updateProfileImage(profileImageUrl);
         }
+
+        String refreshToken = jwtProvider.createRefreshToken();
+        Member member = memberRepository.save(memberInfoRequest.toEntity(
+                refreshToken,
+                imageUrl
+        ));
 
         String accessToken = jwtProvider.createAccessToken(member.getId().toString());
         return new OAuthMemberResponse(member, false, accessToken);
