@@ -60,7 +60,8 @@ public class PostUploadRequest {
     }
 
     public List<String> getAllTaggedMember() {
-        List<String> temp = new ArrayList<>(taggedMemberHandleList);
+        List<String> temp = taggedMemberHandleList != null ?
+                new ArrayList<>(taggedMemberHandleList) : new ArrayList<>();
         if (pinnedHandle != null) {
             temp.add(pinnedHandle);
         }
@@ -70,6 +71,7 @@ public class PostUploadRequest {
     public void validateMemberNotTagged(
             final Member member
     ) {
+        if (taggedMemberHandleList == null) return;
         if (taggedMemberHandleList.contains(member.getHandle())) {
             throw new GeneralException(TAG_INVALID_MEMBER);
         }
