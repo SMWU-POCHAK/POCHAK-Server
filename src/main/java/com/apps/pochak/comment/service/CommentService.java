@@ -17,10 +17,12 @@ import com.apps.pochak.tag.domain.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 import static com.apps.pochak.global.converter.PageableToPageRequestConverter.toPageRequest;
@@ -45,11 +47,19 @@ public class CommentService {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Post post = postRepository.findPublicPostById(postId);
         final Page<Comment> parentCommentList = commentRepository.findParentCommentByPost(post, loginMember, pageable);
-        final List<Comment> childCommentList = commentRepository.findChildCommentByParentComments(
-                parentCommentList.stream().map(Comment::getId).toList(),
-                loginMember.getId()
-        );
 
+        List<Comment> childCommentList = null;
+        if (Objects.requireNonNull(pageable.getSort().getOrderFor("createdDate")).isDescending()) {
+            childCommentList = commentRepository.findLatestChildCommentByParentComments(
+                    parentCommentList.stream().map(Comment::getId).toList(),
+                    loginMember.getId()
+            );
+        } else {
+            childCommentList = commentRepository.findFirstChildCommentByParentComments(
+                    parentCommentList.stream().map(Comment::getId).toList(),
+                    loginMember.getId()
+            );
+        }
         return new CommentElements(loginMember, parentCommentList, childCommentList);
     }
 

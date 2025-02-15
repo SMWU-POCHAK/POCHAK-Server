@@ -69,11 +69,24 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             where c.parentComment = :parentComment
                and c.member not in (select b.blockedMember from Block b where b.blocker = :loginMember)
                and :loginMember not in (select b.blockedMember from Block b where b.blocker = c.member)
-            order by c.createdDate desc
             """)
     Page<Comment> findChildCommentByParentComment(@Param("parentComment") Comment parentComment,
                                                   @Param("loginMember") Member loginMember,
                                                   Pageable pageable);
+
+    @Query(value = """
+            select child_comments.*
+            from (
+                select c.*,
+                       ROW_NUMBER() OVER (partition by c.parent_comment_id order by c.created_date asc) as row_num
+                from comment c
+                join member m on c.member_id = m.id
+                where c.parent_comment_id in ?1
+                  and c.member_id not in (select b.blocked_id from block b where b.blocker_id = ?2)
+                  and ?2 not in (select b.blocked_id from block b where b.blocker_id = c.member_id)
+            ) child_comments
+            where child_comments.row_num = 1""", nativeQuery = true)
+    List<Comment> findFirstChildCommentByParentComments(List<Long> parentCommentIds, Long loginMemberId);
 
     @Query(value = """
             select child_comments.*
@@ -87,7 +100,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
                   and ?2 not in (select b.blocked_id from block b where b.blocker_id = c.member_id)
             ) child_comments
             where child_comments.row_num = 1""", nativeQuery = true)
-    List<Comment> findChildCommentByParentComments(List<Long> parentCommentIds, Long loginMemberId);
+    List<Comment> findLatestChildCommentByParentComments(List<Long> parentCommentIds, Long loginMemberId);
 
     @Modifying
     @Query("update Comment c set c.status = 'DELETED' " +
