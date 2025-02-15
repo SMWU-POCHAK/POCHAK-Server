@@ -71,4 +71,8 @@ public class Post extends BaseEntity {
         this.allowedDate = LocalDateTime.now();
         this.postStatus = PostStatus.PUBLIC;
     }
+
+    public void updateImage(final String image) {
+        this.postImage = image;
+    }
 }

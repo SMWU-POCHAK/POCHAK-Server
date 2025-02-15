@@ -23,7 +23,7 @@ public abstract class ServiceTest {
 
     @BeforeEach
     void setUp() {
-        when(cloudStorageService.upload(any(), any())).thenReturn("");
+        when(cloudStorageService.upload(any(), any(), any())).thenReturn("");
         doNothing().when(fcmService).sendPushNotification((Alarm) any());
         doNothing().when(fcmService).sendPushNotification((List<Alarm>) any());
     }

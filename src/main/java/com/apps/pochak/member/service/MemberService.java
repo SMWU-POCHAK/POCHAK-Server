@@ -71,15 +71,19 @@ public class MemberService {
             throw new GeneralException(UNAUTHORIZED_MEMBER_REQUEST);
         }
 
-        String profileImageUrl = updateMember.getProfileImage();
         if (profileUpdateRequest.getProfileImage() != null) {
-            if (profileImageUrl != null) {
+            if (updateMember.getProfileImage() != null) {
                 cloudStorageService.delete(updateMember.getProfileImage());
             }
-            profileImageUrl = cloudStorageService.upload(profileUpdateRequest.getProfileImage(), MEMBER);
+            String profileImage = cloudStorageService.upload(
+                    profileUpdateRequest.getProfileImage(),
+                    MEMBER,
+                    updateMember.getHandle()
+            );
+            updateMember.updateProfileImage(profileImage);
         }
 
-        updateMember.update(profileUpdateRequest, profileImageUrl);
+        updateMember.update(profileUpdateRequest);
 
         return ProfileUpdateResponse.builder()
                 .member(updateMember)

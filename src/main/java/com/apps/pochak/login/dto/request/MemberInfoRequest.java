@@ -1,5 +1,7 @@
 package com.apps.pochak.login.dto.request;
 
+import com.apps.pochak.member.domain.Member;
+import com.apps.pochak.member.domain.SocialType;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,4 +39,21 @@ public class MemberInfoRequest {
     private String socialType;
 
     private String socialRefreshToken;
+
+    public Member toEntity(
+            final String refreshToken,
+            final String imageUrl
+    ){
+        return Member.signupMember()
+                .name(name)
+                .email(email)
+                .handle(handle)
+                .message(message)
+                .socialId(socialId)
+                .refreshToken(refreshToken)
+                .socialType(SocialType.of(socialType))
+                .profileImage(imageUrl)
+                .socialRefreshToken(socialRefreshToken)
+                .build();
+    }
 }
