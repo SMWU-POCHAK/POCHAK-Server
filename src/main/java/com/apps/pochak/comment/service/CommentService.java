@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
-import static com.apps.pochak.global.converter.PageableToPageRequestConverter.toPageRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -75,7 +74,7 @@ public class CommentService {
         final Page<Comment> childComment = commentRepository.findChildCommentByParentComment(
                 parentComment, loginMember, pageable
         );
-        return new ParentCommentElement(parentComment, childComment, toPageRequest(pageable));
+        return new ParentCommentElement(parentComment, childComment);
     }
 
     public void saveComment(
