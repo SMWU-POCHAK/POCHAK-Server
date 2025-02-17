@@ -1,10 +1,7 @@
 package com.apps.pochak.alarm.dto.response;
 
 import com.apps.pochak.alarm.domain.*;
-import com.apps.pochak.alarm.dto.response.alarm_element.CommentAlarmElement;
-import com.apps.pochak.alarm.dto.response.alarm_element.FollowAlarmElement;
-import com.apps.pochak.alarm.dto.response.alarm_element.LikeAlarmElement;
-import com.apps.pochak.alarm.dto.response.alarm_element.TagApprovalAlarmElement;
+import com.apps.pochak.alarm.dto.response.alarm_element.*;
 import com.apps.pochak.global.util.PageInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,6 +28,8 @@ public class AlarmElements {
                         return new CommentAlarmElement((CommentAlarm) alarm);
                     } else if (alarm instanceof TagAlarm) {
                         return new TagApprovalAlarmElement((TagAlarm) alarm);
+                    } else if (alarm instanceof PostAlarm) {
+                        return new PostAlarmElement((PostAlarm) alarm);
                     } else { // like alarm
                         return new LikeAlarmElement((LikeAlarm) alarm);
                     }

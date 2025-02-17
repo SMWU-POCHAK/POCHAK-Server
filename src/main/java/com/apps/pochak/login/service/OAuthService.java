@@ -41,36 +41,31 @@ public class OAuthService {
     private final CloudStorageService cloudStorageService;
 
     public OAuthMemberResponse signup(final MemberInfoRequest memberInfoRequest) {
-        SocialType socialType = SocialType.of(memberInfoRequest.getSocialType());
-
-        Optional<Member> findMember = memberRepository.findMemberBySocialIdAndSocialType(memberInfoRequest.getSocialId(), socialType);
+        Optional<Member> findMember = memberRepository.findMemberBySocialIdAndSocialType(
+                memberInfoRequest.getSocialId(),
+                SocialType.of(memberInfoRequest.getSocialType())
+        );
         if (findMember.isPresent()) throw new GeneralException(EXIST_USER);
 
         Optional<Member> memberByHandle = memberRepository.findMemberByHandle(memberInfoRequest.getHandle());
         if (memberByHandle.isPresent()) throw new GeneralException(DUPLICATE_HANDLE);
 
-        String profileImageUrl= null;
+        String imageUrl = null;
         if (memberInfoRequest.getProfileImage() != null) {
-            profileImageUrl = cloudStorageService.upload(memberInfoRequest.getProfileImage(), MEMBER);
+            imageUrl = cloudStorageService.upload(
+                    memberInfoRequest.getProfileImage(),
+                    MEMBER,
+                    memberInfoRequest.getHandle()
+            );
         }
 
         String refreshToken = jwtProvider.createRefreshToken();
-
-        Member member = Member.signupMember()
-                .name(memberInfoRequest.getName())
-                .email(memberInfoRequest.getEmail())
-                .handle(memberInfoRequest.getHandle())
-                .message(memberInfoRequest.getMessage())
-                .socialId(memberInfoRequest.getSocialId())
-                .profileImage(profileImageUrl)
-                .refreshToken(refreshToken)
-                .socialType(socialType)
-                .socialRefreshToken(memberInfoRequest.getSocialRefreshToken())
-                .build();
-        memberRepository.save(member);
+        Member member = memberRepository.save(memberInfoRequest.toEntity(
+                refreshToken,
+                imageUrl
+        ));
 
         String accessToken = jwtProvider.createAccessToken(member.getId().toString());
-
         return new OAuthMemberResponse(member, false, accessToken);
     }
 

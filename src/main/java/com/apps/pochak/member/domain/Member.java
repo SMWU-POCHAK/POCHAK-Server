@@ -73,12 +73,10 @@ public class Member extends BaseEntity {
     }
 
     public void update(
-            final ProfileUpdateRequest profileUpdateRequest,
-            final String profileImageUrl
+            final ProfileUpdateRequest profileUpdateRequest
     ) {
         this.name = getOrDefault(profileUpdateRequest.getName(), this.name);
         this.message = getOrDefault(profileUpdateRequest.getMessage(), this.message);
-        this.profileImage = getOrDefault(profileImageUrl, this.profileImage);
     }
 
     private <T> T getOrDefault(
@@ -116,6 +114,10 @@ public class Member extends BaseEntity {
 
     public void updateFcmToken(final String fcmToken) {
         this.fcmToken = fcmToken;
+    }
+
+    public void updateProfileImage(final String profileImage) {
+        this.profileImage = profileImage;
     }
 
     public boolean hasFcmToken() {

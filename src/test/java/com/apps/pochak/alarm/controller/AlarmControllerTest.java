@@ -18,13 +18,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.apps.pochak.alarm.fixture.AlarmFixture.*;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentRequest;
 import static com.apps.pochak.global.ApiDocumentUtils.getDocumentResponse;
-import static com.apps.pochak.global.api_payload.code.status.SuccessStatus.SUCCESS_CHECK_ALARM;
 import static com.apps.pochak.global.converter.ListToPageConverter.toPage;
 import static com.apps.pochak.member.fixture.MemberFixture.STATIC_MEMBER1;
 import static com.apps.pochak.tag.fixture.TagFixture.STATIC_WAITING_TAG;
@@ -55,7 +53,8 @@ class AlarmControllerTest extends ControllerTest {
             STATIC_COMMENT_REPLY_ALARM,
             STATIC_FOLLOW_ALARM,
             STATIC_TAGGED_LIKE_ALARM,
-            STATIC_TAG_ALARM
+            STATIC_TAG_ALARM,
+            STATIC_MOMENT_POST_ALARM
     );
 
     @MockBean
@@ -181,7 +180,27 @@ class AlarmControllerTest extends ControllerTest {
                                         fieldWithPath("result.alarmList[].memberName").type(STRING)
                                                 .description("[댓글 알람] 알람 리스트 | 댓글 단 유저 이름").optional(),
                                         fieldWithPath("result.alarmList[].memberProfileImage").type(STRING)
-                                                .description("[댓글 알람] 알람 리스트 | 댓글 단 유저 프로필 사진").optional()
+                                                .description("[댓글 알람] 알람 리스트 | 댓글 단 유저 프로필 사진").optional(),
+                                        fieldWithPath("result.alarmList[].ownerId").type(NUMBER)
+                                                .description("[순간 포착 게시물 알람] 알람 리스트 | 포차커 아이디").optional(),
+                                        fieldWithPath("result.alarmList[].ownerHandle").type(STRING)
+                                                .description("[순간 포착 게시물 알람] 알람 리스트 | 포차커 handle").optional(),
+                                        fieldWithPath("result.alarmList[].ownerName").type(STRING)
+                                                .description("[순간 포착 게시물 알람] 알람 리스트 | 포카커 이름").optional(),
+                                        fieldWithPath("result.alarmList[].ownerProfileImage").type(STRING)
+                                                .description("[순간 포착 게시물 알람] 알람 리스트 | 포차커 프로필 이미지").optional(),
+                                        fieldWithPath("result.alarmList[].memberId").type(NUMBER)
+                                                .description("[순간 포착 게시물 알람] 알람 리스트 | 순간포착된 포차키 아이디").optional(),
+                                        fieldWithPath("result.alarmList[].memberHandle").type(STRING)
+                                                .description("[순간 포착 게시물 알람] 알람 리스트 | 순간포착된 포차키 핸들").optional(),
+                                        fieldWithPath("result.alarmList[].memberName").type(STRING)
+                                                .description("[순간 포착 게시물 알람] 알람 리스트 | 순간포착된 포차키 이름").optional(),
+                                        fieldWithPath("result.alarmList[].memberProfileImage").type(STRING)
+                                                .description("[순간 포착 게시물 알람] 알람 리스트 | 순간포착된 포차키 프로필 사진").optional(),
+                                        fieldWithPath("result.alarmList[].postId").type(NUMBER)
+                                                .description("[순간 포착 게시물 알람] 알람 리스트 | 순간포착 게시물 아이디").optional(),
+                                        fieldWithPath("result.alarmList[].postImage").type(STRING)
+                                                .description("[순간 포착 게시물 알람] 알람 리스트 | 순간포착 게시물 사진").optional()
                                 )
 
                         )

@@ -15,7 +15,6 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 
@@ -30,11 +29,12 @@ public class CloudStorageService {
 
     public String upload(
             final MultipartFile multipartFile,
-            final DirName dirName
+            final DirName dirName,
+            final String subject
     ) {
         if (multipartFile.isEmpty()) throw new GeneralException(NULL_FILE);
 
-        String objectName = dirName.getDirName() + "/" + UUID.randomUUID() + "_" + multipartFile.getOriginalFilename();
+        String objectName = dirName.getDirName() + "/" + subject;
         String contentType = multipartFile.getContentType();
 
         try {

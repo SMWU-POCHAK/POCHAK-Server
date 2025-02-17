@@ -55,6 +55,9 @@ include::{snippets}/get-alarms/query-parameters.adoc[]
 |`TAG_APPROVAL`
 |누군가 날 게시물에 태그했을 경우 (수락/거절 후 삭제되는 알람)
 
+|`MOMENT_POST`
+|내가 팔로우하고 있는 사람이 순간포착 게시물을 올렸을 경우
+
 |===
 
 include::{snippets}/get-alarms/response-body.adoc[]
