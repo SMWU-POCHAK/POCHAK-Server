@@ -35,14 +35,14 @@ public class ParentCommentElement {
     ) {
         this(
                 parentComment,
-                childCommentList,
+                toPage(childCommentList),
                 PageRequest.of(0, Constant.COMMENT_PAGING_SIZE)
         );
     }
 
     public ParentCommentElement(
             final Comment parentComment,
-            final List<Comment> childCommentList,
+            final Page<Comment> childCommentList,
             final PageRequest pageRequest
     ) {
         final Member member = parentComment.getMember();
@@ -52,16 +52,11 @@ public class ParentCommentElement {
         this.handle = member.getHandle();
         this.createdDate = parentComment.getCreatedDate();
         this.content = parentComment.getContent();
-
-        final List<CommentElement> commentElementList = childCommentList.stream()
+        this.childCommentPageInfo = new PageInfo(childCommentList);
+        this.childCommentList = childCommentList.stream()
                 .map(
                         CommentElement::new
                 )
                 .collect(Collectors.toList());
-
-        final Page<CommentElement> commentElementPage = toPage(commentElementList, pageRequest);
-
-        this.childCommentPageInfo = new PageInfo(commentElementPage);
-        this.childCommentList = commentElementPage.getContent();
     }
 }

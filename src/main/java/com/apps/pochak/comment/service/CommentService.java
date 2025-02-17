@@ -15,6 +15,7 @@ import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.tag.domain.Tag;
 import com.apps.pochak.tag.domain.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -76,7 +77,7 @@ public class CommentService {
         final Page<Comment> childComment = commentRepository.findChildCommentByParentComment(
                 parentComment, loginMember, pageable
         );
-        return new ParentCommentElement(parentComment, childComment.getContent(), toPageRequest(pageable));
+        return new ParentCommentElement(parentComment, childComment, toPageRequest(pageable));
     }
 
     public void saveComment(
