@@ -163,7 +163,8 @@ for (qPattern in "**/QA".."**/QZ") {
 }
 
 Qdomains.add("com/apps/pochak/**/dto/**")
-
+Qdomains.add("com/apps/pochak/**/entity/**")
+Qdomains.add("com/apps/pochak/**/config/**")
 jacocoTestReport {
     dependsOn test
     dependsOn copyDocument
@@ -190,5 +191,6 @@ sonarqube {
         property "sonar.organization", "pochak-server"
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.login", "${System.getenv('SONAR_TOKEN')}"
+        property "sonar.coverage.exclusions", Qdomains.join(", ")
     }
 }
