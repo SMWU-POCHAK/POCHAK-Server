@@ -6,7 +6,6 @@ import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
-import static com.apps.pochak.global.Constant.COMMENT_PAGING_SIZE;
 import static com.apps.pochak.global.Constant.DEFAULT_PAGING_SIZE;
 
 public class ListToPageConverter {
