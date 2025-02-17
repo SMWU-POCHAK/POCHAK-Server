@@ -191,6 +191,6 @@ sonarqube {
         property "sonar.organization", "pochak-server"
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.login", "${System.getenv('SONAR_TOKEN')}"
-        property "sonar.coverage.exclusions", Qdomains.join(", ")
+        property "sonar.coverage.exclusions", "**/entity/**, **/dto/**, **/config/**, **/global/image/**, **/domain/**, **/annotation/**"
     }
 }
