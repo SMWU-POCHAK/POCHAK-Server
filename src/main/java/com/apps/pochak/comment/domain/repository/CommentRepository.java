@@ -84,6 +84,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
                 where c.parent_comment_id in ?1
                   and c.member_id not in (select b.blocked_id from block b where b.blocker_id = ?2)
                   and ?2 not in (select b.blocked_id from block b where b.blocker_id = c.member_id)
+                order by c.created_date asc
             ) child_comments
             where child_comments.row_num <= 2""", nativeQuery = true)
     List<Comment> findFirstChildCommentByParentComments(List<Long> parentCommentIds, Long loginMemberId);
@@ -98,6 +99,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
                 where c.parent_comment_id in ?1
                   and c.member_id not in (select b.blocked_id from block b where b.blocker_id = ?2)
                   and ?2 not in (select b.blocked_id from block b where b.blocker_id = c.member_id)
+                order by c.created_date desc
             ) child_comments
             where child_comments.row_num <= 2""", nativeQuery = true)
     List<Comment> findLatestChildCommentByParentComments(List<Long> parentCommentIds, Long loginMemberId);
