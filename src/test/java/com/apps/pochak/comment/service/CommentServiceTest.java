@@ -90,8 +90,8 @@ class CommentServiceTest {
         // then
         assertAll(
                 () -> assertThat(actual.getParentCommentList()).hasSize(1),
-                () -> assertEquals(actual.getParentCommentList().get(0).getChildCommentList().size(), 1),
-                () -> assertEquals(actual.getParentCommentList().get(0).getChildCommentList().get(0), expectedChild)
+                () -> assertEquals(1, actual.getParentCommentList().get(0).getChildCommentList().size()),
+                () -> assertEquals(expectedChild, actual.getParentCommentList().get(0).getChildCommentList().get(0))
         );
     }
 
@@ -108,7 +108,7 @@ class CommentServiceTest {
                         PageRequest.of(0, COMMENT_PAGING_SIZE, Sort.by(Sort.Direction.ASC, "createdDate"))
                 );
         // then
-        assertThat(actual.getParentCommentList()).hasSize(0);
+        assertThat(actual.getParentCommentList()).isEmpty();
     }
 
     @Test
@@ -124,7 +124,7 @@ class CommentServiceTest {
                         PageRequest.of(0, COMMENT_PAGING_SIZE, Sort.by(Sort.Direction.ASC, "createdDate"))
                 );
         // then
-        assertThat(actual.getParentCommentList()).hasSize(0);
+        assertThat(actual.getParentCommentList()).isEmpty();
     }
 
     @Test
@@ -142,8 +142,8 @@ class CommentServiceTest {
         // then
         assertAll(
                 () -> assertThat(actual.getParentCommentList()).hasSize(1),
-                () -> assertEquals(actual.getParentCommentList().get(0).getCommentId(), parentComment.getId()),
-                () -> assertThat(actual.getParentCommentList().get(0).getChildCommentList()).hasSize(0)
+                () -> assertEquals(parentComment.getId(), actual.getParentCommentList().get(0).getCommentId()),
+                () -> assertThat(actual.getParentCommentList().get(0).getChildCommentList()).isEmpty()
         );
     }
 
@@ -162,8 +162,8 @@ class CommentServiceTest {
         // then
         assertAll(
                 () -> assertThat(actual.getParentCommentList()).hasSize(1),
-                () -> assertEquals(actual.getParentCommentList().get(0).getCommentId(), parentComment.getId()),
-                () -> assertThat(actual.getParentCommentList().get(0).getChildCommentList()).hasSize(0)
+                () -> assertEquals(parentComment.getId(), actual.getParentCommentList().get(0).getCommentId()),
+                () -> assertThat(actual.getParentCommentList().get(0).getChildCommentList()).isEmpty()
         );
     }
 
