@@ -1,7 +1,6 @@
 package com.apps.pochak.comment.dto.response;
 
 import com.apps.pochak.comment.domain.Comment;
-import com.apps.pochak.global.Constant;
 import com.apps.pochak.global.util.PageInfo;
 import com.apps.pochak.member.domain.Member;
 import lombok.AllArgsConstructor;
@@ -35,15 +34,13 @@ public class ParentCommentElement {
     ) {
         this(
                 parentComment,
-                childCommentList,
-                PageRequest.of(0, Constant.COMMENT_PAGING_SIZE)
+                toPage(childCommentList, PageRequest.of(0, 1))
         );
     }
 
     public ParentCommentElement(
             final Comment parentComment,
-            final List<Comment> childCommentList,
-            final PageRequest pageRequest
+            final Page<Comment> childCommentList
     ) {
         final Member member = parentComment.getMember();
         this.commentId = parentComment.getId();
@@ -52,16 +49,11 @@ public class ParentCommentElement {
         this.handle = member.getHandle();
         this.createdDate = parentComment.getCreatedDate();
         this.content = parentComment.getContent();
-
-        final List<CommentElement> commentElementList = childCommentList.stream()
+        this.childCommentPageInfo = new PageInfo(childCommentList);
+        this.childCommentList = childCommentList.stream()
                 .map(
                         CommentElement::new
                 )
                 .collect(Collectors.toList());
-
-        final Page<CommentElement> commentElementPage = toPage(commentElementList, pageRequest);
-
-        this.childCommentPageInfo = new PageInfo(commentElementPage);
-        this.childCommentList = commentElementPage.getContent();
     }
 }
