@@ -181,6 +181,13 @@ for (qPattern in "**/QA".."**/QZ") {
 Qdomains.add("com/apps/pochak/**/dto/**")
 Qdomains.add("com/apps/pochak/**/entity/**")
 Qdomains.add("com/apps/pochak/**/config/**")
+
+configurations {
+    all {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+}
+
 jacocoTestReport {
     dependsOn test
     dependsOn copyDocument
