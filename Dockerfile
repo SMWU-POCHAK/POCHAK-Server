@@ -6,7 +6,11 @@ EXPOSE 5000
 ARG SPRING_PROFILES_ACTIVE
 ARG JASYPT_KEY
 
-ENV SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-DEV}
+ENV SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-PROD}
 ENV JASYPT_KEY=${JASYPT_KEY:-pw}
+
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
 CMD java -jar -Duser.timezone=Asia/Seoul app.jar
