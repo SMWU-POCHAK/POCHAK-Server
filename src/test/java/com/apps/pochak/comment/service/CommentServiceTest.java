@@ -16,9 +16,12 @@ import com.apps.pochak.tag.domain.repository.TagRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.apps.pochak.global.Constant.COMMENT_PAGING_SIZE;
@@ -31,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class CommentServiceTest {
 
+    private static final Logger log = LoggerFactory.getLogger(CommentServiceTest.class);
     @Autowired
     CommentService commentService;
 
@@ -55,6 +59,7 @@ class CommentServiceTest {
     private Post post;
     private Comment parentComment;
     private Comment childComment;
+    private Comment childComment2;
 
     @BeforeEach
     void setUp() {
@@ -70,21 +75,23 @@ class CommentServiceTest {
     @DisplayName("[전체 댓글 조회] 정상 테스트")
     void getComments() {
         // given
+        childComment2 = saveChildComment(childCommenter, post, parentComment);
+
         CommentElement expectedChild = CommentElement.from()
-                .comment(childComment)
+                .comment(childComment2)
                 .build();
         // then
         CommentElements actual = commentService
                 .getComments(
                         Accessor.member(loginMember.getId()),
                         post.getId(),
-                        PageRequest.of(0, COMMENT_PAGING_SIZE)
+                        PageRequest.of(0, COMMENT_PAGING_SIZE, Sort.by(Sort.Direction.DESC, "createdDate"))
                 );
         // then
         assertAll(
                 () -> assertThat(actual.getParentCommentList()).hasSize(1),
-                () -> assertEquals(actual.getParentCommentList().get(0).getChildCommentList().size(), 1),
-                () -> assertEquals(actual.getParentCommentList().get(0).getChildCommentList().get(0), expectedChild)
+                () -> assertEquals(1, actual.getParentCommentList().get(0).getChildCommentList().size()),
+                () -> assertEquals(expectedChild, actual.getParentCommentList().get(0).getChildCommentList().get(0))
         );
     }
 
@@ -98,10 +105,10 @@ class CommentServiceTest {
                 .getComments(
                         Accessor.member(loginMember.getId()),
                         post.getId(),
-                        PageRequest.of(0, COMMENT_PAGING_SIZE)
+                        PageRequest.of(0, COMMENT_PAGING_SIZE, Sort.by(Sort.Direction.ASC, "createdDate"))
                 );
         // then
-        assertThat(actual.getParentCommentList()).hasSize(0);
+        assertThat(actual.getParentCommentList()).isEmpty();
     }
 
     @Test
@@ -114,10 +121,10 @@ class CommentServiceTest {
                 .getComments(
                         Accessor.member(loginMember.getId()),
                         post.getId(),
-                        PageRequest.of(0, COMMENT_PAGING_SIZE)
+                        PageRequest.of(0, COMMENT_PAGING_SIZE, Sort.by(Sort.Direction.ASC, "createdDate"))
                 );
         // then
-        assertThat(actual.getParentCommentList()).hasSize(0);
+        assertThat(actual.getParentCommentList()).isEmpty();
     }
 
     @Test
@@ -130,13 +137,13 @@ class CommentServiceTest {
                 .getComments(
                         Accessor.member(loginMember.getId()),
                         post.getId(),
-                        PageRequest.of(0, COMMENT_PAGING_SIZE)
+                        PageRequest.of(0, COMMENT_PAGING_SIZE, Sort.by(Sort.Direction.ASC, "createdDate"))
                 );
         // then
         assertAll(
                 () -> assertThat(actual.getParentCommentList()).hasSize(1),
-                () -> assertEquals(actual.getParentCommentList().get(0).getCommentId(), parentComment.getId()),
-                () -> assertThat(actual.getParentCommentList().get(0).getChildCommentList()).hasSize(0)
+                () -> assertEquals(parentComment.getId(), actual.getParentCommentList().get(0).getCommentId()),
+                () -> assertThat(actual.getParentCommentList().get(0).getChildCommentList()).isEmpty()
         );
     }
 
@@ -150,13 +157,13 @@ class CommentServiceTest {
                 .getComments(
                         Accessor.member(loginMember.getId()),
                         post.getId(),
-                        PageRequest.of(0, COMMENT_PAGING_SIZE)
+                        PageRequest.of(0, COMMENT_PAGING_SIZE, Sort.by(Sort.Direction.ASC, "createdDate"))
                 );
         // then
         assertAll(
                 () -> assertThat(actual.getParentCommentList()).hasSize(1),
-                () -> assertEquals(actual.getParentCommentList().get(0).getCommentId(), parentComment.getId()),
-                () -> assertThat(actual.getParentCommentList().get(0).getChildCommentList()).hasSize(0)
+                () -> assertEquals(parentComment.getId(), actual.getParentCommentList().get(0).getCommentId()),
+                () -> assertThat(actual.getParentCommentList().get(0).getChildCommentList()).isEmpty()
         );
     }
 

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -62,11 +63,11 @@ class CommentRepositoryTest {
 
     @DisplayName("[전체 댓글 조회] 부모 댓글과 자식 댓글")
     @Test
-    void findChildCommentByParentComments() {
+    void findFirstChildCommentByParentComments() {
         //given
         //when
         Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
-        List<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComments(parentCommentByPost.stream().map(Comment::getId).toList(), loginMember.getId());
+        List<Comment> childCommentByParentComment = commentRepository.findFirstChildCommentByParentComments(parentCommentByPost.stream().map(Comment::getId).toList(), loginMember.getId());
         //then
         assertAll(
                 () -> assertTrue(parentCommentByPost.hasContent()),
@@ -77,14 +78,14 @@ class CommentRepositoryTest {
 
     @DisplayName("[전체 댓글 조회] 부모 댓글의 특정 자식 댓글 차단시")
     @Test
-    void findChildCommentByParentCommentsWhenBlocked() {
+    void findFirstChildCommentByParentCommentsWhenBlocked() {
         //given
         block(childCommenter, loginMember);
         //when
         Page<Comment> parentCommentByPost = commentRepository.findParentCommentByPost(
                 post, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE)
         );
-        List<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComments(
+        List<Comment> childCommentByParentComment = commentRepository.findFirstChildCommentByParentComments(
                 parentCommentByPost.stream().map(Comment::getId).toList(), loginMember.getId()
         );
 
@@ -130,8 +131,7 @@ class CommentRepositoryTest {
     void findChildCommentByParentComment() {
         //when
         Page<Comment> childCommentByParentComment = commentRepository.findChildCommentByParentComment(
-                parentComment, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE));
-
+                parentComment, loginMember, PageRequest.of(0, DEFAULT_PAGING_SIZE, Sort.by(Sort.Direction.DESC, "createdDate")));
         //then
         assertEquals(childCommentByParentComment.getContent().size(), 1);
         assertEquals(childComment, childCommentByParentComment.getContent().get(0));

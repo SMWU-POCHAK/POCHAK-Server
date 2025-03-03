@@ -11,7 +11,6 @@ import org.springframework.data.domain.Page;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -34,7 +33,7 @@ public class CommentElements {
             for (Comment childComment : childComments) {
                 if (Objects.equals(parentComment.getId(), childComment.getParentComment().getId())) {
                     childCommentList.add(childComment);
-                    break;
+                    if (childCommentList.size() == 2) break;
                 }
             }
             parentCommentList.add(new ParentCommentElement(parentComment, childCommentList));

@@ -21,9 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
-import static com.apps.pochak.global.converter.PageableToPageRequestConverter.toPageRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -45,11 +45,19 @@ public class CommentService {
         final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
         final Post post = postRepository.findPublicPostById(postId);
         final Page<Comment> parentCommentList = commentRepository.findParentCommentByPost(post, loginMember, pageable);
-        final List<Comment> childCommentList = commentRepository.findChildCommentByParentComments(
-                parentCommentList.stream().map(Comment::getId).toList(),
-                loginMember.getId()
-        );
 
+        List<Comment> childCommentList = null;
+        if (Objects.requireNonNull(pageable.getSort().getOrderFor("createdDate")).isDescending()) {
+            childCommentList = commentRepository.findLatestChildCommentByParentComments(
+                    parentCommentList.stream().map(Comment::getId).toList(),
+                    loginMember.getId()
+            );
+        } else {
+            childCommentList = commentRepository.findFirstChildCommentByParentComments(
+                    parentCommentList.stream().map(Comment::getId).toList(),
+                    loginMember.getId()
+            );
+        }
         return new CommentElements(loginMember, parentCommentList, childCommentList);
     }
 
@@ -66,7 +74,7 @@ public class CommentService {
         final Page<Comment> childComment = commentRepository.findChildCommentByParentComment(
                 parentComment, loginMember, pageable
         );
-        return new ParentCommentElement(parentComment, childComment.getContent(), toPageRequest(pageable));
+        return new ParentCommentElement(parentComment, childComment);
     }
 
     public void saveComment(
