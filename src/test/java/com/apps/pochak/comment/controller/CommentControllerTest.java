@@ -102,7 +102,7 @@ class CommentControllerTest extends ControllerTest {
                                 ),
                                 queryParameters(
                                         parameterWithName("page").description("조회할 페이지 [default: 0]").optional(),
-                                        parameterWithName("size").description("조회할 페이지 [default: 10]").optional(),
+                                        parameterWithName("size").description("조회할 페이지 사이즈 [default: 10]").optional(),
                                         parameterWithName("sort").description("조회할 페이지 정렬 조건 [format: createdDate,asc or desc]").optional()
                                 ),
                                 responseFields(
@@ -240,6 +240,7 @@ class CommentControllerTest extends ControllerTest {
                                 ),
                                 queryParameters(
                                         parameterWithName("page").description("조회할 페이지 [default: 0]").optional(),
+                                        parameterWithName("size").description("조회할 페이지 사이즈 [default: 10]").optional(),
                                         parameterWithName("sort").description("조회할 페이지 정렬 조건 [format: createdDate,asc or desc]").optional()
                                 ),
                                 responseFields(
