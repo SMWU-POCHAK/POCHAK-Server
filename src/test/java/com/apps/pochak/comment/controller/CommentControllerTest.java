@@ -101,7 +101,9 @@ class CommentControllerTest extends ControllerTest {
                                         parameterWithName("postId").description("게시물 아이디")
                                 ),
                                 queryParameters(
-                                        parameterWithName("page").description("조회할 페이지 [default: 0]").optional()
+                                        parameterWithName("page").description("조회할 페이지 [default: 0]").optional(),
+                                        parameterWithName("size").description("조회할 페이지 [default: 10]").optional(),
+                                        parameterWithName("sort").description("조회할 페이지 정렬 조건 [format: createdDate,asc or desc]").optional()
                                 ),
                                 responseFields(
                                         fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),
@@ -237,7 +239,8 @@ class CommentControllerTest extends ControllerTest {
                                         parameterWithName("commentId").description("부모 댓글 아이디")
                                 ),
                                 queryParameters(
-                                        parameterWithName("page").description("조회할 페이지 [default: 0]").optional()
+                                        parameterWithName("page").description("조회할 페이지 [default: 0]").optional(),
+                                        parameterWithName("sort").description("조회할 페이지 정렬 조건 [format: createdDate,asc or desc]").optional()
                                 ),
                                 responseFields(
                                         fieldWithPath("isSuccess").type(BOOLEAN).description("성공 여부"),

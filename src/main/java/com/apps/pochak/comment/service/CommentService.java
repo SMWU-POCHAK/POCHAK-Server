@@ -47,7 +47,7 @@ public class CommentService {
         final Page<Comment> parentCommentList = commentRepository.findParentCommentByPost(post, loginMember, pageable);
 
         List<Comment> childCommentList = null;
-        if (!pageable.getSort().isEmpty() && pageable.getSort().getOrderFor("createdDate").isDescending()) {
+        if (Objects.requireNonNull(pageable.getSort().getOrderFor("createdDate")).isDescending()) {
             childCommentList = commentRepository.findLatestChildCommentByParentComments(
                     parentCommentList.stream().map(Comment::getId).toList(),
                     loginMember.getId()

@@ -11,6 +11,7 @@ import com.apps.pochak.global.api_payload.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,7 +47,7 @@ public class CommentController {
             @Auth final Accessor accessor,
             @PathVariable("postId") final Long postId,
             @PathVariable("parentCommentId") final Long parentCommentId,
-            @PageableDefault(COMMENT_PAGING_SIZE) final Pageable pageable
+            @PageableDefault(size = COMMENT_PAGING_SIZE, sort = "createdDate", direction = Sort.Direction.ASC) final Pageable pageable
     ) {
         return ApiResponse.onSuccess(
                 commentService.getChildCommentsByParentCommentId(
