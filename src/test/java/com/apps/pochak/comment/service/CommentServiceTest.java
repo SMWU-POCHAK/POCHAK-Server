@@ -105,7 +105,7 @@ class CommentServiceTest {
                 .getComments(
                         Accessor.member(loginMember.getId()),
                         post.getId(),
-                        PageRequest.of(0, COMMENT_PAGING_SIZE, Sort.by(Sort.Direction.ASC, "createdDate"))
+                        PageRequest.of(0, COMMENT_PAGING_SIZE)
                 );
         // then
         assertThat(actual.getParentCommentList()).isEmpty();
