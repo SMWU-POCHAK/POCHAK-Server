@@ -28,6 +28,7 @@ repositories {
 
 task downloadNewrelic(type: Download) {
     mkdir 'newrelic'
+
     src 'https://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic-java.zip'
     dest file('newrelic/newrelic-java.zip')
 
@@ -36,11 +37,15 @@ task downloadNewrelic(type: Download) {
 
 task unzipNewrelic(type: Copy) {
     dependsOn downloadNewrelic
+
     from zipTree(file('newrelic/newrelic-java.zip'))
     into rootDir
+
+    doNotTrackState("압축 해제 작업의 상태 추적을 하지 않음")
 }
 
 build.dependsOn unzipNewrelic
+
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -226,3 +231,4 @@ tasks.named('compileTestJava') {
 tasks.named('test') {
     dependsOn unzipNewrelic
 }
+
