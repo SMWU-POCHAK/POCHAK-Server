@@ -29,6 +29,7 @@ public class LikeService {
     private final LikeAlarmService likeAlarmService;
     private final MemberRepository memberRepository;
 
+    @Transactional
     public void likePost(
             final Accessor accessor,
             final Long postId

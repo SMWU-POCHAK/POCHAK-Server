@@ -9,6 +9,7 @@ import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.post.fixture.PostFixture;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,15 +17,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.*;
 
 import static com.apps.pochak.global.BaseEntityStatus.ACTIVE;
 import static com.apps.pochak.global.BaseEntityStatus.DELETED;
 import static com.apps.pochak.member.fixture.MemberFixture.*;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Transactional
+//@Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class LikeServiceTest extends ServiceTest {
 
@@ -106,6 +110,45 @@ public class LikeServiceTest extends ServiceTest {
                 () -> assertEquals(1, likeList.size()),
                 () -> assertEquals(DELETED, likeEntity.getStatus())
         );
+    }
+
+    @Test
+    void like_100_request() throws InterruptedException {
+        // given
+        final int threadCount = 2;
+        final ExecutorService executorService = Executors.newFixedThreadPool(30);
+        final CountDownLatch countDownLatch = new CountDownLatch(threadCount);
+        Post post = savePublicPost();
+
+        // when
+        for (int i = 0; i < threadCount; i++) {
+            executorService.execute(() -> {
+                try {
+//                    memberRepository.save(loginMember);
+//                    final LikeEntity like = LikeEntity.builder()
+//                            .member(loginMember)
+//                            .post(post)
+//                            .build();
+//                    likeRepository.save(like);
+
+                    likeService.likePost(
+                            Accessor.member(loginMember.getId()),
+                            post.getId()
+                    );
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    countDownLatch.countDown();
+                }
+            });
+        }
+
+        countDownLatch.await();
+        executorService.shutdown();
+        final LikeEntity like = likeRepository.findByMemberAndPost(loginMember, post).orElseThrow();
+
+        // then
+        assertEquals(DELETED, like.getStatus());
     }
 
     private Post savePublicPost() {
