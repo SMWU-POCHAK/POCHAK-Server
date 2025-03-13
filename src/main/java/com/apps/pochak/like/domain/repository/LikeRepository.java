@@ -28,8 +28,17 @@ public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
             @Param("post") final Post post
     );
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<LikeEntity> findByMemberAndPost(
+            final Member member,
+            final Post post
+    );
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+        select l from LikeEntity l
+        where l.member = :member and l.post = :post
+        """)
+    Optional<LikeEntity> findByMemberAndPostForUpdate(
             final Member member,
             final Post post
     );

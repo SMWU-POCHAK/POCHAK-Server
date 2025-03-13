@@ -19,12 +19,18 @@ import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     default Member findMemberById(
             final Long id
     ) {
         return findById(id).orElseThrow(() -> new GeneralException(INVALID_MEMBER_ID));
     }
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+    select m from Member m
+    where m.id = :id
+    """)
+    Optional<Member> findMemberByIdForUpdate(final Long id);
 
     Optional<Member> findMemberByHandle(final String handle);
 
