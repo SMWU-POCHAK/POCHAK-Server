@@ -1,7 +1,6 @@
 package com.apps.pochak.like.service;
 
 import com.apps.pochak.auth.domain.Accessor;
-import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.like.domain.LikeEntity;
 import com.apps.pochak.like.domain.repository.LikeRepository;
 import com.apps.pochak.member.domain.Member;
@@ -9,21 +8,23 @@ import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import com.apps.pochak.post.fixture.PostFixture;
-import lombok.RequiredArgsConstructor;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.apps.pochak.global.BaseEntityStatus.ACTIVE;
-import static com.apps.pochak.member.fixture.MemberFixture.*;
 import static com.apps.pochak.member.fixture.MemberFixture.LOGIN_MEMBER;
+import static com.apps.pochak.member.fixture.MemberFixture.OWNER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class LikeConcurrencyTest {
 
@@ -40,15 +41,11 @@ public class LikeConcurrencyTest {
     LikeRepository likeRepository;
 
     private Member owner;
-    private Member taggedMember1;
-    private Member taggedMember2;
     private Member loginMember;
 
     @BeforeEach
     void setUp() {
         owner = memberRepository.save(OWNER);
-        taggedMember1 = memberRepository.save(TAGGED_MEMBER1);
-        taggedMember2 = memberRepository.save(TAGGED_MEMBER2);
         loginMember = memberRepository.save(LOGIN_MEMBER);
     }
 
