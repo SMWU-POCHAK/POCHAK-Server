@@ -30,7 +30,7 @@ public class CommentController {
     public ApiResponse<CommentElements> getComments(
             @Auth final Accessor accessor,
             @PathVariable("postId") final Long postId,
-            @PageableDefault(COMMENT_PAGING_SIZE) final Pageable pageable
+            @PageableDefault(size = COMMENT_PAGING_SIZE, sort = "createdDate", direction = Sort.Direction.ASC) final Pageable pageable
     ) {
         return ApiResponse.onSuccess(
                 commentService.getComments(
@@ -47,7 +47,7 @@ public class CommentController {
             @Auth final Accessor accessor,
             @PathVariable("postId") final Long postId,
             @PathVariable("parentCommentId") final Long parentCommentId,
-            @PageableDefault(size = COMMENT_PAGING_SIZE, sort = "createdDate", direction = Sort.Direction.ASC) final Pageable pageable
+            @PageableDefault(COMMENT_PAGING_SIZE) final Pageable pageable
     ) {
         return ApiResponse.onSuccess(
                 commentService.getChildCommentsByParentCommentId(
