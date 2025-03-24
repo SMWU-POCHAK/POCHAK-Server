@@ -5,6 +5,7 @@ plugins {
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
     id 'jacoco'
     id "org.sonarqube" version "4.4.1.3373"
+    id "de.undercouch.download" version "5.3.0"
 }
 
 group = 'com.apps'
@@ -25,11 +26,33 @@ repositories {
     mavenCentral()
 }
 
+task downloadNewrelic(type: Download) {
+    mkdir 'newrelic'
+
+    src 'https://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic-java.zip'
+    dest file('newrelic/newrelic-java.zip')
+
+    onlyIf { !file('newrelic/newrelic-java.zip').exists() }
+}
+
+task unzipNewrelic(type: Copy) {
+    dependsOn downloadNewrelic
+
+    from zipTree(file('newrelic/newrelic-java.zip'))
+    into rootDir
+
+    doNotTrackState("압축 해제 작업의 상태 추적을 하지 않음")
+}
+
+build.dependsOn unzipNewrelic
+
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude group: "com.vaadin.external.google", module: "android-json"
     }
@@ -60,6 +83,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
     testCompileOnly 'org.projectlombok:lombok:1.18.34'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
 
@@ -124,7 +148,6 @@ bootJar {
     dependsOn copyDocument
 }
 
-// -plain.jar 제거
 jar {
     enabled = false
 }
@@ -161,7 +184,8 @@ for (qPattern in "**/QA".."**/QZ") {
 }
 
 Qdomains.add("com/apps/pochak/**/dto/**")
-
+Qdomains.add("com/apps/pochak/**/entity/**")
+Qdomains.add("com/apps/pochak/**/config/**")
 jacocoTestReport {
     dependsOn test
     dependsOn copyDocument
@@ -188,5 +212,23 @@ sonarqube {
         property "sonar.organization", "pochak-server"
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.login", "${System.getenv('SONAR_TOKEN')}"
+        property "sonar.coverage.exclusions", "**/entity/**, **/dto/**, **/config/**, **/global/image/**, **/domain/**, **/annotation/**"
     }
 }
+
+tasks.named('compileJava') {
+    dependsOn unzipNewrelic
+}
+tasks.named('processResources') {
+    dependsOn unzipNewrelic
+}
+tasks.named('processTestResources') {
+    dependsOn unzipNewrelic
+}
+tasks.named('compileTestJava') {
+    dependsOn unzipNewrelic
+}
+tasks.named('test') {
+    dependsOn unzipNewrelic
+}
+

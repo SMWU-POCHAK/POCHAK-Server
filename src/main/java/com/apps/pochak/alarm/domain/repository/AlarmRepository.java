@@ -37,12 +37,19 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     }
 
     @Query("""
-            select a from Alarm a
-            join fetch a.receiver
-            join fetch a.sender
-            where a.receiver.id = :receiverId
-            order by a.createdDate desc
-    """)
+                select a from Alarm a
+                join fetch a.receiver
+                join fetch a.sender
+                where a.receiver.id = :receiverId
+                        and a.status != 'DELETED'            
+                order by
+                    a.isChecked asc,
+                    case
+                        when a.alarmType = 'TAG_APPROVAL' then 0
+                        else 1
+                    end,
+                    a.createdDate desc
+            """)
     Page<Alarm> getAllAlarm(
             @Param("receiverId") final Long receiverId,
             final Pageable pageable

@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.List;
+
+import static com.apps.pochak.global.Constant.DEFAULT_DELETION_SIZE;
 
 @Component
 @RequiredArgsConstructor
@@ -21,7 +22,6 @@ public class PostImageDeletionScheduler {
     private final Clock clock;
 
     public static final int EXPIRE_PERIOD = 30;
-    public static final int DEFAULT_DELETION_SIZE = 100;
 
     @Scheduled(cron = "0 0 0 * * ?")
     public void deleteExpiredAlarms() {
@@ -29,7 +29,6 @@ public class PostImageDeletionScheduler {
         PageRequest pageRequest = PageRequest.of(0, DEFAULT_DELETION_SIZE);
         Page<Post> deletedPost;
         do {
-            List<Post> postList = postRepository.findAll();
             deletedPost = postRepository.findAllByDeletedAtBefore(
                     expirationDate,
                     pageRequest

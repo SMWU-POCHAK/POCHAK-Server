@@ -37,6 +37,10 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "owner_id")
     private Member owner;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "pinned_member_id")
+    private Member pinnedMember;
+
     private String postImage;
 
     private String caption;
@@ -45,12 +49,14 @@ public class Post extends BaseEntity {
     public Post(
             final Member owner,
             final String postImage,
-            final String caption
+            final String caption,
+            final Member pinnedMember
     ) {
         this.owner = owner;
         this.postImage = postImage;
         this.caption = caption;
         this.postStatus = PRIVATE;
+        this.pinnedMember = pinnedMember;
     }
 
     public boolean isPrivate() {
@@ -64,5 +70,9 @@ public class Post extends BaseEntity {
     public void makePublic() {
         this.allowedDate = LocalDateTime.now();
         this.postStatus = PostStatus.PUBLIC;
+    }
+
+    public void updateImage(final String image) {
+        this.postImage = image;
     }
 }
