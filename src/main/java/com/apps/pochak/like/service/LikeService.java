@@ -11,11 +11,9 @@ import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.member.domain.repository.MemberRepository;
 import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -26,7 +24,6 @@ import static com.apps.pochak.global.BaseEntityStatus.DELETED;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.INVALID_MEMBER_ID;
 
 @Service
-//@Transactional
 @RequiredArgsConstructor
 public class LikeService {
     private final LikeRepository likeRepository;
