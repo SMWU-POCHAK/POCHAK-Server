@@ -53,7 +53,6 @@ public class LikeServiceTest extends ServiceTest {
         loginMember = memberRepository.save(LOGIN_MEMBER);
     }
 
-
     @DisplayName("[좋아요] 좋아요가 정상적으로 저장된다.")
     @Test
     void likePost() throws Exception {
@@ -81,7 +80,7 @@ public class LikeServiceTest extends ServiceTest {
 
     @DisplayName("[좋아요] 좋아요가 정상적으로 취소된다.")
     @Test
-    void cancelLike() throws Exception{
+    void cancelLike() throws Exception {
         // given
         Post post = savePublicPost();
 

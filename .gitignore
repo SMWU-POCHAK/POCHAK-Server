@@ -13,6 +13,7 @@ caches
 daemon
 native
 logs
+newrelic
 
 # ignore html files
 src/main/resources/static/docs/

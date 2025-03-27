@@ -2,6 +2,7 @@ package com.apps.pochak.like.service;
 
 import com.apps.pochak.alarm.service.LikeAlarmService;
 import com.apps.pochak.auth.domain.Accessor;
+import com.apps.pochak.global.api_payload.exception.GeneralException;
 import com.apps.pochak.like.domain.LikeEntity;
 import com.apps.pochak.like.domain.repository.LikeRepository;
 import com.apps.pochak.like.dto.response.LikeElement;
@@ -12,6 +13,7 @@ import com.apps.pochak.post.domain.Post;
 import com.apps.pochak.post.domain.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -19,9 +21,9 @@ import java.util.Optional;
 
 import static com.apps.pochak.global.BaseEntityStatus.ACTIVE;
 import static com.apps.pochak.global.BaseEntityStatus.DELETED;
+import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.INVALID_MEMBER_ID;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class LikeService {
     private final LikeRepository likeRepository;
@@ -29,17 +31,19 @@ public class LikeService {
     private final LikeAlarmService likeAlarmService;
     private final MemberRepository memberRepository;
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void likePost(
             final Accessor accessor,
             final Long postId
     ) {
-        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
+        final Member loginMember = memberRepository.findMemberByIdForUpdate(accessor.getMemberId())
+                .orElseThrow(() -> new GeneralException(INVALID_MEMBER_ID));
         final Post post = postRepository.findPostById(postId);
 
-        final Optional<LikeEntity> optionalLike = likeRepository.findByMemberAndPost(loginMember, post);
+        final Optional<LikeEntity> optionalLike = likeRepository.findByMemberAndPostForUpdate(loginMember, post);
+
         if (optionalLike.isPresent()) {
-            final LikeEntity postLike = optionalLike.get();
-            toggleLikeStatus(postLike);
+            toggleLikeStatus(optionalLike.get());
         } else {
             saveNewLikeEntity(
                     loginMember,

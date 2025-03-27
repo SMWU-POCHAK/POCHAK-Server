@@ -4,7 +4,9 @@ import com.apps.pochak.like.domain.LikeEntity;
 import com.apps.pochak.like.dto.response.LikeElement;
 import com.apps.pochak.member.domain.Member;
 import com.apps.pochak.post.domain.Post;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,6 +29,16 @@ public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
     );
 
     Optional<LikeEntity> findByMemberAndPost(
+            final Member member,
+            final Post post
+    );
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+        select l from LikeEntity l
+        where l.member = :member and l.post = :post
+        """)
+    Optional<LikeEntity> findByMemberAndPostForUpdate(
             final Member member,
             final Post post
     );
