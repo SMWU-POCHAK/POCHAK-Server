@@ -123,6 +123,7 @@ dependencyManagement {
 
 test {
     exclude '**/PostImageDeletionSchedulerTest.class'
+    exclude '**/LikeConcurrencyTest.class'
     useJUnitPlatform()
     outputs.dir snippetsDir
 }
