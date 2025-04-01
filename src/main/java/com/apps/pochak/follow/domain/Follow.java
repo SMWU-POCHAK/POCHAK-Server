@@ -15,6 +15,9 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"sender_id", "receiver_id"})
+})
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
