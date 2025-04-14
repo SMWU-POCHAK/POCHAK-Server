@@ -41,6 +41,7 @@ public class CloudStorageService {
             storage.create(
                     BlobInfo.newBuilder(bucketName, objectName)
                             .setContentType(contentType)
+                            .setCacheControl("no-store")
                             .build(),
                     multipartFile.getInputStream()
             );
