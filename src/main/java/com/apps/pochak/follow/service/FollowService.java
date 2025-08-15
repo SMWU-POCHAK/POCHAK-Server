@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -21,7 +22,6 @@ import java.util.Optional;
 import static com.apps.pochak.global.api_payload.code.status.ErrorStatus.*;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class FollowService {
     private final FollowRepository followRepository;
@@ -29,11 +29,13 @@ public class FollowService {
     private final MemberFollowCustomRepository memberFollowCustomRepository;
     private final FollowAlarmService followAlarmService;
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void follow(
             final Accessor accessor,
             final String handle
     ) {
-        final Member loginMember = memberRepository.findMemberById(accessor.getMemberId());
+        final Member loginMember = memberRepository.findMemberByIdForUpdate(accessor.getMemberId())
+                .orElseThrow(() -> new GeneralException(INVALID_MEMBER_ID));
         final Member member = memberRepository.findByHandle(handle, loginMember);
 
         if (loginMember.getId().equals(member.getId())) {
@@ -70,6 +72,7 @@ public class FollowService {
         followAlarmService.sendFollowAlarm(follow, receiver);
     }
 
+    @Transactional
     public void deleteFollower(
             final Accessor accessor,
             final String handle,
